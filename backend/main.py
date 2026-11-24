@@ -61,69 +61,6 @@ class ChatResponse(BaseModel):
     reply: str
 
 
-def audit(text: str, module: str) -> dict:
-    lower = text.lower()
-
-    if module == "whatsapp" or any(term in lower for term in ("digital arrest", "skype", ".apk", "upi")):
-        return {
-            "score": 8,
-            "riskLabel": "CRITICAL CYBER SCAM",
-            "headline": "Impersonation & Extortion Scam Detected — Do Not Pay or Reply",
-            "summary": "Indian law enforcement agencies never conduct 'Digital Arrests' over calls or demand clearance fees via UPI.",
-            "statutes": ["BNSS Cyber Fraud", "IT Act s.66C & 66D", "RBI Unauthorized Debit Rules"],
-            "redFlags": [
-                {"title": "Fake Digital Arrest Coercion", "severity": "CRITICAL", "quote": "Digital arrest / Skype officer verification", "explanation": "No Indian statute recognizes digital arrest via video call. Scammers use urgency and fear to isolate victims.", "citation": "BNSS & IT Act s.66D"},
-                {"title": "Fraudulent UPI Payment Demand", "severity": "CRITICAL", "quote": "Transfer security clearance via UPI", "explanation": "Government agencies never collect fines or bail into personal UPI IDs.", "citation": "BNS Cheating & Impersonation"},
-            ],
-            "fairClauses": ["No legitimate legal clauses found in this message."],
-            "reply": "DO NOT REPLY OR SEND MONEY.\n\n1. Block the sender and do not join the video call.\n2. Preserve screenshots and the UPI ID.\n3. Report at https://cybercrime.gov.in or call 1930.",
-        }
-
-    if module == "app" or any(term in lower for term in ("auto-renew", "notarized", "contacts", "gallery photos")):
-        return {
-            "score": 24,
-            "riskLabel": "HIGH DARK-PATTERN RISK",
-            "headline": "Roach-Motel Cancellation & Unnecessary Data Harvesting",
-            "summary": "The policy obstructs cancellation and requests unrelated personal data without clear, granular consent.",
-            "statutes": ["DPDP Act 2023 s.6", "CCPA Dark Patterns 2023", "EU GDPR Art. 7"],
-            "redFlags": [
-                {"title": "Roach-Motel Cancellation Trap", "severity": "HIGH", "quote": "Cancel only by notarized letter 30 days prior", "explanation": "Making cancellation substantially harder than signup is a prohibited dark pattern.", "citation": "CCPA Dark Patterns Guidelines"},
-                {"title": "Unbundled Device-Data Harvesting", "severity": "CRITICAL", "quote": "Access to contacts, gallery, or messages", "explanation": "Data collection unrelated to core functionality violates purpose limitation and free consent.", "citation": "DPDP Act 2023 s.6 & s.7"},
-            ],
-            "fairClauses": ["A trial period may be disclosed, but renewal and cancellation terms must remain clear."],
-            "reply": "Subject: Data Erasure & Subscription Cancellation Notice\n\nUnder the Digital Personal Data Protection Act, 2023, I withdraw consent for non-essential data processing and cancel my subscription immediately without auto-renewal. Please confirm cancellation and erasure.",
-        }
-
-    if module == "bond" or any(term in lower for term in ("marksheet", "liquidated", "2,00,000", "lock-in")):
-        return {
-            "score": 21,
-            "riskLabel": "HIGH UNENFORCEABLE BOND",
-            "headline": "Certificate Retention & Restraint-of-Trade Penalty",
-            "summary": "Withholding originals or imposing arbitrary exit penalties creates a serious restraint and penalty risk.",
-            "statutes": ["UGC Refund & Certificate Rules", "Indian Contract Act s.27", "Contract Act s.74"],
-            "redFlags": [
-                {"title": "Illegal Retention of Original Marksheets", "severity": "CRITICAL", "quote": "Original certificates retained for a fixed period", "explanation": "Academic certificates should not be confiscated as employer leverage.", "citation": "UGC Mandatory Guidelines"},
-                {"title": "Disproportionate Exit Penalty", "severity": "HIGH", "quote": "Large bond penalty for leaving early", "explanation": "A penalty cannot exceed reasonable compensation for proven documented training costs.", "citation": "Indian Contract Act ss.27 & 74"},
-            ],
-            "fairClauses": ["The training duration may be stated clearly in writing."],
-            "reply": "Hi Team,\n\nPlease revise the bond before I sign:\n1. Remove retention of original academic certificates; self-attested copies are sufficient.\n2. Replace the arbitrary exit penalty with compensation limited to proven training costs.\n\nI am happy to proceed after the clauses are revised.",
-        }
-
-    return {
-        "score": 28,
-        "riskLabel": "HIGH RENTAL TRAP",
-        "headline": "One-Sided Deposit Forfeiture & Zero-Notice Eviction Clause",
-        "summary": "The agreement imposes disproportionate financial forfeiture and grants the landlord arbitrary eviction or entry powers.",
-        "statutes": ["CPA 2019 s.2(46)", "Indian Contract Act s.74", "Transfer of Property Act s.106"],
-        "redFlags": [
-            {"title": "Blanket Security Deposit Forfeiture", "severity": "CRITICAL", "quote": "100% of the security deposit shall be forfeited", "explanation": "Blanket forfeiture without proven unpaid rent or damage is an unfair contract term.", "citation": "CPA 2019 s.2(46) & Contract Act s.74"},
-            {"title": "Unannounced Entry or Short-Notice Eviction", "severity": "HIGH", "quote": "Inspection at any hour or eviction on verbal notice", "explanation": "Tenants are entitled to peaceful possession and reasonable written notice.", "citation": "Transfer of Property Act s.106"},
-        ],
-        "fairClauses": ["The deposit amount is stated in writing.", "The lease tenure is stated clearly."],
-        "reply": "Hi [Landlord/PG Manager],\n\nPlease adjust the agreement before I sign:\n1. Use a mutual written notice period.\n2. Limit deposit deductions to unpaid bills or documented damages.\n3. Require reasonable prior notice before room inspections.\n\nI will sign and transfer the deposit once these changes are included.",
-    }
-
-
 async def call_ai(messages: list[dict]) -> dict | None:
     if not AI_API_KEY:
         return None
@@ -231,9 +168,18 @@ def health():
 @app.post("/api/scan")
 async def scan(req: ScanRequest):
     if text_is_unreliable_placeholder(req.text):
-        return grounded_fallback_report(req.text, req.module)
+        raise HTTPException(
+            status_code=422,
+            detail="No supported document text was supplied. Upload a readable document or paste contract text.",
+        )
+
     ai_report = await ai_audit(req.text, req.module)
-    return ai_report or grounded_fallback_report(req.text, req.module)
+    if ai_report is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Live AI analysis is unavailable. Verify the backend API key/provider and try again.",
+        )
+    return ai_report
 
 
 @app.post("/api/chat", response_model=ChatResponse)
@@ -337,29 +283,7 @@ def text_is_unreliable_placeholder(text: str) -> bool:
     return len(lower) < 40 or any(marker in lower for marker in markers)
 
 
-def grounded_fallback_report(text: str, module: str) -> dict:
-    if text_is_unreliable_placeholder(text):
-        return {
-            "score": 0,
-            "riskLabel": "ANALYSIS UNAVAILABLE",
-            "headline": "Document text could not be analysed reliably",
-            "summary": "No supported source document text was supplied, so no contractual findings have been inferred.",
-            "statutes": [],
-            "redFlags": [],
-            "fairClauses": [],
-            "reply": "Please upload a readable TXT, PDF, PNG, JPG, or JPEG document and rerun the analysis.",
-        }
-    return {
-        "score": 50,
-        "riskLabel": "AI REVIEW UNAVAILABLE",
-        "headline": "No verified findings could be produced",
-        "summary": "The contract text was received, but AI analysis was unavailable. No unsupported clause findings have been generated.",
-        "statutes": [],
-        "redFlags": [],
-        "fairClauses": [],
-        "reply": "Please rerun after the AI provider is available. Do not rely on this message as a contract review.",
-    }
-
+# Live scan failures are returned explicitly from /api/scan; no demo report is substituted.
 
 # API routes are registered above the static mount.
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
