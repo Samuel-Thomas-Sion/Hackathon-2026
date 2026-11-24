@@ -5,220 +5,127 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 let animationFrameId = null;
 let isScanningBoost = false;
+let scrollProgress = 0;
 let sceneCleanup = null;
 
 
-
-
-
-
-
-
-
-
 // =====================================================================
-// #SEGMENT_02: PROCEDURAL EARTH CONTINENTS & CITY LIGHTS TEXTURE
+// #SEGMENT_02: GLOWING NODE & VOLUMETRIC HALO TEXTURES
 // =====================================================================
-function createProceduralEarthTexture() {
-  const width = 1024;
-  const height = 512;
+function createGlowingNodeTexture() {
+  const size = 64;
   const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = size;
+  canvas.height = size;
   const ctx = canvas.getContext('2d');
 
-  // Deep midnight-slate ocean base matching #131926 UI palette
-  const oceanGrad = ctx.createLinearGradient(0, 0, 0, height);
-  oceanGrad.addColorStop(0, '#0d1726');
-  oceanGrad.addColorStop(0.5, '#0f1d30');
-  oceanGrad.addColorStop(1, '#0b1422');
-  ctx.fillStyle = oceanGrad;
-  ctx.fillRect(0, 0, width, height);
+  const half = size / 2;
+  const grad = ctx.createRadialGradient(half, half, 0, half, half, half);
+  grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  grad.addColorStop(0.26, 'rgba(110, 231, 183, 0.96)');
+  grad.addColorStop(0.58, 'rgba(56, 189, 248, 0.45)');
+  grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
-  // Subtle equirectangular ocean grid lines
-  ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
-  ctx.lineWidth = 1;
-  for (let lon = -180; lon <= 180; lon += 15) {
-    const x = ((lon + 180) / 360) * width;
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, height);
-    ctx.stroke();
-  }
-  for (let lat = -75; lat <= 75; lat += 15) {
-    const y = ((90 - lat) / 180) * height;
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-    ctx.stroke();
-  }
-
-  // Helper: Convert [longitude, latitude] to canvas [x, y]
-  const toXY = ([lon, lat]) => [
-    ((lon + 180) / 360) * width,
-    ((90 - lat) / 180) * height
-  ];
-
-  // Recognizable Earth Continent Polygons [lon, lat]
-  const continents = [
-    // North America
-    [
-      [-168, 66], [-152, 70], [-130, 70], [-105, 73], [-82, 70], [-64, 60],
-      [-55, 50], [-67, 44], [-76, 35], [-81, 25], [-84, 30], [-96, 28],
-      [-97, 19], [-86, 13], [-79, 9], [-85, 11], [-94, 16], [-106, 22],
-      [-114, 31], [-122, 37], [-125, 49], [-138, 58], [-152, 60], [-164, 60]
-    ],
-    // Greenland
-    [
-      [-56, 60], [-44, 60], [-22, 70], [-18, 81], [-45, 83], [-62, 77], [-58, 68]
-    ],
-    // South America
-    [
-      [-79, 9], [-72, 12], [-60, 8], [-50, 1], [-35, -6], [-39, -18],
-      [-48, -28], [-58, -38], [-66, -48], [-68, -55], [-74, -52], [-73, -38],
-      [-71, -18], [-81, -5], [-79, 4]
-    ],
-    // Europe
-    [
-      [-9, 37], [-9, 43], [-2, 48], [4, 52], [9, 55], [6, 61], [16, 69],
-      [28, 71], [42, 67], [58, 68], [58, 52], [44, 44], [34, 45], [26, 41],
-      [22, 37], [16, 38], [13, 44], [6, 43], [0, 38]
-    ],
-    // UK & Ireland
-    [
-      [-8, 51], [-5, 58], [1, 57], [1, 51], [-5, 50]
-    ],
-    // Africa
-    [
-      [-17, 15], [-13, 28], [-5, 35], [10, 37], [25, 32], [33, 31], [43, 12],
-      [51, 11], [41, -2], [40, -15], [35, -25], [27, -33], [18, -34], [14, -22],
-      [12, -6], [9, 4], [2, 6], [-8, 5], [-16, 11]
-    ],
-    // Madagascar
-    [
-      [44, -25], [47, -25], [50, -14], [47, -13], [44, -19]
-    ],
-    // Asia & Indian Subcontinent
-    [
-      [27, 41], [36, 42], [44, 44], [58, 52], [58, 68], [85, 73], [115, 73],
-      [145, 70], [175, 66], [162, 56], [142, 53], [135, 43], [129, 35],
-      [121, 39], [122, 31], [115, 22], [108, 16], [104, 2], [99, 8], [96, 17],
-      [88, 22], [85, 19], [80, 13], [77, 8], [73, 15], [69, 23], [61, 25],
-      [56, 26], [50, 29], [58, 22], [53, 16], [44, 13], [35, 29], [35, 36]
-    ],
-    // Japan
-    [
-      [130, 32], [136, 35], [141, 41], [144, 44], [140, 44], [138, 37], [131, 33]
-    ],
-    // Indonesia / Maritime Southeast Asia
-    [
-      [96, 5], [105, -6], [115, -8], [122, -7], [118, 1], [108, 2], [100, 1]
-    ],
-    // Australia
-    [
-      [114, -22], [123, -15], [131, -12], [136, -15], [142, -11], [149, -20],
-      [153, -28], [149, -37], [138, -35], [130, -32], [116, -34], [113, -26]
-    ],
-    // New Zealand
-    [
-      [167, -46], [174, -41], [177, -37], [173, -35], [171, -42], [166, -45]
-    ]
-  ];
-
-  // Draw glowing landmasses + crisp emerald coastlines
-  ctx.save();
-  ctx.shadowColor = 'rgba(52, 211, 153, 0.55)';
-  ctx.shadowBlur = 10;
-
-  continents.forEach((poly) => {
-    ctx.beginPath();
-    poly.forEach((coord, idx) => {
-      const [x, y] = toXY(coord);
-      if (idx === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.closePath();
-
-    const landGrad = ctx.createLinearGradient(0, 0, width, height);
-    landGrad.addColorStop(0, 'rgba(16, 185, 129, 0.36)');
-    landGrad.addColorStop(0.5, 'rgba(20, 184, 166, 0.34)');
-    landGrad.addColorStop(1, 'rgba(56, 189, 248, 0.32)');
-    ctx.fillStyle = landGrad;
-    ctx.fill();
-
-    ctx.strokeStyle = '#34d399';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-  ctx.restore();
-
-  // Digital dot-matrix stipple texture clipped inside continents
-  ctx.save();
-  continents.forEach((poly) => {
-    ctx.beginPath();
-    poly.forEach((coord, idx) => {
-      const [x, y] = toXY(coord);
-      if (idx === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.closePath();
-    ctx.clip();
-
-    ctx.fillStyle = 'rgba(167, 243, 208, 0.25)';
-    for (let gx = 0; gx < width; gx += 6) {
-      for (let gy = 0; gy < height; gy += 6) {
-        ctx.fillRect(gx, gy, 1.5, 1.5);
-      }
-    }
-    ctx.restore();
-    ctx.save();
-  });
-  ctx.restore();
-
-  // Global Shield Hub Beacons (with bright primary node over India)
-  const hubs = [
-    { lon: 78.5, lat: 17.4, primary: true },  // Hyderabad / India
-    { lon: 77.2, lat: 28.6, primary: true },  // New Delhi
-    { lon: 72.8, lat: 19.0, primary: true },  // Mumbai
-    { lon: -0.1, lat: 51.5, primary: false }, // London
-    { lon: -74.0, lat: 40.7, primary: false }, // New York
-    { lon: 103.8, lat: 1.3, primary: false }, // Singapore
-    { lon: 139.7, lat: 35.7, primary: false }, // Tokyo
-    { lon: 151.2, lat: -33.8, primary: false }, // Sydney
-    { lon: -46.6, lat: -23.5, primary: false }, // Sao Paulo
-    { lon: 36.8, lat: -1.3, primary: false }  // Nairobi
-  ];
-
-  hubs.forEach((hub) => {
-    const [hx, hy] = toXY([hub.lon, hub.lat]);
-    ctx.beginPath();
-    ctx.arc(hx, hy, hub.primary ? 6 : 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = hub.primary ? 'rgba(52, 211, 153, 0.35)' : 'rgba(56, 189, 248, 0.3)';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(hx, hy, hub.primary ? 2.6 : 1.8, 0, Math.PI * 2);
-    ctx.fillStyle = hub.primary ? '#a7f3d0' : '#7dd3fc';
-    ctx.fill();
-  });
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  return texture;
+}
+
+function createVolumetricGlowTexture() {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  const half = size / 2;
+  const grad = ctx.createRadialGradient(half, half, 0, half, half, half);
+  grad.addColorStop(0, 'rgba(16, 185, 129, 0.44)');
+  grad.addColorStop(0.36, 'rgba(6, 182, 212, 0.25)');
+  grad.addColorStop(0.68, 'rgba(139, 92, 246, 0.14)');
+  grad.addColorStop(1, 'rgba(19, 25, 38, 0)');
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
 
+// =====================================================================
+// #SEGMENT_03: VERTEX COLOR GRADIENTS (EMERALD -> CYAN -> VIOLET)
+// =====================================================================
+function extractColoredVertices(geometry) {
+  const posAttr = geometry.getAttribute('position');
+  const seen = new Set();
+  const unique = [];
+  const colors = [];
 
+  const cEmerald = new THREE.Color(0x34d399);
+  const cCyan = new THREE.Color(0x38bdf8);
+  const cViolet = new THREE.Color(0xa78bfa);
+  const tempColor = new THREE.Color();
 
+  for (let i = 0; i < posAttr.count; i++) {
+    const x = posAttr.getX(i);
+    const y = posAttr.getY(i);
+    const z = posAttr.getZ(i);
+    const key = `${x.toFixed(3)}_${y.toFixed(3)}_${z.toFixed(3)}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(x, y, z);
 
+      const t = THREE.MathUtils.clamp((y + 2.2) / 4.4, 0, 1);
+      if (t < 0.5) {
+        tempColor.lerpColors(cViolet, cCyan, t * 2);
+      } else {
+        tempColor.lerpColors(cCyan, cEmerald, (t - 0.5) * 2);
+      }
+      colors.push(tempColor.r, tempColor.g, tempColor.b);
+    }
+  }
 
+  const outGeo = new THREE.BufferGeometry();
+  outGeo.setAttribute('position', new THREE.Float32BufferAttribute(unique, 3));
+  outGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  return outGeo;
+}
 
+function applyEdgeGradientColors(edgesGeo) {
+  const posAttr = edgesGeo.getAttribute('position');
+  const colors = new Float32Array(posAttr.count * 3);
 
+  const cEmerald = new THREE.Color(0x34d399);
+  const cCyan = new THREE.Color(0x38bdf8);
+  const cViolet = new THREE.Color(0x818cf8);
+  const temp = new THREE.Color();
+
+  for (let i = 0; i < posAttr.count; i++) {
+    const x = posAttr.getX(i);
+    const y = posAttr.getY(i);
+    const blend = THREE.MathUtils.clamp((x + y + 3.2) / 6.4, 0, 1);
+
+    if (blend < 0.5) {
+      temp.lerpColors(cViolet, cCyan, blend * 2);
+    } else {
+      temp.lerpColors(cCyan, cEmerald, (blend - 0.5) * 2);
+    }
+    colors[i * 3] = temp.r;
+    colors[i * 3 + 1] = temp.g;
+    colors[i * 3 + 2] = temp.b;
+  }
+
+  edgesGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+}
 
 
 // =====================================================================
-// #SEGMENT_03: CENTERED 3D EARTH GLOBE, ATMOSPHERE & ORBITAL RINGS
+// #SEGMENT_04: 3D GEODESIC CRYSTAL, LIGHTING & LUMINOUS ORBITAL RINGS
 // =====================================================================
 export function initUpfrontScene(containerId) {
   const container = document.getElementById(containerId);
@@ -230,15 +137,13 @@ export function initUpfrontScene(containerId) {
   }
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   const scene = new THREE.Scene();
 
   const width = container.clientWidth || window.innerWidth;
-  const height = container.clientHeight || 620;
+  const height = container.clientHeight || 650;
 
-  // Camera centered directly on the Earth Globe at (0, 0, 0)
-  const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-  camera.position.set(0, 0, 7.2);
+  const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+  camera.position.set(0, 0, 7.1);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({
@@ -252,189 +157,306 @@ export function initUpfrontScene(containerId) {
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
 
-  // Three-point studio lighting for crisp 3D depth
-  const ambientLight = new THREE.AmbientLight(0xd1fae5, 0.9);
+  // 3D Depth Lighting Rig (Emerald Key, Cyan Fill, Violet Rim)
+  const ambientLight = new THREE.AmbientLight(0x1e293b, 1.5);
   scene.add(ambientLight);
 
-  const keyLight = new THREE.DirectionalLight(0x34d399, 1.8);
-  keyLight.position.set(5, 3, 6);
-  scene.add(keyLight);
+  const emeraldLight = new THREE.PointLight(0x34d399, 20, 18);
+  emeraldLight.position.set(3.2, 2.8, 3.8);
+  scene.add(emeraldLight);
 
-  const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.4);
-  rimLight.position.set(-5, -2, -4);
-  scene.add(rimLight);
+  const cyanLight = new THREE.PointLight(0x38bdf8, 18, 18);
+  cyanLight.position.set(-3.4, -2.0, 3.2);
+  scene.add(cyanLight);
 
-  // Master centered Earth Group with authentic 23.5° axial tilt
-  const earthTiltGroup = new THREE.Group();
-  earthTiltGroup.position.set(0, -0.08, 0);
-  earthTiltGroup.rotation.z = THREE.MathUtils.degToRad(23.5);
-  scene.add(earthTiltGroup);
+  const violetRimLight = new THREE.PointLight(0xa855f7, 16, 18);
+  violetRimLight.position.set(0, 3.2, -3.5);
+  scene.add(violetRimLight);
 
-  const earthSpinGroup = new THREE.Group();
-  // Start rotated so India & Eurasia face forward on load
-  earthSpinGroup.rotation.y = -2.35;
-  earthTiltGroup.add(earthSpinGroup);
+  const nodeTexture = createGlowingNodeTexture();
+  const haloTexture = createVolumetricGlowTexture();
 
-  // 1. Core 3D Earth Sphere with Procedural Continents
-  const earthTexture = createProceduralEarthTexture();
-  const earthGeo = new THREE.SphereGeometry(2.05, 64, 64);
-  const earthMat = new THREE.MeshStandardMaterial({
-    map: earthTexture,
-    emissiveMap: earthTexture,
-    emissive: new THREE.Color(0x10b981),
-    emissiveIntensity: 0.75,
-    roughness: 0.5,
-    metalness: 0.15
-  });
-  const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-  earthSpinGroup.add(earthMesh);
-
-  // 2. Latitude & Longitude Geodesic Wireframe Overlay
-  const graticuleGeo = new THREE.SphereGeometry(2.075, 28, 18);
-  const graticuleWire = new THREE.WireframeGeometry(graticuleGeo);
-  const graticuleMat = new THREE.LineBasicMaterial({
-    color: 0x38bdf8,
+  // Volumetric Backdrop Aura Sprite for Deep Spatial Separation
+  const backdropHaloMat = new THREE.SpriteMaterial({
+    map: haloTexture,
     transparent: true,
-    opacity: 0.12
-  });
-  const graticuleLines = new THREE.LineSegments(graticuleWire, graticuleMat);
-  earthSpinGroup.add(graticuleLines);
-
-  // 3. Atmospheric Fresnel Halo Rim
-  const atmosphereGeo = new THREE.SphereGeometry(2.24, 48, 48);
-  const atmosphereMat = new THREE.ShaderMaterial({
-    transparent: true,
-    side: THREE.BackSide,
-    blending: THREE.AdditiveBlending,
+    opacity: 0.96,
     depthWrite: false,
-    uniforms: {
-      glowColor: { value: new THREE.Color(0x34d399) },
-      secondaryColor: { value: new THREE.Color(0x38bdf8) }
-    },
-    vertexShader: `
-      varying vec3 vNormal;
-      void main() {
-        vNormal = normalize(normalMatrix * normal);
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform vec3 glowColor;
-      uniform vec3 secondaryColor;
-      varying vec3 vNormal;
-      void main() {
-        float intensity = pow(0.66 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
-        vec3 col = mix(secondaryColor, glowColor, 0.6);
-        gl_FragColor = vec4(col, intensity * 0.85);
-      }
-    `
+    blending: THREE.AdditiveBlending
   });
-  const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
-  earthTiltGroup.add(atmosphereMesh);
+  const backdropHalo = new THREE.Sprite(backdropHaloMat);
+  backdropHalo.scale.set(8.4, 8.4, 1);
+  backdropHalo.position.set(0, 0, -1.2);
+  scene.add(backdropHalo);
 
-  // 4. Dual Orbital Legal Shield Rings & Satellites
-  const orbitRing1Geo = new THREE.TorusGeometry(2.68, 0.011, 12, 120);
-  const orbitRing1Mat = new THREE.MeshBasicMaterial({
-    color: 0x34d399,
+  const masterGroup = new THREE.Group();
+  masterGroup.position.set(0, -0.02, 0);
+  scene.add(masterGroup);
+
+  // 1. Outer Multi-Color Geodesic Polyhedron Lattice
+  const outerGeo = new THREE.IcosahedronGeometry(2.24, 1);
+  const outerEdges = new THREE.EdgesGeometry(outerGeo);
+  applyEdgeGradientColors(outerEdges);
+
+  const outerEdgeMat = new THREE.LineBasicMaterial({
+    vertexColors: true,
     transparent: true,
-    opacity: 0.35
+    opacity: 0.86
   });
-  const orbitRing1 = new THREE.Mesh(orbitRing1Geo, orbitRing1Mat);
-  orbitRing1.rotation.x = Math.PI / 2.3;
-  orbitRing1.rotation.y = 0.25;
-  earthTiltGroup.add(orbitRing1);
+  const outerWireframe = new THREE.LineSegments(outerEdges, outerEdgeMat);
 
-  const orbitRing2Geo = new THREE.TorusGeometry(2.92, 0.008, 12, 120);
-  const orbitRing2Mat = new THREE.MeshBasicMaterial({
-    color: 0x38bdf8,
+  const outerGlassMat = new THREE.MeshPhysicalMaterial({
+    color: 0x0f766e,
+    emissive: 0x064e3b,
+    emissiveIntensity: 0.28,
+    roughness: 0.18,
+    metalness: 0.22,
     transparent: true,
-    opacity: 0.24
+    opacity: 0.13,
+    flatShading: true,
+    side: THREE.DoubleSide,
+    depthWrite: false
   });
-  const orbitRing2 = new THREE.Mesh(orbitRing2Geo, orbitRing2Mat);
-  orbitRing2.rotation.x = -Math.PI / 2.6;
-  orbitRing2.rotation.y = -0.35;
-  earthTiltGroup.add(orbitRing2);
+  const outerGlassShell = new THREE.Mesh(outerGeo, outerGlassMat);
 
-  // Orbiting Shield Nodes on Ring 1 & Ring 2
-  const satGeo = new THREE.SphereGeometry(0.055, 16, 16);
-  const sat1 = new THREE.Mesh(satGeo, new THREE.MeshBasicMaterial({ color: 0xa7f3d0 }));
-  sat1.position.set(2.68, 0, 0);
-  orbitRing1.add(sat1);
+  const outerNodesGeo = extractColoredVertices(outerGeo);
+  const outerNodesMat = new THREE.PointsMaterial({
+    map: nodeTexture,
+    vertexColors: true,
+    size: 0.34,
+    transparent: true,
+    opacity: 1.0,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  const outerNodes = new THREE.Points(outerNodesGeo, outerNodesMat);
 
-  const sat2 = new THREE.Mesh(satGeo, new THREE.MeshBasicMaterial({ color: 0x7dd3fc }));
-  sat2.position.set(-2.92, 0, 0);
-  orbitRing2.add(sat2);
+  const outerPolyGroup = new THREE.Group();
+  outerPolyGroup.add(outerGlassShell);
+  outerPolyGroup.add(outerWireframe);
+  outerPolyGroup.add(outerNodes);
+  masterGroup.add(outerPolyGroup);
 
-  // Subtle ambient star/data dust field around the globe
-  const dustCount = 160;
+  // 2. Sculpted 3D Faceted Crystal Core + Neural Struts
+  const innerGeo = new THREE.IcosahedronGeometry(1.16, 1);
+  const innerCrystalMat = new THREE.MeshStandardMaterial({
+    color: 0x0ea5e9,
+    emissive: 0x10b981,
+    emissiveIntensity: 0.45,
+    roughness: 0.2,
+    metalness: 0.8,
+    flatShading: true,
+    transparent: true,
+    opacity: 0.72
+  });
+  const innerCrystalMesh = new THREE.Mesh(innerGeo, innerCrystalMat);
+
+  const innerEdges = new THREE.EdgesGeometry(innerGeo);
+  const innerEdgeMat = new THREE.LineBasicMaterial({
+    color: 0x7dd3fc,
+    transparent: true,
+    opacity: 0.82
+  });
+  const innerWireframe = new THREE.LineSegments(innerEdges, innerEdgeMat);
+
+  const innerNodesGeo = extractColoredVertices(innerGeo);
+  const innerNodesMat = new THREE.PointsMaterial({
+    map: nodeTexture,
+    color: 0xa7f3d0,
+    size: 0.22,
+    transparent: true,
+    opacity: 0.96,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  const innerNodes = new THREE.Points(innerNodesGeo, innerNodesMat);
+
+  // Radial Neural Connectors linking Inner Crystal to Outer Lattice
+  const outerPos = outerNodesGeo.getAttribute('position');
+  const innerPos = innerNodesGeo.getAttribute('position');
+  const strutVertices = [];
+  const pairCount = Math.min(outerPos.count, innerPos.count);
+  for (let i = 0; i < pairCount; i++) {
+    strutVertices.push(
+      innerPos.getX(i), innerPos.getY(i), innerPos.getZ(i),
+      outerPos.getX(i), outerPos.getY(i), outerPos.getZ(i)
+    );
+  }
+  const strutGeo = new THREE.BufferGeometry();
+  strutGeo.setAttribute('position', new THREE.Float32BufferAttribute(strutVertices, 3));
+  const strutMat = new THREE.LineBasicMaterial({
+    color: 0x2dd4bf,
+    transparent: true,
+    opacity: 0.28
+  });
+  const radialStruts = new THREE.LineSegments(strutGeo, strutMat);
+  outerPolyGroup.add(radialStruts);
+
+  const innerCoreGroup = new THREE.Group();
+  innerCoreGroup.add(innerCrystalMesh);
+  innerCoreGroup.add(innerWireframe);
+  innerCoreGroup.add(innerNodes);
+  masterGroup.add(innerCoreGroup);
+
+  // 3. Thick 3D Glowing Torus Orbital Rings + Comet Trails
+  const create3DOrbitalRing = (radius, tubeRadius, rotX, rotY, rotZ, colorHex, emissiveHex, opacity) => {
+    const torusGeo = new THREE.TorusGeometry(radius, tubeRadius, 14, 140);
+    const torusMat = new THREE.MeshStandardMaterial({
+      color: colorHex,
+      emissive: emissiveHex,
+      emissiveIntensity: 0.88,
+      roughness: 0.25,
+      metalness: 0.5,
+      transparent: true,
+      opacity
+    });
+    const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+
+    const ringHolder = new THREE.Group();
+    ringHolder.rotation.set(rotX, rotY, rotZ);
+    ringHolder.add(torusMesh);
+
+    const trailDots = [];
+    for (let k = 0; k < 3; k++) {
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute('position', new THREE.Float32BufferAttribute([radius, 0, 0], 3));
+      const pMat = new THREE.PointsMaterial({
+        map: nodeTexture,
+        color: colorHex,
+        size: 0.42 - k * 0.1,
+        transparent: true,
+        opacity: 1 - k * 0.28,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const pDot = new THREE.Points(pGeo, pMat);
+      ringHolder.add(pDot);
+      trailDots.push({ pDot, pGeo, pMat });
+    }
+
+    masterGroup.add(ringHolder);
+    return { ringHolder, torusGeo, torusMat, trailDots, radius };
+  };
+
+  const orbit1 = create3DOrbitalRing(3.05, 0.022, 1.16, 0.38, -0.32, 0x34d399, 0x10b981, 0.8);
+  const orbit2 = create3DOrbitalRing(2.88, 0.02, -1.08, -0.44, 0.42, 0x38bdf8, 0x0284c7, 0.74);
+  const orbit3 = create3DOrbitalRing(2.65, 0.016, 0.48, 0.88, 0.18, 0xa78bfa, 0x7c3aed, 0.56);
+
+  // 4. Multi-Color Floating Depth Particles
+  const dustCount = 180;
   const dustPositions = new Float32Array(dustCount * 3);
+  const dustColors = new Float32Array(dustCount * 3);
+  const palette = [
+    new THREE.Color(0x34d399),
+    new THREE.Color(0x38bdf8),
+    new THREE.Color(0xa78bfa)
+  ];
+
   for (let i = 0; i < dustCount; i++) {
-    const r = 3.4 + Math.random() * 2.8;
+    const r = 2.4 + Math.random() * 3.2;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
     dustPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
     dustPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
     dustPositions[i * 3 + 2] = r * Math.cos(phi);
+
+    const col = palette[i % palette.length];
+    dustColors[i * 3] = col.r;
+    dustColors[i * 3 + 1] = col.g;
+    dustColors[i * 3 + 2] = col.b;
   }
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+  dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColors, 3));
   const dustMat = new THREE.PointsMaterial({
-    color: 0x6ee7b7,
-    size: 0.032,
+    map: nodeTexture,
+    vertexColors: true,
+    size: 0.14,
     transparent: true,
-    opacity: 0.45
+    opacity: 0.8,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
   });
-  const dustPoints = new THREE.Points(dustGeo, dustMat);
-  scene.add(dustPoints);
+  const dustField = new THREE.Points(dustGeo, dustMat);
+  scene.add(dustField);
 
-  // Smooth Mouse Parallax Interaction
-  let targetMouseX = 0;
-  let targetMouseY = 0;
+  let pointerX = 0;
+  let pointerY = 0;
   const onPointerMove = (e) => {
-    const nx = (e.clientX / window.innerWidth) * 2 - 1;
-    const ny = (e.clientY / window.innerHeight) * 2 - 1;
-    targetMouseX = nx * 0.25;
-    targetMouseY = ny * 0.16;
+    pointerX = (e.clientX / window.innerWidth) * 2 - 1;
+    pointerY = (e.clientY / window.innerHeight) * 2 - 1;
   };
   window.addEventListener('pointermove', onPointerMove, { passive: true });
 
-  // Responsive Resize Handler
   const onResize = () => {
     if (!container) return;
     const w = container.clientWidth || window.innerWidth;
-    const h = container.clientHeight || 620;
+    const h = container.clientHeight || 650;
     camera.aspect = w / h;
-    // Slightly pull camera back on narrow mobile viewports so full globe fits
-    camera.position.z = w < 640 ? 8.6 : 7.2;
+    camera.position.z = w < 640 ? 8.8 : 7.1;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
   };
   onResize();
   window.addEventListener('resize', onResize, { passive: true });
 
-  // Render & Animation Loop
   const clock = new THREE.Clock();
   const animate = () => {
     animationFrameId = requestAnimationFrame(animate);
     const delta = clock.getDelta();
+    const elapsed = clock.getElapsedTime();
 
-    const speedMultiplier = prefersReducedMotion ? 0.12 : isScanningBoost ? 3.2 : 1.0;
+    const speed = prefersReducedMotion ? 0.12 : isScanningBoost ? 3.0 : 1.0 + scrollProgress * 0.85;
 
-    earthSpinGroup.rotation.y += delta * 0.24 * speedMultiplier;
-    orbitRing1.rotation.z += delta * 0.45 * speedMultiplier;
-    orbitRing2.rotation.z -= delta * 0.35 * speedMultiplier;
-    dustPoints.rotation.y -= delta * 0.04 * speedMultiplier;
+    outerPolyGroup.rotation.y += delta * 0.24 * speed;
+    outerPolyGroup.rotation.x += delta * 0.09 * speed;
 
-    earthMat.emissiveIntensity = THREE.MathUtils.lerp(
-      earthMat.emissiveIntensity,
-      isScanningBoost ? 1.25 : 0.75,
+    innerCoreGroup.rotation.y -= delta * 0.38 * speed;
+    innerCoreGroup.rotation.z += delta * 0.18 * speed;
+
+    const coreScale = 1 + Math.sin(elapsed * 2.4) * (isScanningBoost ? 0.09 : 0.038);
+    innerCoreGroup.scale.setScalar(coreScale);
+
+    const haloScale = 8.4 + Math.sin(elapsed * 1.5) * 0.45;
+    backdropHalo.scale.set(haloScale, haloScale, 1);
+
+    // Scroll-driven depth expansion & tilt
+    if (!prefersReducedMotion) {
+      const targetScale = 1 + scrollProgress * 0.24;
+      masterGroup.scale.setScalar(THREE.MathUtils.lerp(masterGroup.scale.x, targetScale, 0.08));
+      masterGroup.position.y = THREE.MathUtils.lerp(masterGroup.position.y, -0.02 - scrollProgress * 0.55, 0.08);
+    }
+
+    const t1 = elapsed * 0.9 * speed;
+    orbit1.trailDots.forEach((d, idx) => {
+      const a = t1 - idx * 0.11;
+      d.pDot.position.set(Math.cos(a) * orbit1.radius, Math.sin(a) * orbit1.radius, 0);
+    });
+
+    const t2 = -elapsed * 0.76 * speed + 1.8;
+    orbit2.trailDots.forEach((d, idx) => {
+      const a = t2 + idx * 0.11;
+      d.pDot.position.set(Math.cos(a) * orbit2.radius, Math.sin(a) * orbit2.radius, 0);
+    });
+
+    const t3 = elapsed * 0.62 * speed + 3.4;
+    orbit3.trailDots.forEach((d, idx) => {
+      const a = t3 - idx * 0.11;
+      d.pDot.position.set(Math.cos(a) * orbit3.radius, Math.sin(a) * orbit3.radius, 0);
+    });
+
+    dustField.rotation.y -= delta * 0.045 * speed;
+
+    const targetRotY = pointerX * 0.52 + scrollProgress * 1.15;
+    const targetRotX = pointerY * 0.34 + scrollProgress * 0.35;
+    masterGroup.rotation.y += (targetRotY - masterGroup.rotation.y) * 0.06;
+    masterGroup.rotation.x += (targetRotX - masterGroup.rotation.x) * 0.06;
+
+    innerCrystalMat.emissiveIntensity = THREE.MathUtils.lerp(
+      innerCrystalMat.emissiveIntensity,
+      isScanningBoost ? 0.95 : 0.45,
       0.08
     );
-
-    // Smooth camera parallax around center
-    camera.position.x += (targetMouseX - camera.position.x) * 0.05;
-    camera.position.y += (-targetMouseY - camera.position.y) * 0.05;
-    camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
   };
@@ -444,20 +466,33 @@ export function initUpfrontScene(containerId) {
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('resize', onResize);
-    earthGeo.dispose();
-    earthMat.dispose();
-    earthTexture.dispose();
-    graticuleGeo.dispose();
-    graticuleWire.dispose();
-    graticuleMat.dispose();
-    atmosphereGeo.dispose();
-    atmosphereMat.dispose();
-    orbitRing1Geo.dispose();
-    orbitRing1Mat.dispose();
-    orbitRing2Geo.dispose();
-    orbitRing2Mat.dispose();
+    outerGeo.dispose();
+    outerEdges.dispose();
+    outerEdgeMat.dispose();
+    outerGlassMat.dispose();
+    outerNodesGeo.dispose();
+    outerNodesMat.dispose();
+    innerGeo.dispose();
+    innerCrystalMat.dispose();
+    innerEdges.dispose();
+    innerEdgeMat.dispose();
+    innerNodesGeo.dispose();
+    innerNodesMat.dispose();
+    strutGeo.dispose();
+    strutMat.dispose();
+    [orbit1, orbit2, orbit3].forEach((o) => {
+      o.torusGeo.dispose();
+      o.torusMat.dispose();
+      o.trailDots.forEach((d) => {
+        d.pGeo.dispose();
+        d.pMat.dispose();
+      });
+    });
     dustGeo.dispose();
     dustMat.dispose();
+    backdropHaloMat.dispose();
+    nodeTexture.dispose();
+    haloTexture.dispose();
     renderer.dispose();
   };
 }
@@ -465,3 +500,7 @@ export function initUpfrontScene(containerId) {
 export function setUpfrontScanState(active) {
   isScanningBoost = Boolean(active);
 }
+
+export function setUpfrontScrollProgress(progress) {
+  scrollProgress = Math.max(0, Math.min(1, Number(progress) || 0));
+} 
