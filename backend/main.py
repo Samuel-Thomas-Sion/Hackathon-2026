@@ -3,12 +3,13 @@ from __future__ import annotations
 import io
 import os
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Optional, Any
 import json
 
-import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from google import genai
+from google.genai import types
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -30,10 +31,9 @@ Module = Literal["pg", "whatsapp", "app", "bond", "home"]
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-AI_API_KEY = os.getenv("CLAUSEGUARD_API_KEY", "").strip()
-AI_MODEL = os.getenv("CLAUSEGUARD_MODEL", "gemini-2.5-flash").strip()
-AI_BASE_URL = os.getenv("CLAUSEGUARD_API_BASE", "https://generativelanguage.googleapis.com/v1beta/openai/").rstrip("/")
-AI_TIMEOUT = float(os.getenv("CLAUSEGUARD_AI_TIMEOUT", "30"))
+AI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("CLAUSEGUARD_API_KEY", "")).strip()
+AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-2.5-flash")).strip()
+client = genai.Client(api_key=AI_API_KEY) if AI_API_KEY else None
 
 app = FastAPI(title="ClauseGuard API", version="1.0.0")
 app.add_middleware(
@@ -52,34 +52,64 @@ class ScanRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=4_000)
-    module: Module = "home"
-    documentText: str = ""
-    auditSummary: str = ""
+    module: Optional[str] = "home"
+    documentText: Optional[str] = ""
+    auditSummary: Optional[Any] = None
+    context_text: Optional[str] = ""
+    audit_context: Optional[Any] = None
 
 
 class ChatResponse(BaseModel):
     reply: str
 
 
+class AuditRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=50_000)
+    module: Optional[str] = "general"
+
+
+class FlaggedClause(BaseModel):
+    quote: str
+    title: str
+    severity: Literal["HIGH", "MEDIUM", "LOW"]
+    explanation: str
+
+
+class AuditResponse(BaseModel):
+    score: int
+    risk_label: Literal["CRITICAL SCAM", "HIGH RISK", "MODERATE RISK", "LOW RISK"]
+    title: str
+    summary: str
+    clauses: list[FlaggedClause]
+    counter_reply: str
+
+
 async def call_ai(messages: list[dict]) -> dict | None:
-    if not AI_API_KEY:
+    if client is None:
         return None
 
+    system_instruction = ""
+    content_parts = []
+    for message in messages:
+        role = message.get("role")
+        content = str(message.get("content", ""))
+        if role == "system":
+            system_instruction = content
+        else:
+            content_parts.append(content)
+
     try:
-        async with httpx.AsyncClient(timeout=AI_TIMEOUT) as client:
-            response = await client.post(
-                f"{AI_BASE_URL}/chat/completions",
-                headers={"Authorization": f"Bearer {AI_API_KEY}", "Content-Type": "application/json"},
-                json={
-                    "model": AI_MODEL,
-                    "temperature": 0.1,
-                    "response_format": {"type": "json_object"},
-                    "messages": messages,
-                },
-            )
-            response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"]
-            return json.loads(content)
+        response = client.models.generate_content(
+            model=AI_MODEL,
+            contents="\n\n".join(content_parts),
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                response_mime_type="application/json",
+                temperature=0.1,
+            ),
+        )
+        text = getattr(response, "text", "") or ""
+        return json.loads(text)
     except Exception:
         return None
 
@@ -97,8 +127,9 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
         clause_number = normalize_grounded_text(str(flag.get("clauseNumber", "")))
         if not quotation_exists(source_text, quote):
             continue
-        if clause_number and not clause_reference_exists(source_text, clause_number):
-            continue
+        if clause_number and clause_number.lower() not in ("message", "verified passage"):
+            if not clause_reference_exists(source_text, clause_number):
+                continue
         clean_flags.append({
             "title": str(flag.get("title", "Potentially unfavourable term")),
             "severity": str(flag.get("severity", "MEDIUM")).upper(),
@@ -161,8 +192,35 @@ Contract text:
 
 
 @app.get("/api/health")
-def health():
+def api_health():
     return {"status": "ok", "service": "clauseguard", "aiConfigured": bool(AI_API_KEY), "aiModel": AI_MODEL}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "model": AI_MODEL}
+
+
+@app.post("/api/audit")
+async def audit_document(req: AuditRequest):
+    if not req.text.strip():
+        raise HTTPException(status_code=400, detail="Input text cannot be empty.")
+    ai_report = await ai_audit(req.text, req.module or "general")
+    if ai_report is None:
+        raise HTTPException(status_code=503, detail="Live AI analysis is unavailable.")
+    return {
+        "score": ai_report["score"],
+        "risk_label": ai_report["riskLabel"],
+        "title": ai_report["headline"],
+        "summary": ai_report["summary"],
+        "clauses": [{
+            "quote": flag["quote"],
+            "title": flag["title"],
+            "severity": flag["severity"],
+            "explanation": flag["explanation"],
+        } for flag in ai_report["redFlags"]],
+        "counter_reply": ai_report["reply"],
+    }
 
 
 @app.post("/api/scan")
@@ -188,8 +246,8 @@ async def chat(req: ChatRequest):
 Do not invent statutes. State that this is informational, not formal legal advice.
 
 Module: {req.module}
-Document text: {req.documentText[:10000]}
-Active audit: {req.auditSummary}
+Document text: {(req.context_text or req.documentText or "")[:10000]}
+Active audit: {req.audit_context if req.audit_context is not None else req.auditSummary}
 User question: {req.message}"""
     result = await call_ai([
         {"role": "system", "content": "Return a concise, practical JSON object with a single key named reply."},
@@ -205,8 +263,9 @@ User question: {req.message}"""
         reply = "Under Indian Contract Act s.74 and Consumer Protection Act 2019 s.2(46), a landlord cannot forfeit 100% of a deposit merely on exit. Deductions should require unpaid bills or documented damage."
     elif any(word in q for word in ("marksheet", "certificate", "bond", "internship")):
         reply = "UGC rules prohibit institutions or employers from retaining original academic certificates. Request written verification of any bond, and challenge penalties that exceed documented training costs under Contract Act ss.27 and 74."
-    elif req.auditSummary:
-        reply = f"Your active audit found: {req.auditSummary}. Ask for a written revision and preserve all agreements and payment records in writing."
+    elif req.auditSummary or req.audit_context:
+        context = req.audit_context if req.audit_context is not None else req.auditSummary
+        reply = f"Your active audit found: {context}. Ask for a written revision and preserve all agreements and payment records in writing."
     else:
         reply = "Paste a clause or upload a document in the audit workspace. I can explain the likely Indian-law issue and help draft a pushback reply."
 
@@ -258,8 +317,8 @@ def normalize_grounded_text(text: str) -> str:
 
 def quotation_exists(source_text: str, quote: str) -> bool:
     source = normalize_grounded_text(source_text).lower()
-    quote = normalize_grounded_text(quote).lower()
-    return len(quote) >= 12 and quote in source
+    candidate = normalize_grounded_text(quote).lower()
+    return len(candidate) >= 12 and candidate in source
 
 
 def clause_reference_exists(source_text: str, clause_number: str) -> bool:
@@ -267,23 +326,13 @@ def clause_reference_exists(source_text: str, clause_number: str) -> bool:
         return False
     source = normalize_grounded_text(source_text).lower()
     candidate = normalize_grounded_text(clause_number).lower()
-    if candidate in ("unknown", "n/a", "none", "not specified"):
-        return False
-    return candidate in source
+    return candidate not in ("unknown", "n/a", "none", "not specified") and candidate in source
 
 
 def text_is_unreliable_placeholder(text: str) -> bool:
-    lower = normalize_grounded_text(text).lower()
-    markers = (
-        "[extracted document text from",
-        "please paste",
-        "placeholder",
-        "sample contract",
-    )
-    return len(lower) < 40 or any(marker in lower for marker in markers)
+    normalized = normalize_grounded_text(text).lower()
+    markers = ("[extracted document text from", "please paste", "placeholder", "sample contract")
+    return len(normalized) < 40 or any(marker in normalized for marker in markers)
 
 
-# Live scan failures are returned explicitly from /api/scan; no demo report is substituted.
-
-# API routes are registered above the static mount.
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")

@@ -77,10 +77,7 @@ def test_extract_txt():
 
 def test_placeholder_is_not_contract_evidence():
     response = client.post("/api/scan", json={"module": "bond", "text": "[Extracted Document Text from contract.pdf]"})
-    assert response.status_code == 200
-    report = response.json()
-    assert report["riskLabel"] == "ANALYSIS UNAVAILABLE"
-    assert report["redFlags"] == []
+    assert response.status_code == 422
 
 
 def test_validator_discards_fabricated_marksheet_quote():
