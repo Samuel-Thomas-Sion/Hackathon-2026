@@ -349,7 +349,7 @@
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3.5">
-        <a href="indexOP.html" class="flex items-center gap-2.5 group">
+        <a href="index.html" class="flex items-center gap-2.5 group">
           <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-inner group-hover:scale-105 transition-transform">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -380,7 +380,7 @@
           </svg>
           <span>Ask AI</span>
         </button>
-        <a href="indexOP.html" class="ripple-btn text-xs sm:text-sm font-semibold text-slate-200 bg-white/10 hover:bg-white/15 border border-white/15 px-3.5 py-1.5 rounded-xl transition">
+        <a href="index.html" class="ripple-btn text-xs sm:text-sm font-semibold text-slate-200 bg-white/10 hover:bg-white/15 border border-white/15 px-3.5 py-1.5 rounded-xl transition">
           ← Home
         </a>
       </div>
@@ -604,27 +604,6 @@
           <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">STEP 02</span>
           <h2 class="text-lg sm:text-xl font-bold text-white">Paste Fine Print or Attach Document</h2>
         </div>
-
-        <!-- Unified Frosted-Slate Sample Pills with Colored Status Dots -->
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs font-mono text-slate-400 mr-1">Try Sample:</span>
-          <button type="button" onclick="loadSample('pg')" class="ripple-btn inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 transition cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-red-400"></span>
-            <span>PG Trap</span>
-          </button>
-          <button type="button" onclick="loadSample('whatsapp')" class="ripple-btn inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 transition cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span>Scam Notice</span>
-          </button>
-          <button type="button" onclick="loadSample('app')" class="ripple-btn inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 transition cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-            <span>App Terms</span>
-          </button>
-          <button type="button" onclick="loadSample('bond')" class="ripple-btn inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 transition cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <span>Student Bond</span>
-          </button>
-        </div>
       </div>
 
       <!-- #RECESSED_FROSTED_TEXTAREA_CONTAINER (Sans-serif for effortless reading) -->
@@ -633,7 +612,7 @@
         <textarea
           id="clause-input"
           rows="7"
-          oninput="updateCharCount()"
+          oninput="latestReport = null; document.getElementById('results-section').classList.add('hidden'); updateCharCount()"
           placeholder="Paste rental agreement clauses, Terms & Conditions, coaching refund policy, or a suspicious WhatsApp message here..."
           class="frosted-input w-full rounded-2xl p-4 sm:p-5 text-sm sm:text-[15px] text-slate-100 placeholder-slate-400/75 font-sans leading-relaxed resize-y"
         ></textarea>
@@ -1148,60 +1127,17 @@
     let latestReport = null;
     let historyCache = [];
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    const MODULE_META = {
-      pg: { name: 'Rental & PG Leases' },
-      whatsapp: { name: 'WhatsApp & Cyber Scams' },
-      app: { name: 'App Terms & Dark Patterns' },
-      bond: { name: 'Student & Internship Bonds' }
-    };
-
-    const SAMPLE_TRAPS = {
-      pg: {
-        module: 'pg',
-        text: `PG ACCOMMODATION AGREEMENT (CLAUSE 7 & 11)\n1. Tenant shall pay a security deposit of ₹35,000. If the tenant vacates before completing the 11-month lock-in period for any reason, 100% of the security deposit shall be forfeited automatically.\n2. Landlord reserves the absolute right to inspect the room at any hour without prior notice and may evict the tenant with 24 hours verbal notice.\n3. A flat ₹6,500 mandatory painting & deep-cleaning fee will be deducted upon exit regardless of room condition.`
-      },
-      whatsapp: {
-        module: 'whatsapp',
-        text: `URGENT NOTICE — MUMBAI CYBER CRIME & TRAI CELL\nYour Aadhaar-linked mobile number is involved in money laundering. A DIGITAL ARREST WARRANT has been issued under BNSS. Do not disconnect or inform anyone. Join Skype Officer Verification immediately and transfer ₹24,500 refundable security clearance via UPI ID: officer.verify@ybl within 30 minutes to avoid immediate arrest.`
-      },
-      app: {
-        module: 'app',
-        text: `TERMS OF SERVICE & PRIVACY POLICY (SECTION 4.2)\nBy clicking "Continue", you agree to a 3-day free trial that automatically renews at ₹4,999/year. Cancellation is only accepted via a notarized physical letter sent to our overseas office 30 days prior to renewal. You grant us a perpetual, royalty-free license to harvest your device contacts, gallery photos, and messages for third-party ad partners.`
-      },
-      bond: {
-        module: 'bond',
-        text: `INTERNSHIP & TRAINING BOND AGREEMENT\n1. Selected intern must submit original Class 10th, 12th, and University marksheets to HR on Day 1, which will be retained for 24 months.\n2. This is an unpaid 6-month internship followed by a mandatory 2-year employment lock-in. Leaving early requires paying ₹2,00,000 liquidated penalty.\n3. Any software or personal project built by the intern even on weekends belongs exclusively to the Company.`
-      }
-    };
-
     // #MODULE_SELECTION
     function selectModule(modKey) {
       currentModule = modKey;
       document.querySelectorAll('.module-card').forEach((card) => {
+
+
+
         card.classList.toggle('is-active', card.getAttribute('data-module') === modKey);
       });
       const label = MODULE_META[modKey]?.name || 'Rental & PG Leases';
       document.getElementById('selected-module-badge').textContent = `Active: ${label}`;
-    }
-
-    // #SAMPLE_LOADER
-    function loadSample(key) {
-      const sample = SAMPLE_TRAPS[key];
-      if (!sample) return;
-      selectModule(sample.module);
-      const input = document.getElementById('clause-input');
-      input.value = sample.text;
-      updateCharCount();
-      runClauseAudit();
     }
 
     // #CHAR_COUNTER & FILE_HANDLER
@@ -1212,26 +1148,40 @@
       document.getElementById('char-counter').textContent = `${chars} chars • ${words} words`;
     }
 
-    function handleFileSelect(event) {
+    async function handleFileSelect(event) {
       const file = event.target.files?.[0];
       if (!file) return;
-      document.getElementById('file-status-title').textContent = `Attached: ${file.name}`;
-      document.getElementById('file-status-sub').textContent = `${(file.size / 1024).toFixed(1)} KB • Ready to audit`;
 
-      if (file.name.toLowerCase().endsWith('.txt')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          document.getElementById('clause-input').value = e.target.result;
-          updateCharCount();
-        };
-        reader.readAsText(file);
-      } else if (!document.getElementById('clause-input').value.trim()) {
-        document.getElementById('clause-input').value = `[Extracted Document Text from ${file.name}]\n` + SAMPLE_TRAPS[currentModule].text;
+      latestReport = null;
+      document.getElementById('results-section').classList.add('hidden');
+
+      const title = document.getElementById('file-status-title');
+           const sub = document.getElementById('file-status-sub');
+      title.textContent = `Attached: ${file.name}`;
+      sub.textContent = 'Extracting text through ClauseGuard API...';
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch('/api/extract', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Document extraction failed');
+
+        document.getElementById('clause-input').value = data.text;
+        sub.textContent = `${(file.size / 1024).toFixed(1)} KB • ${data.chars} extracted chars`;
         updateCharCount();
+      } catch (error) {
+        sub.textContent = 'Extraction failed — paste the text manually or choose another document';
+        title.textContent = `Could not extract: ${file.name}`;
+        alert(error.message || 'Could not extract text from this document.');
       }
     }
 
     function clearWorkspace() {
+      latestReport = null;
       document.getElementById('clause-input').value = '';
       document.getElementById('file-upload').value = '';
       document.getElementById('file-status-title').textContent = 'Attach PDF, Screenshot (.png/.jpg), or .txt';
@@ -1241,129 +1191,13 @@
       updateCharCount();
     }
 
-    // #LOCAL_STATUTE_AUDIT_ENGINE
-    function buildAuditReport(text, modKey) {
-      const lower = text.toLowerCase();
-
-      if (modKey === 'whatsapp' || lower.includes('digital arrest') || lower.includes('skype') || lower.includes('.apk')) {
-        return {
-          score: 8,
-          riskLabel: 'CRITICAL CYBER SCAM',
-          headline: 'Impersonation & Extortion Scam Detected — Do Not Pay or Reply',
-          summary: 'Indian law enforcement agencies (CBI, ED, TRAI, Cyber Crime) never conduct "Digital Arrests" over Skype/WhatsApp or demand clearance fees via UPI.',
-          statutes: ['BNSS Cyber Fraud', 'IT Act s.66C & 66D', 'RBI Unauthorized Debit Rules'],
-          redFlags: [
-            {
-              title: 'Fake "Digital Arrest" Coercion',
-              severity: 'CRITICAL',
-              quote: 'DIGITAL ARREST WARRANT / Join Skype Officer Verification',
-              explanation: 'No Indian statute recognizes "digital arrest" via video call. Scammers use urgency and fear to isolate victims.',
-              citation: 'BNSS & IT Act s.66D'
-            },
-            {
-              title: 'Fraudulent UPI / Clearance Payment Demand',
-              severity: 'CRITICAL',
-              quote: 'Transfer refundable security clearance via UPI within 30 minutes',
-              explanation: 'Government agencies never collect bail, fines, or security deposits into personal UPI IDs.',
-              citation: 'BNS Cheating & Impersonation'
-            }
-          ],
-          fairClauses: ['No legitimate legal clauses found in this message.'],
-          reply: `DO NOT REPLY OR SEND MONEY.\n\n1. Block this sender immediately and do not join any video call.\n2. Take screenshots of the chat and UPI ID.\n3. Report the incident immediately at https://cybercrime.gov.in or call 1930.`
-        };
-      }
-
-      if (modKey === 'app' || lower.includes('auto-renew') || lower.includes('notarized') || lower.includes('contacts')) {
-        return {
-          score: 24,
-          riskLabel: 'HIGH DARK-PATTERN RISK',
-          headline: 'Roach-Motel Cancellation & Illegal Data Harvesting Detected',
-          summary: 'This policy uses unlawful subscription traps and bundles unrelated device permissions without granular user consent.',
-          statutes: ['DPDP Act 2023 s.6', 'CCPA Dark Patterns 2023', 'EU GDPR Art. 7'],
-          redFlags: [
-            {
-              title: 'Roach-Motel Subscription Cancellation Trap',
-              severity: 'HIGH',
-              quote: 'Cancel only via notarized physical letter 30 days prior',
-              explanation: 'Making cancellation vastly harder than signing up is an illegal dark pattern under CCPA guidelines.',
-              citation: 'CCPA Dark Patterns Guidelines'
-            },
-            {
-              title: 'Unbundled Contact & Gallery Harvesting',
-              severity: 'CRITICAL',
-              quote: 'Harvest your device contacts, gallery photos, and messages',
-              explanation: 'Collecting personal data unrelated to core app functionality violates purpose limitation and free consent.',
-              citation: 'DPDP Act 2023 s.6 & s.7'
-            }
-          ],
-          fairClauses: ['3-day initial trial window disclosed upfront.'],
-          reply: `Subject: Data Erasure & Subscription Cancellation Notice (DPDP Act 2023)\n\nUnder Sections 6 & 12 of the Digital Personal Data Protection Act, 2023, I withdraw consent for non-essential data processing (contacts/gallery) and cancel my subscription immediately without auto-renewal. Please confirm erasure within 72 hours.`
-        };
-      }
-
-      if (modKey === 'bond' || lower.includes('marksheet') || lower.includes('liquidated') || lower.includes('2,00,000')) {
-        return {
-          score: 21,
-          riskLabel: 'HIGH UNENFORCEABLE BOND',
-          headline: 'Illegal Certificate Retention & Restraint-of-Trade Penalty',
-          summary: 'Withholding original academic certificates is strictly prohibited, and arbitrary bond penalties without proven training costs are void.',
-          statutes: ['UGC Refund & Certificate Rules', 'Indian Contract Act s.27', 'Contract Act s.74'],
-          redFlags: [
-            {
-              title: 'Illegal Withholding of Original Marksheets',
-              severity: 'CRITICAL',
-              quote: 'Submit original Class 10th, 12th, and University marksheets... retained for 24 months',
-              explanation: 'No institute or employer may confiscate original educational certificates as leverage.',
-              citation: 'UGC Mandatory Guidelines'
-            },
-            {
-              title: 'Disproportionate Exit Bond Penalty',
-              severity: 'HIGH',
-              quote: 'Mandatory 2-year lock-in... paying ₹2,00,000 liquidated penalty',
-              explanation: 'Post-employment restraints are void under s.27, and penalties under s.74 cannot exceed actual documented training expenses.',
-              citation: 'Indian Contract Act ss.27 & 74'
-            }
-          ],
-          fairClauses: ['6-month structured internship duration clearly defined.'],
-          reply: `Hi Team,\n\nThank you for the offer. Before signing, please update two clauses to align with Indian statutory norms:\n1. I can provide self-attested copies of my marksheets for verification, as original certificates cannot be retained.\n2. Under Sections 27 & 74 of the Indian Contract Act, please remove the ₹2,00,000 arbitrary bond penalty.\n\nHappy to proceed once revised!`
-        };
-      }
-
-      return {
-        score: 28,
-        riskLabel: 'HIGH RENTAL TRAP',
-        headline: 'One-Sided Deposit Forfeiture & Zero-Notice Eviction Clause',
-        summary: 'This agreement imposes disproportionate financial forfeiture on the tenant while granting the landlord arbitrary eviction and entry powers.',
-        statutes: ['CPA 2019 s.2(46)', 'Indian Contract Act s.74', 'Transfer of Property Act s.106'],
-        redFlags: [
-          {
-            title: '100% Blanket Security Deposit Forfeiture',
-            severity: 'CRITICAL',
-            quote: '100% of the security deposit shall be forfeited automatically',
-            explanation: 'Blanket forfeiture without proving actual unpaid rent or property damage is an unfair contract term.',
-            citation: 'CPA 2019 s.2(46) & Contract Act s.74'
-          },
-          {
-            title: '24-Hour Verbal Eviction & Unannounced Entry',
-            severity: 'HIGH',
-            quote: 'Inspect at any hour without notice and evict with 24 hours verbal notice',
-            explanation: 'Tenants have a right to peaceful possession and mutual written notice (typically 30 days).',
-            citation: 'Transfer of Property Act s.106'
-          }
-        ],
-        fairClauses: [
-          'Base security deposit amount is clearly stated in writing.',
-          '11-month standard residential lease tenure is specified.'
-        ],
-        reply: `Hi [Landlord/PG Manager],\n\nI reviewed the agreement and would like three fair adjustments before paying the deposit:\n1. Make the 30-day written notice period mutual for both landlord and tenant (replacing 24-hour verbal eviction).\n2. Limit deposit deductions strictly to unpaid rent/bills or documented damages rather than blanket forfeiture.\n3. Require 24 hours prior notice before room inspections.\n\nOnce updated, I am ready to sign and transfer the deposit.`
-      };
-    }
+    // Browser fallback reporting is disabled. All analyses use /api/scan.
 
     // #MAIN_AUDIT_RUNNER
     async function runClauseAudit() {
       const text = document.getElementById('clause-input').value.trim();
       if (!text) {
-        alert('Please paste a clause, message, or click one of the Try Sample buttons first.');
+        alert('Please paste clause text or upload a document before starting the audit.');
         return;
       }
 
@@ -1378,27 +1212,39 @@
       if (heroBanner) heroBanner.classList.add('is-auditing');
 
       let report = null;
+      latestReport = null;
+      document.getElementById('results-section').classList.add('hidden');
 
       try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 1200);
-        const res = await fetch('http://localhost:8000/api/scan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ module: currentModule, text }),
-          signal: controller.signal
-        });
-        clearTimeout(timer);
-        if (res.ok) {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 30000);
+          const res = await fetch('/api/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ module: currentModule, text }),
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+          if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            throw new Error(error.detail || `Live analysis failed (${res.status}). Please try again.`);
+          }
           report = await res.json();
-        }
-      } catch (_) {}
-
-      await new Promise((r) => setTimeout(r, 650));
-      if (!report) {
-        report = buildAuditReport(text, currentModule);
+          if (!report || !Array.isArray(report.redFlags)) {
+            throw new Error('The backend returned an invalid analysis response.');
+          }
+      } catch (error) {
+        latestReport = null;
+        document.getElementById('results-section').classList.add('hidden');
+        console.error('Live contract analysis failed:', error);
+        btn.disabled = false;
+        btnText.textContent = 'Audit Fine Print Now';
+        laser.classList.add('hidden');
+        if (heroBanner) heroBanner.classList.remove('is-auditing');
+        return;
       }
 
+      await new Promise((r) => setTimeout(r, 650));
       latestReport = report;
       renderAuditResults(report, text);
 
@@ -1534,7 +1380,7 @@
         return `Your active ${MODULE_META[currentModule].name} audit flagged ${latestReport.redFlags.length} issue(s) under ${latestReport.statutes.join(', ')}. Ask me how to push back or where to file a complaint if they refuse to revise it.`;
       }
 
-      return `I'm ready! Select a Scan Module above (or tap one of the 4 sample traps) and run an audit—then ask me anything about the flagged clauses or your legal options.`;
+      return `I'm ready! Select a Scan Module above and run an audit—then ask me anything about the flagged clauses or your legal options.`;
     }
 
     function sendSuggestedPrompt(promptText) {
@@ -1556,7 +1402,7 @@
       try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 1400);
-        const res = await fetch('http://localhost:8000/api/chat', {
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1698,12 +1544,6 @@
         btn.appendChild(ripple);
         setTimeout(() => ripple.remove(), 650);
       });
-
-      const params = new URLSearchParams(window.location.search);
-      const sampleParam = params.get('sample');
-      if (sampleParam && SAMPLE_TRAPS[sampleParam]) {
-        loadSample(sampleParam);
-      }
     });
   </script>
 </body>

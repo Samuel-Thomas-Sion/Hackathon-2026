@@ -418,7 +418,7 @@
   <!-- ===================================================================== -->
   <section class="relative w-full min-h-[590px] sm:min-h-[650px] flex items-center justify-center overflow-hidden border-b border-white/10">
     <!-- Live Three.js 3D Earth Globe centered at (0, 0, 0) in the viewport -->
-    <div id="upfront-canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+    <div id="earth-container" class="absolute inset-0 w-full h-full z-0" aria-hidden="true"></div>
 
     <!-- Radial contrast vignette keeps centered hero text razor-sharp over the spinning Earth -->
     <div
@@ -1755,7 +1755,7 @@
   <script type="module">
     try {
       const { initUpfrontScene, setUpfrontScanState } = await import('./upfront.js');
-      initUpfrontScene('upfront-canvas-container');
+      initUpfrontScene('earth-container');
       pulse3DEarth = setUpfrontScanState;
     } catch (err) {
       console.warn('upfront.js 3D Earth scene skipped:', err);

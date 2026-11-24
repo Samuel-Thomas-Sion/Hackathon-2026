@@ -11,17 +11,56 @@ def test_health():
     assert response.json()["status"] == "ok"
 
 
-def test_scan_pg():
+def test_scan_pg(monkeypatch):
+    async def fake_call_ai(messages):
+        return {
+            "score": 70,
+            "riskLabel": "LOW VERIFIED RISK",
+            "headline": "Renewal terms require review",
+            "summary": "The supplied text contains an automatic renewal clause.",
+            "statutes": ["Consumer Protection Act 2019"],
+            "redFlags": [{
+                "title": "Automatic renewal",
+                "severity": "MEDIUM",
+                "clauseNumber": "Clause 2",
+                "quote": "automatic renewal every twelve months",
+                "explanation": "Renewal terms should be clear.",
+                "citation": "Consumer Protection Act 2019",
+            }],
+            "fairClauses": [],
+            "reply": "Request clear renewal consent.",
+        }
+
+    monkeypatch.setattr("backend.main.call_ai", fake_call_ai)
     response = client.post("/api/scan", json={"module": "pg", "text": "Clause 2 provides for automatic renewal every twelve months unless written notice is served."})
     assert response.status_code == 200
-    report = response.json()
-    assert report["redFlags"] == []
+    assert len(response.json()["redFlags"]) == 1
 
 
-def test_scan_scam():
+def test_scan_scam(monkeypatch):
+    async def fake_call_ai(messages):
+        return {
+            "score": 8,
+            "riskLabel": "CRITICAL CYBER SCAM",
+            "headline": "Cyber scam indicators",
+            "summary": "The supplied message contains coercive payment instructions.",
+            "statutes": ["IT Act s.66D"],
+            "redFlags": [{
+                "title": "Payment demand",
+                "severity": "CRITICAL",
+                "clauseNumber": "Message",
+                "quote": "Transfer money by UPI within 30 minutes.",
+                "explanation": "Urgent payment demands may indicate fraud.",
+                "citation": "IT Act s.66D",
+            }],
+            "fairClauses": [],
+            "reply": "Do not transfer money. Report the incident.",
+        }
+
+    monkeypatch.setattr("backend.main.call_ai", fake_call_ai)
     response = client.post("/api/scan", json={"module": "whatsapp", "text": "Digital arrest. Transfer money by UPI within 30 minutes."})
     assert response.status_code == 200
-    assert response.json()["score"] == 8
+    assert response.json()["redFlags"][0]["quote"] in "Digital arrest. Transfer money by UPI within 30 minutes."
 
 
 def test_chat():
