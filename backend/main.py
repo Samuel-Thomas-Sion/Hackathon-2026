@@ -38,7 +38,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 CLAUSEGUARD_API_KEY = os.getenv("CLAUSEGUARD_API_KEY", "").strip()
 CLAUSEGUARD_API_BASE = os.getenv("CLAUSEGUARD_API_BASE", "").strip().rstrip("/")
 AI_API_KEY = GEMINI_API_KEY or CLAUSEGUARD_API_KEY
-AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip()
+AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3.5-flash-lite")).strip()
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 app = FastAPI(title="ClauseGuard API", version="1.0.0")
