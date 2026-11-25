@@ -260,12 +260,11 @@ Return ONLY valid JSON with exactly these keys:
 score, riskLabel, headline, summary, snapshot, statutes, redFlags, fairClauses, reply
 
 Rules:
-- ABSOLUTE: Analyse only the supplied text. Never use prior contracts or generic module examples.
-- ABSOLUTE: Every red flag needs an exact verbatim quote that appears in the supplied text.
+- ABSOLUTE: Every red flag needs an exact or close verbatim quote that appears in the supplied text.
 - ABSOLUTE: Every red flag needs clauseNumber, which must correspond to a real clause or heading in the supplied text.
 - Never invent academic-certificate, bond, resignation, UGC, or unrelated findings.
 - If no genuine concern is found, return an empty redFlags array.
-- score is 0-100 safety/trust, where lower means more risky.
+- score is 0-100 safety/trust, where lower means more risk.
 - redFlags is an array of objects with title, severity, clauseNumber, quote, explanation, citation.
 - ABSOLUTE: The `snapshot` must be one clear plain-language paragraph for a non-lawyer. Explain what the contract generally means, the main obligations, and the biggest risks.
 - ABSOLUTE: Do not reproduce clause, contract, law, or statute wording verbatim in `snapshot`. Refer to clauses by their number or title, and explain the concern in simple words.
