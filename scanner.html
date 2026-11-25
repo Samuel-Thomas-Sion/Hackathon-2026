@@ -122,6 +122,9 @@
     /* Thinking Level Menu */
     .thinking-option { display: none; }
     .thinking-option[data-thinking="low"] { display: flex; }
+
+    /* Model Menu */
+    .model-option { display: flex; }
   </style>
 </head>
 <body class="chessigma-grid min-h-screen flex flex-col relative">
@@ -283,6 +286,43 @@
           <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
             <span id="char-count">0 characters</span>
             <span>Direct Backend Audit</span>
+          </div>
+        </div>
+
+        <!-- AI Model Selector -->
+        <div class="relative space-y-2" id="model-control">
+          <div class="text-xs font-mono uppercase tracking-wider text-slate-300">AI model</div>
+          <button
+            type="button"
+            id="model-btn"
+            onclick="toggleModelMenu()"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            class="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/[0.08] text-left transition cursor-pointer"
+          >
+            <span class="flex items-center gap-3">
+              <span id="model-check" class="text-emerald-300">✓</span>
+              <span>
+                <span id="model-name" class="block text-sm font-bold text-white">Gemini 3 Flash</span>
+                <span id="model-desc" class="block text-xs text-slate-400 mt-0.5">Hosted • Google</span>
+              </span>
+            </span>
+            <svg id="model-chevron" class="w-4 h-4 text-slate-400 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <div id="model-menu" class="hidden absolute z-30 left-0 right-0 bottom-[calc(100%+8px)] rounded-2xl bg-[#111827]/95 border border-white/15 shadow-2xl shadow-black/50 backdrop-blur-xl p-1.5" role="menu">
+            <button type="button" onclick="selectModel('gemini-3-flash')" data-model="gemini-3-flash" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/10 border border-white/20 text-left transition cursor-pointer" role="menuitem">
+              <span class="model-check w-4 text-emerald-300">✓</span>
+              <span><span class="block text-sm font-bold text-white">Gemini 3 Flash</span><span class="block text-xs text-slate-400">Hosted • Google</span></span>
+            </button>
+            <button type="button" onclick="selectModel('openrouter-deepseek')" data-model="openrouter-deepseek" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer mt-1" role="menuitem">
+              <span class="model-check w-4 text-emerald-300"></span>
+              <span><span class="block text-sm font-bold text-slate-200">OpenRouter DeepSeek</span><span class="block text-xs text-slate-400">Hosted • OpenRouter</span></span>
+            </button>
+            <button type="button" onclick="selectModel('groq-gpt-oss')" data-model="groq-gpt-oss" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer mt-1" role="menuitem">
+              <span class="model-check w-4 text-emerald-300"></span>
+              <span><span class="block text-sm font-bold text-slate-200">Groq GPT OSS</span><span class="block text-xs text-slate-400">Hosted • Groq</span></span>
+            </button>
           </div>
         </div>
 
@@ -503,6 +543,7 @@
 
     let apiConfig = { ...DEFAULT_CFG };
     let currentModule = 'pg';
+    let selectedModel = 'gemini-3-flash';
     let thinkingLevel = 'low';
     let lastAuditPayload = null;
     let pulse3DSphere = () => {};
@@ -783,7 +824,8 @@ function renderBackendResults(raw) {
           body: JSON.stringify({
             text,
             module: currentModule,
-            thinking_level: thinkingLevel
+            thinking_level: thinkingLevel,
+            model: selectedModel
           })
         });
 
@@ -854,7 +896,8 @@ function renderBackendResults(raw) {
             module: currentModule,
             context_text: documentText,
             audit_context: lastAuditPayload,
-            thinking_level: thinkingLevel
+            thinking_level: thinkingLevel,
+            model: selectedModel
           })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -904,11 +947,54 @@ function renderBackendResults(raw) {
       toggleThinkingMenu();
     }
 
+    function toggleModelMenu() {
+      const menu = document.getElementById('model-menu');
+      const button = document.getElementById('model-btn');
+      const opening = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !opening);
+      button.setAttribute('aria-expanded', String(opening));
+      document.getElementById('model-chevron').classList.toggle('rotate-90', opening);
+    }
+
+    function selectModel(model) {
+      const models = {
+        'gemini-3-flash': ['Gemini 3 Flash', 'Hosted • Google'],
+        'groq-llama': ['Groq Llama', 'Hosted • Groq'],
+        'openrouter-qwen': ['OpenRouter Qwen', 'Hosted • OpenRouter'],
+        'openrouter-deepseek': ['OpenRouter DeepSeek', 'Hosted • OpenRouter'],
+        'groq-gpt-oss': ['Groq GPT OSS', 'Hosted • Groq']
+      };
+      if (!models[model]) return;
+
+      selectedModel = model;
+      document.getElementById('model-name').textContent = models[model][0];
+      document.getElementById('model-desc').textContent = models[model][1];
+
+      document.querySelectorAll('.model-option').forEach((option) => {
+        const active = option.getAttribute('data-model') === model;
+        option.className = active
+          ? 'model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/10 border border-white/20 text-left transition cursor-pointer'
+          : 'model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer';
+        option.querySelector('.model-check').textContent = active ? '✓' : '';
+        option.querySelector('span:last-child span:first-child').className = active
+          ? 'block text-sm font-bold text-white'
+          : 'block text-sm font-bold text-slate-200';
+      });
+
+      toggleModelMenu();
+    }
+
     document.addEventListener('click', (event) => {
-      const control = document.getElementById('thinking-level-control');
-      const menu = document.getElementById('thinking-level-menu');
-      if (control && menu && !control.contains(event.target) && !menu.classList.contains('hidden')) {
+      const thinkingControl = document.getElementById('thinking-level-control');
+      const thinkingMenu = document.getElementById('thinking-level-menu');
+      if (thinkingControl && thinkingMenu && !thinkingControl.contains(event.target) && !thinkingMenu.classList.contains('hidden')) {
         toggleThinkingMenu();
+      }
+
+      const modelControl = document.getElementById('model-control');
+      const modelMenu = document.getElementById('model-menu');
+      if (modelControl && modelMenu && !modelControl.contains(event.target) && !modelMenu.classList.contains('hidden')) {
+        toggleModelMenu();
       }
     });
 

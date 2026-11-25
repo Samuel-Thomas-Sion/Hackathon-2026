@@ -145,3 +145,34 @@ def test_knowledge_base_add_search_delete(tmp_path):
     assert results[0]["document_id"] == document["id"]
     assert kb.delete_document(document["id"])
     assert kb.stats()["document_count"] == 0
+
+
+def test_model_selection_is_allowlisted(monkeypatch):
+    async def fake_call_ai(messages):
+        return {
+            "score": 70,
+            "riskLabel": "LOW VERIFIED RISK",
+            "headline": "Renewal terms require review",
+            "summary": "The supplied text contains an automatic renewal clause.",
+            "snapshot": "The agreement renews for another year unless written notice is given.",
+            "statutes": [],
+            "redFlags": [],
+            "fairClauses": [],
+            "reply": "Request clear renewal consent.",
+        }
+
+    monkeypatch.setattr("backend.main.call_ai", fake_call_ai)
+    response = client.post("/api/scan", json={
+        "module": "pg",
+        "text": "Clause 2: The Agreement renews automatically every twelve months.",
+        "model": "groq-gpt-oss",
+    })
+    assert response.status_code == 200
+
+
+def test_unknown_model_is_rejected():
+    response = client.post("/api/audit", json={
+        "text": "Clause 2: The tenant deposit is refundable.",
+        "model": "unknown-provider-model",
+    })
+    assert response.status_code == 422
