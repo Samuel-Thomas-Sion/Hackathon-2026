@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import Literal, Optional, Any
 import json
+from contextvars import ContextVar
 
 from dotenv import load_dotenv
 from google import genai
@@ -48,10 +49,13 @@ app.add_middleware(
 
 knowledge_base = KnowledgeBase()
 
+ACTIVE_THINKING_LEVEL: ContextVar[str] = ContextVar("active_thinking_level", default="low")
+
 
 class ScanRequest(BaseModel):
     module: Module = "pg"
     text: str = Field(min_length=1, max_length=50_000)
+    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
 
 
 class ChatRequest(BaseModel):
@@ -61,6 +65,7 @@ class ChatRequest(BaseModel):
     auditSummary: Optional[Any] = None
     context_text: Optional[str] = ""
     audit_context: Optional[Any] = None
+    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
 
 
 class ChatResponse(BaseModel):
@@ -70,6 +75,7 @@ class ChatResponse(BaseModel):
 class AuditRequest(BaseModel):
     text: str = Field(min_length=1, max_length=50_000)
     module: Optional[str] = "general"
+    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
 
 
 class FlaggedClause(BaseModel):
@@ -118,6 +124,13 @@ async def call_ai(messages: list[dict]) -> dict | None:
             content_parts.append(content)
 
     try:
+        thinking_level = ACTIVE_THINKING_LEVEL.get().lower()
+        gemini_level = {
+            "low": types.ThinkingLevel.LOW,
+            "medium": types.ThinkingLevel.HIGH,
+            "high": types.ThinkingLevel.HIGH,
+        }.get(thinking_level, types.ThinkingLevel.LOW)
+
         response = client.models.generate_content(
             model=AI_MODEL,
             contents="\n\n".join(content_parts),
@@ -125,6 +138,7 @@ async def call_ai(messages: list[dict]) -> dict | None:
                 system_instruction=system_instruction,
                 response_mime_type="application/json",
                 temperature=0.1,
+                thinking_config=types.ThinkingConfig(thinking_level=gemini_level),
             ),
         )
         text = getattr(response, "text", "") or ""
@@ -175,7 +189,7 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
     return data
 
 
-async def ai_audit(text: str, module: str) -> dict | None:
+async def ai_audit(text: str, module: str, thinking_level: str = "low") -> dict | None:
     module_names = {
         "pg": "Rental and PG lease",
         "whatsapp": "WhatsApp or cyber-scam message",
@@ -204,10 +218,14 @@ Rules:
 Module: {module}
 Contract text:
 {text[:50000]}"""
-    result = await call_ai([
-        {"role": "system", "content": "You produce accurate, cautious JSON contract-audit reports for Indian users."},
-        {"role": "user", "content": prompt},
-    ])
+    token = ACTIVE_THINKING_LEVEL.set(thinking_level)
+    try:
+        result = await call_ai([
+            {"role": "system", "content": "You produce accurate, cautious JSON contract-audit reports for Indian users."},
+            {"role": "user", "content": prompt},
+        ])
+    finally:
+        ACTIVE_THINKING_LEVEL.reset(token)
     if not result:
         return None
     try:
@@ -230,7 +248,7 @@ def health():
 async def audit_document(req: AuditRequest):
     if not req.text.strip():
         raise HTTPException(status_code=400, detail="Input text cannot be empty.")
-    ai_report = await ai_audit(req.text, req.module or "general")
+    ai_report = await ai_audit(req.text, req.module or "general", req.thinking_level or "low")
     if ai_report is None:
         raise HTTPException(status_code=503, detail="Live AI analysis is unavailable.")
     return {
@@ -257,7 +275,7 @@ async def scan(req: ScanRequest):
             detail="No supported document text was supplied. Upload a readable document or paste contract text.",
         )
 
-    ai_report = await ai_audit(req.text, req.module)
+    ai_report = await ai_audit(req.text, req.module, req.thinking_level or "low")
     if ai_report is None:
         raise HTTPException(
             status_code=503,
@@ -283,10 +301,14 @@ Active audit: {req.audit_context if req.audit_context is not None else req.audit
 Retrieved knowledge-base context:
 {knowledge_context}
 User question: {req.message}"""
-    result = await call_ai([
-        {"role": "system", "content": "Return a concise, practical JSON object with a single key named reply."},
-        {"role": "user", "content": prompt},
-    ])
+    token = ACTIVE_THINKING_LEVEL.set(req.thinking_level or "low")
+    try:
+        result = await call_ai([
+            {"role": "system", "content": "Return a concise, practical JSON object with a single key named reply."},
+            {"role": "user", "content": prompt},
+        ])
+    finally:
+        ACTIVE_THINKING_LEVEL.reset(token)
     if isinstance(result, dict) and str(result.get("reply", "")).strip():
         return ChatResponse(reply=str(result["reply"]))
 
@@ -407,6 +429,12 @@ def search_knowledge(req: KnowledgeSearchRequest):
         "query": req.query,
         "results": knowledge_base.search(req.query, module=req.module, limit=req.limit),
     }
+
+
+@app.get("/")
+@app.get("/index.html")
+def serve_homepage():
+    return FileResponse(ROOT / "indexOP.html")
 
 
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
