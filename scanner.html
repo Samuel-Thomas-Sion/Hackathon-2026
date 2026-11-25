@@ -434,7 +434,6 @@
               </button>
             </form>
           </div>
-
         </div>
       </section>
     </div>
@@ -653,6 +652,9 @@ function renderBackendResults(raw) {
       document.getElementById('res-headline').textContent = headline;
       document.getElementById('res-summary').textContent = summary;
 
+      const plainSnapshot = data?.snapshot || data?.plain_language_summary || data?.contract_snapshot || summary || 'This contract was reviewed, but a plain-language snapshot could not be generated.';
+      document.getElementById('res-snapshot').textContent = String(plainSnapshot);
+
       const flags = data?.clauses || data?.red_flags || data?.flags || data?.issues || data?.findings || [];
       const flagsList = document.getElementById('res-flags-list');
       const flagsWrapper = document.getElementById('res-flags-wrapper');
@@ -700,6 +702,10 @@ function renderBackendResults(raw) {
       } else {
         replyWrapper.classList.add('hidden');
       }
+
+      const snapshot = data?.snapshot || data?.contract_snapshot || '';
+      const snapshotWrapper = document.getElementById('res-snapshot-wrapper');
+      snapshotWrapper.classList.remove('hidden');
 
       showPanelState('results');
     }

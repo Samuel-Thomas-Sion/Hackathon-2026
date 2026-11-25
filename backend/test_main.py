@@ -18,6 +18,7 @@ def test_scan_pg(monkeypatch):
             "riskLabel": "LOW VERIFIED RISK",
             "headline": "Renewal terms require review",
             "summary": "The supplied text contains an automatic renewal clause.",
+            "snapshot": "The agreement renews for another year unless you give notice. This could make it harder to leave on the date you expect.",
             "statutes": ["Consumer Protection Act 2019"],
             "redFlags": [{
                 "title": "Automatic renewal",
@@ -35,6 +36,7 @@ def test_scan_pg(monkeypatch):
     response = client.post("/api/scan", json={"module": "pg", "text": "Clause 2 provides for automatic renewal every twelve months unless written notice is served."})
     assert response.status_code == 200
     assert len(response.json()["redFlags"]) == 1
+    assert "renew" in response.json()["snapshot"]
 
 
 def test_scan_scam(monkeypatch):
