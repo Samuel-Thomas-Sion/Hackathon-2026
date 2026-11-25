@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 AI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("CLAUSEGUARD_API_KEY", "")).strip()
-AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-2.5-flash")).strip()
+AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip()
 client = genai.Client(api_key=AI_API_KEY) if AI_API_KEY else None
 
 app = FastAPI(title="ClauseGuard API", version="1.0.0")
