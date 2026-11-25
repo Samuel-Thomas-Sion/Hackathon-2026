@@ -166,6 +166,11 @@ The top-right gear menu in the scanner allows the backend URL and `/api/audit` a
 | `POST` | `/api/audit` | Analyze pasted text |
 | `POST` | `/api/chat` | Answer a follow-up question with document context |
 | `POST` | `/api/extract` | Extract text from TXT, PDF, PNG, JPG, or JPEG uploads |
+| `GET` | `/api/knowledge/stats` | Report knowledge-base storage and chunk counts |
+| `POST` | `/api/knowledge/documents` | Add a document; text is automatically chunked and indexed |
+| `GET` | `/api/knowledge/documents` | List stored knowledge documents |
+| `POST` | `/api/knowledge/search` | Retrieve relevant indexed passages for a question |
+| `DELETE` | `/api/knowledge/documents/{document_id}` | Delete a document and all indexed chunks |
 
 Example audit request:
 

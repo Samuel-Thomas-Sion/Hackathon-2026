@@ -15,6 +15,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from backend.knowledge_base import KnowledgeBase
+
 try:
     from pypdf import PdfReader
 except ImportError:
@@ -43,6 +45,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+knowledge_base = KnowledgeBase()
 
 
 class ScanRequest(BaseModel):
@@ -83,6 +87,20 @@ class AuditResponse(BaseModel):
     snapshot: str
     clauses: list[FlaggedClause]
     counter_reply: str
+
+
+class KnowledgeDocumentRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=300)
+    content: str = Field(min_length=1, max_length=2_000_000)
+    source: str = ""
+    module: str = "general"
+    metadata: Any = Field(default_factory=dict)
+
+
+class KnowledgeSearchRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=4_000)
+    module: Optional[str] = None
+    limit: int = Field(default=5, ge=1, le=20)
 
 
 async def call_ai(messages: list[dict]) -> dict | None:
@@ -251,12 +269,20 @@ async def scan(req: ScanRequest):
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
+    retrieved = knowledge_base.search(req.message, module=req.module, limit=5)
+    knowledge_context = "\n\n".join(
+        f"[{item['title']}] {item['text']}" for item in retrieved
+    ) or "No matching knowledge-base material found."
+
     prompt = f"""Answer as ClauseGuard, a cautious Indian consumer-law and scam-safety assistant.
 Do not invent statutes. State that this is informational, not formal legal advice.
+Use the retrieved knowledge-base material only as supporting context. It is not user-document evidence and it must not override exact wording in the supplied document.
 
 Module: {req.module}
 Document text: {(req.context_text or req.documentText or "")[:10000]}
 Active audit: {req.audit_context if req.audit_context is not None else req.auditSummary}
+Retrieved knowledge-base context:
+{knowledge_context}
 User question: {req.message}"""
     result = await call_ai([
         {"role": "system", "content": "Return a concise, practical JSON object with a single key named reply."},
@@ -342,6 +368,46 @@ def text_is_unreliable_placeholder(text: str) -> bool:
     normalized = normalize_grounded_text(text).lower()
     markers = ("[extracted document text from", "please paste", "placeholder", "sample contract")
     return len(normalized) < 40 or any(marker in normalized for marker in markers)
+
+
+@app.delete("/api/knowledge/documents/{document_id}")
+def delete_knowledge_document(document_id: str):
+    if not knowledge_base.delete_document(document_id):
+        raise HTTPException(status_code=404, detail="Knowledge document not found")
+    return {"deleted": True, "document_id": document_id}
+
+
+@app.get("/api/knowledge/stats")
+def knowledge_stats():
+    return knowledge_base.stats()
+
+
+@app.post("/api/knowledge/documents")
+def add_knowledge_document(req: KnowledgeDocumentRequest):
+    try:
+        document = knowledge_base.add_document(
+            title=req.title,
+            content=req.content,
+            source=req.source,
+            module=req.module,
+            metadata=json.dumps(req.metadata, ensure_ascii=False),
+        )
+        return document
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/knowledge/documents")
+def list_knowledge_documents(module: Optional[str] = None, limit: int = 100):
+    return knowledge_base.list_documents(module=module, limit=limit)
+
+
+@app.post("/api/knowledge/search")
+def search_knowledge(req: KnowledgeSearchRequest):
+    return {
+        "query": req.query,
+        "results": knowledge_base.search(req.query, module=req.module, limit=req.limit),
+    }
 
 
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
