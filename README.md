@@ -1,7 +1,5 @@
 # 🛡️ ClauseGuard
 
-**ClauseGuardRegistration takes seconds. Reading the agreement takes minutes. ClauseGuard gives users an attention layer before they click Accept.**
-
 ClauseGuard is a student-hackathon prototype that helps people review rental agreements, suspicious WhatsApp messages, app terms, and internship or job bonds. It uses a FastAPI backend and Google Gemini to translate selected text into a plain-language safety report with a risk score, relevant clauses, and a suggested counter-reply.
 
 This is an educational awareness tool, not legal advice and not a production legal-analysis system. Results can be inaccurate or incomplete, and human review remains necessary.
@@ -168,6 +166,11 @@ The top-right gear menu in the scanner allows the backend URL and `/api/audit` a
 | `POST` | `/api/audit` | Analyze pasted text |
 | `POST` | `/api/chat` | Answer a follow-up question with document context |
 | `POST` | `/api/extract` | Extract text from TXT, PDF, PNG, JPG, or JPEG uploads |
+| `GET` | `/api/knowledge/stats` | Report knowledge-base storage and chunk counts |
+| `POST` | `/api/knowledge/documents` | Add a document; text is automatically chunked and indexed |
+| `GET` | `/api/knowledge/documents` | List stored knowledge documents |
+| `POST` | `/api/knowledge/search` | Retrieve relevant indexed passages for a question |
+| `DELETE` | `/api/knowledge/documents/{document_id}` | Delete a document and all indexed chunks |
 
 Example audit request:
 

@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from backend.main import app, validate_ai_report
+from backend.knowledge_base import KnowledgeBase
 
 client = TestClient(app)
 
@@ -127,3 +128,20 @@ def test_validator_accepts_only_exact_source_quote():
     result = validate_ai_report(ai_data, source)
     assert len(result["redFlags"]) == 1
     assert result["redFlags"][0]["quote"] in source
+
+
+def test_knowledge_base_add_search_delete(tmp_path):
+    kb = KnowledgeBase(tmp_path / "kb.sqlite")
+    document = kb.add_document(
+        title="Deposit guidance",
+        content="Security deposits should be adjusted for documented damage and unpaid bills.",
+        source="internal-guidance",
+        module="pg",
+    )
+
+    assert kb.stats()["document_count"] == 1
+    results = kb.search("security deposit unpaid bills", module="pg")
+    assert results
+    assert results[0]["document_id"] == document["id"]
+    assert kb.delete_document(document["id"])
+    assert kb.stats()["document_count"] == 0

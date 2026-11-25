@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Contract Law Research — Overview and Universal Principles",
+    "source": "CONTRACT LAW AROUND THE WORLD — research document for ClauseGuard, 2026",
+    "module": "general",
+    "metadata": {"jurisdiction": "International", "status": "educational summary", "checked": "2026-11"},
+    "content": "A contract is a promise or set of promises that the law will enforce. Everyday contracts include purchases, transport, app terms, rent, bank accounts and loans. Indian law defines a contract as an agreement enforceable by law: an agreement plus lawful enforceability. Core elements across legal systems are offer, acceptance, consideration or an equivalent civil-law basis, intention to create legal relations, capacity, free consent, lawful object and certainty. A valid contract has all required elements and can be enforced. A void contract has no legal effect. A voidable contract is binding until the affected party chooses to rescind it. An unenforceable contract may be valid but blocked by a technical requirement. Common remedies include damages, specific performance, injunction, rescission, liquidated damages and restitution. A penalty is not enforceable where it exceeds a reasonable estimate of loss. Common warning signs in standard-form contracts include hidden terms, one-sided cancellation, unilateral changes, excessive penalties, blanket liability waivers, unnecessary data collection, subscription traps, no-refund provisions, barriers to complaints and ownership claims over user content. Courts commonly examine notice, bargaining power, significant imbalance and unconscionability."
+  },
+  {
+    "title": "Indian Contract Law — Formation and Remedies",
+    "source": "CONTRACT LAW AROUND THE WORLD — India chapter",
+    "module": "general",
+    "metadata": {"jurisdiction": "India", "law": "Indian Contract Act, 1872"},
+    "content": "The Indian Contract Act, 1872 governs formation, consent, performance, breach and compensation. Sections 10 and 11 require free consent, competent parties, lawful consideration and lawful object. Consent is not free if caused by coercion under section 15, undue influence under section 16, fraud under section 17, misrepresentation under section 18 or mistake under sections 20–22. Section 23 makes an object unlawful if it is forbidden by law, fraudulent, harmful to people or property, immoral or contrary to public policy. Section 27 generally voids post-employment restraint of trade. Section 28 voids agreements that absolutely prevent parties from enforcing rights through usual legal proceedings, although arbitration remains available. Section 56 addresses impossibility and frustration. Section 73 allows compensation for naturally resulting or foreseeable loss. Section 74 limits a named penalty to reasonable compensation and bars punishment. The Consumer Protection Act, 2019 defines unfair contracts and allows consumer commissions to declare unfair terms void."
+  },
+  {
+    "title": "Indian Everyday Contracts — Rent, PG and Employment",
+    "source": "CONTRACT LAW AROUND THE WORLD — Indian everyday contracts",
+    "module": "pg",
+    "metadata": {"jurisdiction": "India", "topics": ["rent", "pg", "employment", "bonds"]},
+    "content": "PG, hostel and rental agreements may contain excessive deposit forfeiture, long lock-ins, mid-lease rent increases, eviction without notice or unrestricted landlord entry. A tenant generally has a right to quiet enjoyment. Section 74 may make forfeiture of an entire deposit for a small breach challengeable; deductions should reflect unpaid rent or documented damage. Model Tenancy Act 2021 guidance caps residential security deposits at two months rent, requires written agreements and 24 hours notice before entry, but it applies only where adopted. Employment and training bonds can be valid if reasonable and proportionate to genuine training cost. Post-employment non-competes are generally void under Indian Contract Act section 27. Confidentiality and trade-secret clauses can remain valid. Original academic certificates should not be retained by institutions or employers merely to enforce a bond, and a label of unpaid internship does not prevent employee status where the role has fixed hours, work output and employer control."
+  },
+  {
+    "title": "Indian Digital and Consumer Protection",
+    "source": "CONTRACT LAW AROUND THE WORLD — online platforms, data and AI",
+    "module": "app",
+    "metadata": {"jurisdiction": "India", "topics": ["consumer", "ecommerce", "data", "ai", "dark patterns"]},
+    "content": "The Consumer Protection Act, 2019 covers unfair contracts, deficiency in service and unfair trade practices. Dark Patterns Guidelines 2023 identify subscription traps, false urgency, basket sneaking, confirm shaming, forced action and drip pricing. Cancellation should be no harder than signup, and pre-ticked consent is problematic. The E-Commerce Rules require clear prices and refund terms, seller details, affirmative consent and grievance redress. The Digital Personal Data Protection Act, 2023 requires consent to be free, specific, informed, unconditional and unambiguous. Processing children's data requires verifiable parental consent for users under 18, and behavioural tracking or targeted advertising to children is prohibited. DPDP duties are staged and should be verified against current rules. App terms should not claim ownership of user photos or work unless the exact licence is clear, limited and justified. The IT Act and consumer law protect electronic signatures and electronic contracts while also covering fraud and identity misuse."
+  },
+  {
+    "title": "Digital Arrest and Cyber Scam Protection",
+    "source": "CONTRACT LAW AROUND THE WORLD — scam protection",
+    "module": "whatsapp",
+    "metadata": {"jurisdiction": "India", "topics": ["digital arrest", "scam", "cybercrime"]},
+    "content": "There is no legal concept of digital arrest in India. Police, CBI, customs or courts do not arrest a person through a video call or demand transfer of money to a so-called safe account. Red flags include secrecy demands, immediate UPI payment, fake court or police summons, threats of arrest, requests to install screen-sharing apps and claims that a bank account is frozen. BNSS section 63–64 concerns genuine court summons, while 66C and 66D of the IT Act address identity theft and cheating by personation. If a scam message is received, do not pay or share OTP, passwords or identity documents. Preserve screenshots and payment details, block the sender, call 1930 or report at cybercrime.gov.in."
+  },
+  {
+    "title": "Indian Loan, Education, Hospital and Travel Contract Checks",
+    "source": "CONTRACT LAW AROUND THE WORLD — Indian everyday contracts",
+    "module": "general",
+    "metadata": {"jurisdiction": "India", "topics": ["loan", "education", "hospital", "travel"]},
+    "content": "Loan apps must disclose the Annual Percentage Rate and Key Fact Statement, follow need-based consent, avoid unauthorized contacts or gallery access, send and receive loan money directly through regulated lender accounts and provide grievance redress. RBI-regulated loans require a minimum one-day cooling-off period. Harassing recovery and threats to contact references are prohibited. Education institutions should make refund terms clear. UGC, AICTE and coaching-sector rules provide specific refund and certificate-return protections, but dates and state details must be checked for the academic year. Hospital and insurance terms should disclose expected costs and itemised bills and avoid discriminatory hidden charges. DGCA rules provide passenger compensation and refunds for certain flight cancellations and denied boarding, while exceptional circumstances may remove compensation. Consumer protection may apply to services but education and professional cases must be routed under the correct law."
+  },
+  {
+    "title": "International Contract and Fair-Term Comparison",
+    "source": "CONTRACT LAW AROUND THE WORLD — international, USA, China, Russia and UK",
+    "module": "general",
+    "metadata": {"jurisdiction": "International", "topics": ["CISG", "USA", "China", "Russia", "UK"]},
+    "content": "The CISG governs many international sales of goods between businesses in contracting states, but India and the United Kingdom are not parties. UNIDROIT Principles cover good faith, surprising terms, gross disparity and hardship when parties choose or arbitrators apply them. In the United States, consideration is generally required, online assent requires reasonably conspicuous notice, and unconscionability considers both procedural and substantive unfairness. China's Civil Code Articles 496–498 require clear notice of significant standard terms and protect against unreasonable liability exclusions and conflicting interpretations. Russia's Civil Code Article 428 protects parties adhering to burdensome standard terms, and Russia's consumer law voids unacceptable terms. English and UK law applies a transparency and significant-imbalance test under the Consumer Rights Act 2015, and hidden onerous terms may require especially clear notice. Across systems, unfair standard terms, lack of notice, excessive penalties, hidden charges and barriers to cancellation are key warning signs."
+  }
+]
