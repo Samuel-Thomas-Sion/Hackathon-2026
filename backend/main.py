@@ -50,12 +50,14 @@ app.add_middleware(
 knowledge_base = KnowledgeBase()
 
 ACTIVE_THINKING_LEVEL: ContextVar[str] = ContextVar("active_thinking_level", default="low")
+ACTIVE_MODEL: ContextVar[str] = ContextVar("active_model", default="gemini-3-flash")
 
 
 class ScanRequest(BaseModel):
     module: Module = "pg"
     text: str = Field(min_length=1, max_length=50_000)
     thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    model: ModelName = "gemini-3-flash"
 
 
 class ChatRequest(BaseModel):
@@ -66,6 +68,7 @@ class ChatRequest(BaseModel):
     context_text: Optional[str] = ""
     audit_context: Optional[Any] = None
     thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    model: ModelName = "gemini-3-flash"
 
 
 class ChatResponse(BaseModel):
@@ -76,6 +79,7 @@ class AuditRequest(BaseModel):
     text: str = Field(min_length=1, max_length=50_000)
     module: Optional[str] = "general"
     thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    model: ModelName = "gemini-3-flash"
 
 
 class FlaggedClause(BaseModel):
@@ -109,41 +113,92 @@ class KnowledgeSearchRequest(BaseModel):
     limit: int = Field(default=5, ge=1, le=20)
 
 
-async def call_ai(messages: list[dict]) -> dict | None:
-    if client is None:
-        return None
+def _openai_compatible_call(base_url: str, api_key: str, model: str, messages: list[dict]) -> dict | None:
+    payload = json.dumps({
+        "model": model,
+        "messages": messages,
+        "temperature": 0.1,
+        "response_format": {"type": "json_object"},
+    }).encode("utf-8")
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    request = urllib.request.Request(
+        f"{base_url.rstrip('/')}/chat/completions",
+        data=payload,
+        headers=headers,
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=120) as response:
+        data = json.loads(response.read().decode("utf-8"))
+    content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+    content = content.strip()
+    if content.startswith("```"):
+        content = content.split("```", 2)[1]
+        if content.startswith("json"):
+            content = content[4:].lstrip()
+    return json.loads(content) if content else None
 
+
+async def call_ai(messages: list[dict]) -> dict | None:
+    selected = ACTIVE_MODEL.get()
     system_instruction = ""
-    content_parts = []
+    chat_messages = []
     for message in messages:
         role = message.get("role")
         content = str(message.get("content", ""))
         if role == "system":
             system_instruction = content
         else:
-            content_parts.append(content)
+            chat_messages.append({"role": role or "user", "content": content})
 
     try:
-        thinking_level = ACTIVE_THINKING_LEVEL.get().lower()
-        gemini_level = {
-            "low": types.ThinkingLevel.LOW,
-            "medium": types.ThinkingLevel.HIGH,
-            "high": types.ThinkingLevel.HIGH,
-        }.get(thinking_level, types.ThinkingLevel.LOW)
+        if selected == "gemini-3-flash":
+            if client is None:
+                return None
+            thinking_level = ACTIVE_THINKING_LEVEL.get().lower()
+            gemini_level = {
+                "low": types.ThinkingLevel.LOW,
+                "medium": types.ThinkingLevel.HIGH,
+                "high": types.ThinkingLevel.HIGH,
+            }.get(thinking_level, types.ThinkingLevel.LOW)
+            response = await asyncio.to_thread(
+                client.models.generate_content,
+                model=AI_MODELS[selected],
+                contents="\n\n".join(str(item["content"]) for item in chat_messages),
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    response_mime_type="application/json",
+                    temperature=0.1,
+                    thinking_config=types.ThinkingConfig(thinking_level=gemini_level),
+                ),
+            )
+            text = getattr(response, "text", "") or ""
+            return json.loads(text)
 
-        response = client.models.generate_content(
-            model=AI_MODEL,
-            contents="\n\n".join(content_parts),
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                response_mime_type="application/json",
-                temperature=0.1,
-                thinking_config=types.ThinkingConfig(thinking_level=gemini_level),
-            ),
-        )
-        text = getattr(response, "text", "") or ""
-        return json.loads(text)
-    except Exception:
+        if selected in ("groq-llama", "groq-gpt-oss"):
+            if not GROQ_API_KEY:
+                return None
+            return await asyncio.to_thread(
+                _openai_compatible_call,
+                "https://api.groq.com/openai/v1",
+                GROQ_API_KEY,
+                AI_MODELS[selected],
+                ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
+            )
+
+        if selected in ("openrouter-qwen", "openrouter-deepseek"):
+            if not OPENROUTER_API_KEY:
+                return None
+            return await asyncio.to_thread(
+                _openai_compatible_call,
+                "https://openrouter.ai/api/v1",
+                OPENROUTER_API_KEY,
+                AI_MODELS[selected],
+                ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
+            )
+
+    except (Exception, urllib.error.URLError):
         return None
 
 
@@ -189,7 +244,7 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
     return data
 
 
-async def ai_audit(text: str, module: str, thinking_level: str = "low") -> dict | None:
+async def ai_audit(text: str, module: str, thinking_level: str = "low", model: str = "gemini-3-flash") -> dict | None:
     module_names = {
         "pg": "Rental and PG lease",
         "whatsapp": "WhatsApp or cyber-scam message",
@@ -218,14 +273,16 @@ Rules:
 Module: {module}
 Contract text:
 {text[:50000]}"""
-    token = ACTIVE_THINKING_LEVEL.set(thinking_level)
+    model_token = ACTIVE_MODEL.set(model)
+    thinking_token = ACTIVE_THINKING_LEVEL.set(thinking_level)
     try:
         result = await call_ai([
             {"role": "system", "content": "You produce accurate, cautious JSON contract-audit reports for Indian users."},
             {"role": "user", "content": prompt},
         ])
     finally:
-        ACTIVE_THINKING_LEVEL.reset(token)
+        ACTIVE_THINKING_LEVEL.reset(thinking_token)
+        ACTIVE_MODEL.reset(model_token)
     if not result:
         return None
     try:
@@ -248,7 +305,7 @@ def health():
 async def audit_document(req: AuditRequest):
     if not req.text.strip():
         raise HTTPException(status_code=400, detail="Input text cannot be empty.")
-    ai_report = await ai_audit(req.text, req.module or "general", req.thinking_level or "low")
+    ai_report = await ai_audit(req.text, req.module or "general", req.thinking_level or "low", req.model)
     if ai_report is None:
         raise HTTPException(status_code=503, detail="Live AI analysis is unavailable.")
     return {
@@ -275,7 +332,7 @@ async def scan(req: ScanRequest):
             detail="No supported document text was supplied. Upload a readable document or paste contract text.",
         )
 
-    ai_report = await ai_audit(req.text, req.module, req.thinking_level or "low")
+    ai_report = await ai_audit(req.text, req.module, req.thinking_level or "low", req.model)
     if ai_report is None:
         raise HTTPException(
             status_code=503,
@@ -301,14 +358,16 @@ Active audit: {req.audit_context if req.audit_context is not None else req.audit
 Retrieved knowledge-base context:
 {knowledge_context}
 User question: {req.message}"""
-    token = ACTIVE_THINKING_LEVEL.set(req.thinking_level or "low")
+    model_token = ACTIVE_MODEL.set(req.model)
+    thinking_token = ACTIVE_THINKING_LEVEL.set(req.thinking_level or "low")
     try:
         result = await call_ai([
             {"role": "system", "content": "Return a concise, practical JSON object with a single key named reply."},
             {"role": "user", "content": prompt},
         ])
     finally:
-        ACTIVE_THINKING_LEVEL.reset(token)
+        ACTIVE_THINKING_LEVEL.reset(thinking_token)
+        ACTIVE_MODEL.reset(model_token)
     if isinstance(result, dict) and str(result.get("reply", "")).strip():
         return ChatResponse(reply=str(result["reply"]))
 
@@ -438,3 +497,21 @@ def serve_homepage():
 
 
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
+
+
+import asyncio
+import urllib.request
+import urllib.error
+
+# API keys stay on the server. Browser users only select an allowlisted model name.
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+
+AI_MODELS = {
+    "gemini-3-flash": os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip(),
+    "groq-llama": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
+    "openrouter-qwen": os.getenv("OPENROUTER_QWEN_MODEL", "qwen/qwen3-4b:free").strip(),
+    "openrouter-deepseek": os.getenv("OPENROUTER_DEEPSEEK_MODEL", "deepseek/deepseek-r1-0528:free").strip(),
+    "groq-gpt-oss": os.getenv("GROQ_GPT_OSS_MODEL", "openai/gpt-oss-120b").strip(),
+}
+ModelName = Literal["gemini-3-flash", "groq-llama", "openrouter-qwen", "openrouter-deepseek", "groq-gpt-oss"]
