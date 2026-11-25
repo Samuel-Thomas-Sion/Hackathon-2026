@@ -80,6 +80,7 @@ class AuditResponse(BaseModel):
     risk_label: Literal["CRITICAL SCAM", "HIGH RISK", "MODERATE RISK", "LOW RISK"]
     title: str
     summary: str
+    snapshot: str
     clauses: list[FlaggedClause]
     counter_reply: str
 
@@ -140,6 +141,10 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
         })
 
     data["score"] = max(0, min(100, int(data["score"])))
+    snapshot = str(data.get("snapshot", "")).strip()
+    if not snapshot:
+        snapshot = str(data.get("summary", "")).strip() or "The contract was reviewed, but a plain-language snapshot could not be generated."
+    data["snapshot"] = snapshot[:1500]
     data["statutes"] = [str(item) for item in data["statutes"]][:12]
     data["fairClauses"] = [str(item) for item in data["fairClauses"]][:12]
     data["redFlags"] = clean_flags[:20]
@@ -165,7 +170,7 @@ Do not claim a law or section is authoritative unless you are reasonably certain
 This is informational, not formal legal advice.
 
 Return ONLY valid JSON with exactly these keys:
-score, riskLabel, headline, summary, statutes, redFlags, fairClauses, reply
+score, riskLabel, headline, summary, snapshot, statutes, redFlags, fairClauses, reply
 
 Rules:
 - ABSOLUTE: Analyse only the supplied text. Never use prior contracts or generic module examples.
@@ -175,6 +180,9 @@ Rules:
 - If no genuine concern is found, return an empty redFlags array.
 - score is 0-100 safety/trust, where lower means more risky.
 - redFlags is an array of objects with title, severity, clauseNumber, quote, explanation, citation.
+- ABSOLUTE: The `snapshot` must be one clear plain-language paragraph for a non-lawyer. Explain what the contract generally means, the main obligations, and the biggest risks.
+- ABSOLUTE: Do not reproduce clause, contract, law, or statute wording verbatim in `snapshot`. Refer to clauses by their number or title, and explain the concern in simple words.
+- Example style: "Clause 3 gives one person sole authority to settle disputes, and this may be risky because courts do not allow that kind of one-sided control."
 
 Module: {module}
 Contract text:
@@ -213,6 +221,7 @@ async def audit_document(req: AuditRequest):
         "risk_label": ai_report["riskLabel"],
         "title": ai_report["headline"],
         "summary": ai_report["summary"],
+        "snapshot": ai_report["snapshot"],
         "clauses": [{
             "quote": flag["quote"],
             "title": flag["title"],
