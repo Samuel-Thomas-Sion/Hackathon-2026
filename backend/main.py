@@ -34,9 +34,12 @@ Module = Literal["pg", "whatsapp", "app", "bond", "home"]
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-AI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("CLAUSEGUARD_API_KEY", "")).strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+CLAUSEGUARD_API_KEY = os.getenv("CLAUSEGUARD_API_KEY", "").strip()
+CLAUSEGUARD_API_BASE = os.getenv("CLAUSEGUARD_API_BASE", "").strip().rstrip("/")
+AI_API_KEY = GEMINI_API_KEY or CLAUSEGUARD_API_KEY
 AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip()
-client = genai.Client(api_key=AI_API_KEY) if AI_API_KEY else None
+client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 app = FastAPI(title="ClauseGuard API", version="1.0.0")
 app.add_middleware(
@@ -154,6 +157,15 @@ async def call_ai(messages: list[dict]) -> dict | None:
 
     try:
         if selected == "gemini-3-flash":
+            if CLAUSEGUARD_API_BASE and CLAUSEGUARD_API_KEY:
+                return await asyncio.to_thread(
+                    _openai_compatible_call,
+                    CLAUSEGUARD_API_BASE,
+                    CLAUSEGUARD_API_KEY,
+                    AI_MODELS[selected],
+                    ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
+                )
+
             if client is None:
                 return None
             thinking_level = ACTIVE_THINKING_LEVEL.get().lower()
