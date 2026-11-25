@@ -1,7 +1,5 @@
 # 🛡️ ClauseGuard
 
-**ClauseGuardRegistration takes seconds. Reading the agreement takes minutes. ClauseGuard gives users an attention layer before they click Accept.**
-
 ClauseGuard is a student-hackathon prototype that helps people review rental agreements, suspicious WhatsApp messages, app terms, and internship or job bonds. It uses a FastAPI backend and Google Gemini to translate selected text into a plain-language safety report with a risk score, relevant clauses, and a suggested counter-reply.
 
 This is an educational awareness tool, not legal advice and not a production legal-analysis system. Results can be inaccurate or incomplete, and human review remains necessary.
