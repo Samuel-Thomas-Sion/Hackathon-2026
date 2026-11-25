@@ -187,7 +187,7 @@ async def call_ai(messages: list[dict]) -> dict | None:
                 ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
             )
 
-        if selected in ("openrouter-qwen", "openrouter-deepseek"):
+        if selected in ("openrouter-qwen", "openrouter-deepseek", "openrouter-kimi", "openrouter-zephyr"):
             if not OPENROUTER_API_KEY:
                 return None
             return await asyncio.to_thread(
@@ -514,5 +514,7 @@ AI_MODELS = {
     "openrouter-qwen": os.getenv("OPENROUTER_QWEN_MODEL", "qwen/qwen3-4b:free").strip(),
     "openrouter-deepseek": os.getenv("OPENROUTER_DEEPSEEK_MODEL", "deepseek/deepseek-r1-0528:free").strip(),
     "groq-gpt-oss": os.getenv("GROQ_GPT_OSS_MODEL", "openai/gpt-oss-120b").strip(),
+    "openrouter-kimi": os.getenv("OPENROUTER_KIMI_MODEL", "moonshotai/kimi-k2:free").strip(),
+    "openrouter-zephyr": os.getenv("OPENROUTER_ZEPHYR_MODEL", "huggingfaceh4/zephyr-7b-beta:free").strip(),
 }
-ModelName = Literal["gemini-3-flash", "groq-llama", "openrouter-qwen", "openrouter-deepseek", "groq-gpt-oss"]
+ModelName = Literal["gemini-3-flash", "groq-llama", "openrouter-qwen", "openrouter-deepseek", "groq-gpt-oss", "openrouter-kimi", "openrouter-zephyr"]

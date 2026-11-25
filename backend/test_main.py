@@ -170,6 +170,29 @@ def test_model_selection_is_allowlisted(monkeypatch):
     assert response.status_code == 200
 
 
+def test_openrouter_hosted_model_selection(monkeypatch):
+    async def fake_call_ai(messages):
+        return {
+            "score": 70,
+            "riskLabel": "LOW VERIFIED RISK",
+            "headline": "Review completed",
+            "summary": "The supplied text was checked.",
+            "snapshot": "The supplied agreement is ready for plain-language review.",
+            "statutes": [],
+            "redFlags": [],
+            "fairClauses": [],
+            "reply": "Ask for a written revision.",
+        }
+
+    monkeypatch.setattr("backend.main.call_ai", fake_call_ai)
+    response = client.post("/api/scan", json={
+        "module": "pg",
+        "text": "Clause 2: The Agreement renews automatically every twelve months.",
+        "model": "openrouter-zephyr",
+    })
+    assert response.status_code == 200
+
+
 def test_unknown_model_is_rejected():
     response = client.post("/api/audit", json={
         "text": "Clause 2: The tenant deposit is refundable.",

@@ -323,6 +323,22 @@
               <span class="model-check w-4 text-emerald-300"></span>
               <span><span class="block text-sm font-bold text-slate-200">Groq GPT OSS</span><span class="block text-xs text-slate-400">Hosted • Groq</span></span>
             </button>
+            <button type="button" onclick="selectModel('openrouter-kimi')" data-model="openrouter-kimi" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer mt-1" role="menuitem">
+              <span class="model-check w-4 text-emerald-300"></span>
+              <span><span class="block text-sm font-bold text-slate-200">OpenRouter Kimi</span><span class="block text-xs text-slate-400">Hosted • OpenRouter</span></span>
+            </button>
+            <button type="button" onclick="selectModel('openrouter-zephyr')" data-model="openrouter-zephyr" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer mt-1" role="menuitem">
+              <span class="model-check w-4 text-emerald-300"></span>
+              <span><span class="block text-sm font-bold text-slate-200">OpenRouter Zephyr</span><span class="block text-xs text-slate-400">Hosted • OpenRouter</span></span>
+            </button>
+            <button type="button" onclick="selectModel('groq-llama')" data-model="groq-llama" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer mt-1" role="menuitem">
+              <span class="model-check w-4 text-emerald-300"></span>
+              <span><span class="block text-sm font-bold text-slate-200">Groq Llama</span><span class="block text-xs text-slate-400">Hosted • Groq</span></span>
+            </button>
+            <button type="button" onclick="selectModel('openrouter-qwen')" data-model="openrouter-qwen" class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-left transition cursor-pointer mt-1" role="menuitem">
+              <span class="model-check w-4 text-emerald-300"></span>
+              <span><span class="block text-sm font-bold text-slate-200">OpenRouter Qwen</span><span class="block text-xs text-slate-400">Hosted • OpenRouter</span></span>
+            </button>
           </div>
         </div>
 
@@ -962,7 +978,9 @@ function renderBackendResults(raw) {
         'groq-llama': ['Groq Llama', 'Hosted • Groq'],
         'openrouter-qwen': ['OpenRouter Qwen', 'Hosted • OpenRouter'],
         'openrouter-deepseek': ['OpenRouter DeepSeek', 'Hosted • OpenRouter'],
-        'groq-gpt-oss': ['Groq GPT OSS', 'Hosted • Groq']
+        'groq-gpt-oss': ['Groq GPT OSS', 'Hosted • Groq'],
+        'openrouter-kimi': ['OpenRouter Kimi', 'Hosted • OpenRouter'],
+        'openrouter-zephyr': ['OpenRouter Zephyr', 'Hosted • OpenRouter']
       };
       if (!models[model]) return;
 
