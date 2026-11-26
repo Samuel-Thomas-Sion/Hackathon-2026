@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- #SEGMENT_01: HEAD, METADATA & TAILWIND CONFIG -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="ClauseGuard Audit Workspace — Audit any contract, lease, or message in seconds."
+  />
+  <meta name="theme-color" content="#131926" />
+  <title>ClauseGuard Scanner — Frosted 3D Clause Inspector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bg: '#131926',
+            surface: '#1a2234',
+            surfaceHover: '#222d44',
+            border: '#2c374f',
+            accent: '#10b981'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- #SEGMENT_02: INDEXOP DARK GRID, TEAL-INDIGO GLASSMORPHISM & 3-LINE MERGE ANIMATION -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      background-color: #131926;
+    }
+
+    body {
+      background-color: #131926;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Background Grid matching indexOP.html (keeps #131926 base color intact) */
+    .chessigma-grid {
+      background-color: #131926;
+      background-image: radial-gradient(rgba(52, 211, 153, 0.13) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .page-section {
+      scroll-margin-top: 4.5rem;
+    }
+
+    .section-heading {
+      font-size: clamp(1.45rem, 2.3vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    /* Spring-Eased Scroll Appearing Animations */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(34px) scale(0.98);
+      transition:
+        opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-34px);
+      transition:
+        opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(34px);
+      transition:
+        opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.94) translateY(20px);
+      transition:
+        opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-up.is-visible,
+    .reveal-left.is-visible,
+    .reveal-right.is-visible,
+    .reveal-scale.is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    .reveal-delay-1 { transition-delay: 80ms; }
+    .reveal-delay-2 { transition-delay: 160ms; }
+    .reveal-delay-3 { transition-delay: 240ms; }
+
+    /* Frosted 3D Glass matching indexOP.html */
+    .frosted-glass {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.06) 0%,
+        rgba(26, 34, 52, 0.62) 48%,
+        rgba(16, 185, 129, 0.06) 100%
+      );
+      backdrop-filter: blur(22px) saturate(165%);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-top: 1px solid rgba(255, 255, 255, 0.20);
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 48px -12px rgba(4, 8, 18, 0.68), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .frosted-glass-elevated {
+      background: linear-gradient(
+        140deg,
+        rgba(18, 52, 66, 0.72) 0%,
+        rgba(24, 34, 56, 0.78) 50%,
+        rgba(34, 30, 68, 0.76) 100%
+      );
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid rgba(94, 234, 212, 0.20);
+      border-top: 1px solid rgba(167, 243, 208, 0.28);
+      border-left: 1px solid rgba(125, 211, 252, 0.22);
+      box-shadow:
+        0 28px 60px -15px rgba(2, 6, 16, 0.82),
+        0 0 32px -8px rgba(16, 185, 129, 0.16),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    /* Unified Teal-to-Indigo Hero Container */
+    .hero-teal-indigo {
+      background: linear-gradient(
+        125deg,
+        rgba(15, 58, 66, 0.76) 0%,
+        rgba(20, 38, 64, 0.82) 50%,
+        rgba(38, 30, 74, 0.80) 100%
+      );
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid rgba(45, 212, 191, 0.24);
+      border-top: 1px solid rgba(125, 211, 252, 0.30);
+      box-shadow:
+        0 28px 60px -15px rgba(2, 6, 16, 0.85),
+        0 0 40px -10px rgba(20, 184, 166, 0.20),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    /* Inner Wing Cards inside Hero */
+    .inspector-wing-card {
+      background: linear-gradient(
+        155deg,
+        rgba(12, 26, 42, 0.88) 0%,
+        rgba(16, 24, 44, 0.92) 100%
+      );
+      backdrop-filter: blur(18px) saturate(165%);
+      -webkit-backdrop-filter: blur(18px) saturate(165%);
+      border: 1px solid rgba(56, 189, 248, 0.26);
+      border-top: 1px solid rgba(94, 234, 212, 0.34);
+      box-shadow:
+        0 18px 40px -10px rgba(3, 8, 18, 0.82),
+        0 0 24px -8px rgba(45, 212, 191, 0.20);
+    }
+
+    .frosted-input {
+      background: rgba(11, 16, 28, 0.66);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 1px solid rgba(94, 234, 212, 0.25);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.45);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .frosted-input:focus {
+      outline: none;
+      background: rgba(13, 19, 34, 0.82);
+      border-color: rgba(16, 185, 129, 0.65);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(16, 185, 129, 0.16);
+    }
+
+    /* 3D Card Tilt & Spotlight */
+    .tilt-card {
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .tilt-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(380px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255, 255, 255, 0.11), rgba(16, 185, 129, 0.08) 42%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .tilt-card:hover::before { opacity: 1; }
+
+    /* =================================================================== */
+    /* CONTINUOUS 3-LINE FLOW (LEFT -> MERGE AT CENTER -> RIGHT)           */
+    /* =================================================================== */
+    .flow-stream-1 {
+      stroke-dasharray: 18 14;
+      animation: streamLeftToRight 2.6s linear infinite;
+    }
+    .flow-stream-2 {
+      stroke-dasharray: 24 12;
+      animation: streamLeftToRight 2.1s linear infinite;
+    }
+    .flow-stream-3 {
+      stroke-dasharray: 18 16;
+      animation: streamLeftToRight 2.9s linear infinite;
+    }
+
+    .is-scanning .flow-stream-1,
+    .is-scanning .flow-stream-2,
+    .is-scanning .flow-stream-3 {
+      animation-duration: 0.7s;
+    }
+
+    @keyframes streamLeftToRight {
+      0% { stroke-dashoffset: 64; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    .merge-node-pulse {
+      animation: centerMergePulse 2.4s ease-in-out infinite;
+      transform-origin: 400px 100px;
+    }
+    @keyframes centerMergePulse {
+      0%, 100% { opacity: 0.35; transform: scale(0.92); }
+      50% { opacity: 0.85; transform: scale(1.12); }
+    }
+
+    .raw-clause-laser {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #34d399, #fb7185, transparent);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.9);
+      animation: miniDocSweep 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes miniDocSweep {
+      0%, 100% { top: 24%; opacity: 0.4; }
+      50% { top: 72%; opacity: 1; }
+    }
+
+    .trap-bar-glow {
+      animation: trapBarBlink 2.6s ease-in-out infinite;
+    }
+    @keyframes trapBarBlink {
+      0%, 100% { opacity: 0.78; }
+      50% { opacity: 1; box-shadow: 0 0 12px rgba(251, 113, 133, 0.85); }
+    }
+
+    .statute-shield-pulse {
+      animation: shieldFloatPulse 3.2s ease-in-out infinite;
+    }
+    @keyframes shieldFloatPulse {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+        box-shadow: 0 0 22px rgba(56, 189, 248, 0.25);
+      }
+      50% {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 0 34px rgba(52, 211, 153, 0.42);
+      }
+    }
+
+    /* Active Scan Laser Sweep on Textarea */
+    .scan-beam {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #34d399, #38bdf8, #a78bfa, transparent);
+      box-shadow: 0 0 18px rgba(52, 211, 153, 0.95);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .is-scanning .scan-beam {
+      opacity: 1;
+      animation: laserSweep 1.4s ease-in-out infinite;
+    }
+    @keyframes laserSweep {
+      0%, 100% { top: 4%; }
+      50% { top: 94%; }
+    }
+
+    /* Ambient X-Ray Sweep */
+    .xray-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #34d399, #38bdf8, transparent);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.85);
+      animation: xraySweep 3.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes xraySweep {
+      0%, 100% { top: 5%; opacity: 0.25; }
+      50% { top: 93%; opacity: 1; }
+    }
+
+    /* Ambient Aurora Orbs matching indexOP.html */
+    .orb-float-1 { animation: orbDriftOne 15s ease-in-out infinite alternate; }
+    .orb-float-2 { animation: orbDriftTwo 18s ease-in-out infinite alternate; }
+    .orb-float-3 { animation: orbDriftThree 13s ease-in-out infinite alternate; }
+    @keyframes orbDriftOne { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(45px,-35px,0) scale(1.1); } }
+    @keyframes orbDriftTwo { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(-50px,30px,0) scale(1.08); } }
+    @keyframes orbDriftThree { 0% { transform: translate3d(0,0,0) scale(0.96); } 100% { transform: translate3d(30px,40px,0) scale(1.06); } }
+
+    .ripple-btn { position: relative; overflow: hidden; }
+    .btn-ripple-wave {
+      position: absolute;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(0);
+      animation: rippleExpand 0.65s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleExpand { to { transform: scale(2.3); opacity: 0; } }
+
+    .fade-in-up { animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Radial SVG Score Gauge */
+    #score-ring-progress {
+      transition: stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.4s ease;
+    }
+
+    /* Right-Side Scroll-Spy Dots */
+    .scroll-dot {
+      transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .scroll-dot.active {
+      background-color: #34d399;
+      transform: scale(1.45);
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.85);
+    }
+
+    .chat-scroll::-webkit-scrollbar,
+    .custom-scroll::-webkit-scrollbar { width: 5px; }
+    .chat-scroll::-webkit-scrollbar-track,
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-scroll::-webkit-scrollbar-thumb,
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 9999px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .reveal-up, .reveal-left, .reveal-right, .reveal-scale { opacity: 1 !important; transform: none !important; }
+      .tilt-card { transform: none !important; }
+    }
+  </style>
+</head>
+<body class="chessigma-grid min-h-screen flex flex-col relative">
+
+  <!-- #SEGMENT_03: AMBIENT AURORA ORBS (MATCHING INDEXOP.HTML) -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="orb-float-1 absolute -top-24 left-[8%] w-[34rem] h-[34rem] rounded-full bg-emerald-500/20 blur-[125px]"></div>
+    <div class="orb-float-2 absolute top-[30%] -right-24 w-[36rem] h-[36rem] rounded-full bg-cyan-500/18 blur-[130px]"></div>
+    <div class="orb-float-3 absolute bottom-[4%] left-[20%] w-[30rem] h-[30rem] rounded-full bg-indigo-500/18 blur-[120px]"></div>
+  </div>
+
+  <!-- #FLOATING_SCROLL_SPY_RAIL -->
+  <aside aria-label="Workspace navigation" class="hidden xl:flex fixed right-5 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-3.5 px-2 py-3 rounded-full frosted-glass border border-white/15">
+    <a href="#inspector-hero" data-spy="inspector-hero" title="Clause Inspector" class="scroll-dot active w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#scanner-editor" data-spy="scanner-editor" title="Paste & Audit" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#audit-verdict" data-spy="audit-verdict" title="Safety Score" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#clause-breakdown" data-spy="clause-breakdown" title="Clause X-Ray" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#pushback-reply" data-spy="pushback-reply" title="Counter-Reply" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#helplines" data-spy="helplines" title="Helplines" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+  </aside>
+
+  <!-- #SEGMENT_04: STICKY NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 frosted-glass border-b border-white/15">
+    <div id="scroll-progress-bar" class="h-[2px] w-0 bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-400 transition-[width] duration-75"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <a href="indexOP.html" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-inner group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white">Clause<span class="text-emerald-400">Guard</span></span>
+        </a>
+        <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 tracking-wider">
+          AUDIT WORKSPACE
+        </span>
+      </div>
+
+      <div class="flex items-center gap-5">
+        <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-slate-300">
+          <a href="indexOP.html#comparison" class="hover:text-white transition">Why ClauseGuard</a>
+          <a href="#audit-verdict" class="hover:text-white transition">Architecture</a>
+          <a href="#helplines" class="hover:text-white transition">Helplines</a>
+        </nav>
+
+        <a
+          href="indexOP.html"
+          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-200 bg-white/5 hover:bg-white/10 border border-white/15 px-3.5 py-1.5 rounded-xl transition"
+        >
+          <span>← Home</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- #MAIN_SCROLLABLE_WORKSPACE -->
+  <main id="workspace-root" class="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-12">
+
+    <!-- =================================================================== -->
+    <!-- #SEGMENT_05: UNIFIED TEAL-INDIGO HERO BOX WITH 3-LINE MERGE FLOW    -->
+    <!-- =================================================================== -->
+    <section id="inspector-hero" class="page-section space-y-8">
+      <div class="reveal-scale is-visible hero-teal-indigo rounded-3xl px-6 py-10 sm:px-10 sm:py-12 relative overflow-hidden">
+        <!-- Seamless Teal -> Cyan -> Indigo ambient glow inside the single hero card -->
+        <div
+          aria-hidden="true"
+          class="absolute inset-0 pointer-events-none"
+          style="background:
+            radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.16) 0%, transparent 45%),
+            radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.10) 0%, transparent 52%),
+            radial-gradient(circle at 85% 50%, rgba(99, 102, 241, 0.18) 0%, transparent 45%);"
+        ></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-4">
+
+          <!-- LEFT CARD: RAW CLAUSE MINI-DOCUMENT -->
+          <div class="inspector-wing-card w-44 h-44 sm:w-48 sm:h-48 shrink-0 rounded-2xl p-4 flex flex-col justify-between relative z-20">
+            <div class="raw-clause-laser"></div>
+
+            <!-- Top-left document badge icon -->
+            <div class="flex items-center justify-between">
+              <div class="w-6 h-6 rounded-md bg-emerald-400/20 border border-emerald-300/35 flex items-center justify-center text-white shadow-sm">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </div>
+              <span class="w-2 h-2 rounded-full bg-amber-300 animate-pulse shadow-[0_0_8px_#fcd34d]"></span>
+            </div>
+
+            <!-- Simulated Clause Text Lines -->
+            <div class="space-y-2.5 my-auto py-2">
+              <div class="h-1.5 w-full rounded-full bg-slate-500/60"></div>
+              <div class="h-1.5 w-4/5 rounded-full bg-slate-500/60"></div>
+              <div class="h-1.5 w-11/12 rounded-full bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 trap-bar-glow"></div>
+              <div class="h-1.5 w-3/5 rounded-full bg-slate-600/60"></div>
+            </div>
+
+            <!-- Bottom RAW CLAUSE tag -->
+            <div class="w-full py-1 px-2 rounded-lg bg-white/5 border border-teal-400/25 text-center">
+              <span class="text-[10px] font-mono font-semibold tracking-widest text-teal-200 uppercase">RAW CLAUSE</span>
+            </div>
+          </div>
+
+          <!-- FULL-SPAN 3-LINE CONTINUOUS CONDUIT: LEFT -> MERGES AT CENTER -> RIGHT -->
+          <div aria-hidden="true" class="hidden lg:block absolute inset-y-0 left-44 right-44 z-10 pointer-events-none">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 800 200" fill="none" preserveAspectRatio="none">
+              <defs>
+                <!-- Gradient 1: Top Emerald -> Teal -> Sky -->
+                <linearGradient id="continuousLine1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#34d399" stop-opacity="0.85" />
+                  <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.35" />
+                  <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.85" />
+                </linearGradient>
+
+                <!-- Gradient 2: Center Teal -> Emerald -> Indigo -->
+                <linearGradient id="continuousLine2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.90" />
+                  <stop offset="50%" stop-color="#34d399" stop-opacity="0.45" />
+                  <stop offset="100%" stop-color="#818cf8" stop-opacity="0.90" />
+                </linearGradient>
+
+                <!-- Gradient 3: Bottom Sky -> Indigo -> Purple -->
+                <linearGradient id="continuousLine3" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.85" />
+                  <stop offset="50%" stop-color="#818cf8" stop-opacity="0.35" />
+                  <stop offset="100%" stop-color="#c084fc" stop-opacity="0.85" />
+                </linearGradient>
+
+                <radialGradient id="centerMergeHalo" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.38" />
+                  <stop offset="65%" stop-color="#6366f1" stop-opacity="0.14" />
+                  <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+
+              <!-- Subtle Center Convergence Halo behind the integrated heading -->
+              <circle cx="400" cy="100" r="44" fill="url(#centerMergeHalo)" class="merge-node-pulse" />
+
+              <!-- Base 3 Continuous Paths: Left (x=0) -> Merge at Center (x=400) -> Fan out to Right (x=800) -->
+              <path
+                d="M 0 42 C 185 42, 275 96, 400 96 C 525 96, 615 42, 800 42"
+                stroke="url(#continuousLine1)"
+                stroke-width="1.6"
+              />
+              <path
+                d="M 0 100 L 800 100"
+                stroke="url(#continuousLine2)"
+                stroke-width="2"
+              />
+              <path
+                d="M 0 158 C 185 158, 275 104, 400 104 C 525 104, 615 158, 800 158"
+                stroke="url(#continuousLine3)"
+                stroke-width="1.6"
+              />
+
+              <!-- Animated Flowing Energy Dashes on All 3 Continuous Paths -->
+              <path
+                d="M 0 42 C 185 42, 275 96, 400 96 C 525 96, 615 42, 800 42"
+                stroke="#6ee7b7"
+                stroke-width="2"
+                class="flow-stream-1"
+                opacity="0.7"
+              />
+              <path
+                d="M 0 100 L 800 100"
+                stroke="#5eead4"
+                stroke-width="2.2"
+                class="flow-stream-2"
+                opacity="0.75"
+              />
+              <path
+                d="M 0 158 C 185 158, 275 104, 400 104 C 525 104, 615 158, 800 158"
+                stroke="#a5b4fc"
+                stroke-width="2"
+                class="flow-stream-3"
+                opacity="0.7"
+              />
+
+              <!-- Left Card Anchor Ports (x=0) -->
+              <circle cx="0" cy="42" r="3.5" fill="#34d399" />
+              <circle cx="0" cy="100" r="4" fill="#2dd4bf" />
+              <circle cx="0" cy="158" r="3.5" fill="#38bdf8" />
+
+              <!-- Right Card Anchor Ports (x=800) -->
+              <circle cx="800" cy="42" r="3.5" fill="#38bdf8" />
+              <circle cx="800" cy="100" r="4" fill="#818cf8" />
+              <circle cx="800" cy="158" r="3.5" fill="#c084fc" />
+
+              <!-- Glowing Light Packets Traveling Full Distance: Left -> Merge at Center -> Right -->
+              <circle r="3.8" fill="#a7f3d0">
+                <animateMotion dur="2.8s" repeatCount="indefinite" path="M 0 42 C 185 42, 275 96, 400 96 C 525 96, 615 42, 800 42" />
+              </circle>
+              <circle r="4.2" fill="#5eead4">
+                <animateMotion dur="2.2s" repeatCount="indefinite" path="M 0 100 L 800 100" />
+              </circle>
+              <circle r="3.8" fill="#c7d2fe">
+                <animateMotion dur="3.1s" repeatCount="indefinite" path="M 0 158 C 185 158, 275 104, 400 104 C 525 104, 615 158, 800 158" />
+              </circle>
+            </svg>
+          </div>
+
+          <!-- CENTER HEADING (Completely Integrated — NO Box Surrounding It) -->
+          <div class="max-w-md lg:max-w-lg text-center space-y-3.5 px-2 z-20 relative">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 text-xs font-mono">
+              <span id="scan-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="scan-status-text">Frosted 3D Clause Inspector</span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl lg:text-[2.15rem] font-black text-white tracking-tight leading-[1.16] drop-shadow-[0_2px_14px_rgba(10,18,32,0.9)]">
+              Audit any contract, lease, or message in seconds.
+            </h1>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md mx-auto drop-shadow-[0_1px_10px_rgba(10,18,32,0.85)]">
+              Paste fine print or upload a document, and ClauseGuard will flag unfair terms with plain-language explanations and supporting citations.
+            </p>
+          </div>
+
+          <!-- RIGHT CARD: STATUTE GUARD / VERIFIED LAW -->
+          <div class="inspector-wing-card w-44 h-44 sm:w-48 sm:h-48 shrink-0 rounded-2xl p-4 flex flex-col items-center justify-between relative z-20">
+            <!-- Top STATUTE GUARD header -->
+            <span class="text-[10px] font-mono font-semibold tracking-widest text-indigo-200 uppercase">STATUTE GUARD</span>
+
+            <!-- Glowing Center Shield Icon with Coral-Red Core -->
+            <div class="statute-shield-pulse w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500/25 via-sky-500/20 to-indigo-500/25 border border-indigo-400/40 flex items-center justify-center relative">
+              <svg class="w-7 h-7 text-sky-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span class="w-3 h-3 rounded-full bg-rose-400 border-2 border-[#101c30] shadow-[0_0_8px_#fb7185] absolute"></span>
+            </div>
+
+            <!-- Bottom VERIFIED LAW pill -->
+            <div class="w-full py-1 px-2.5 rounded-lg bg-white/5 border border-indigo-400/35 text-center">
+              <span class="text-[10px] font-mono font-semibold tracking-widest text-indigo-200 uppercase">VERIFIED LAW</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- STEP 01: GENERAL DOCUMENT AUDIT -->
+      <div class="hidden" aria-hidden="true"></div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- #SEGMENT_06: STEP 02 — PASTE FINE PRINT OR UPLOAD DOCUMENT          -->
+    <!-- =================================================================== -->
+    <section id="scanner-editor" class="page-section space-y-4 pt-2">
+      <div class="reveal-up flex items-center gap-2.5">
+        <span class="px-2.5 py-0.5 rounded-md bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-mono font-bold">STEP 01</span>
+        <h2 class="text-base sm:text-lg font-extrabold text-white">Paste or Upload a Document</h2>
+      </div>
+
+      <div id="input-card" class="reveal-scale frosted-glass-elevated rounded-3xl p-5 sm:p-7 space-y-4 relative overflow-hidden">
+        <div class="scan-beam"></div>
+
+        <textarea
+          id="audit-input"
+          rows="8"
+          oninput="updateCharStats()"
+          placeholder="Paste any contract, agreement, policy, notice, or terms and conditions here..."
+          class="frosted-input custom-scroll w-full rounded-2xl p-4 sm:p-5 text-sm sm:text-base text-slate-100 placeholder-slate-500 leading-relaxed resize-y"
+        ></textarea>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <div class="relative" id="thinking-selector">
+            <button type="button" id="thinking-menu-btn" onclick="toggleThinkingMenu(event)" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-white/12 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-semibold transition">
+              <span>Thinking level</span><span id="thinking-current" class="text-emerald-300 font-mono">LOW</span><span>⌄</span>
+            </button>
+            <div id="thinking-menu" class="hidden absolute left-0 bottom-full mb-2 w-72 rounded-2xl border border-white/12 bg-[#111827]/95 backdrop-blur-xl shadow-2xl overflow-hidden z-50">
+              <button type="button" data-thinking="auto" onclick="selectThinkingLevel('auto')" class="thinking-option w-full px-4 py-3 flex items-start justify-between text-left hover:bg-white/8"><span><span class="block text-sm font-semibold text-slate-100">Auto</span><span class="block text-xs text-slate-400 mt-0.5">Adapts to your needs</span></span><span class="selected-check hidden text-emerald-300">✓</span></button>
+              <button type="button" data-thinking="low" onclick="selectThinkingLevel('low')" class="thinking-option w-full px-4 py-3 flex items-start justify-between text-left bg-white/5 hover:bg-white/8"><span><span class="block text-sm font-semibold text-slate-100">Low</span><span class="block text-xs text-slate-400 mt-0.5">Fast and efficient</span></span><span class="selected-check text-emerald-300">✓</span></button>
+              <button type="button" data-thinking="medium" onclick="selectThinkingLevel('medium')" class="thinking-option w-full px-4 py-3 flex items-start justify-between text-left hover:bg-white/8"><span><span class="block text-sm font-semibold text-slate-100">Medium</span><span class="block text-xs text-slate-400 mt-0.5">Balanced depth</span></span><span class="selected-check hidden text-emerald-300">✓</span></button>
+              <button type="button" data-thinking="high" onclick="selectThinkingLevel('high')" class="thinking-option w-full px-4 py-3 flex items-start justify-between text-left hover:bg-white/8"><span><span class="block text-sm font-semibold text-slate-100">High</span><span class="block text-xs text-slate-400 mt-0.5">Extra thorough</span></span><span class="selected-check hidden text-emerald-300">✓</span></button>
+              <button type="button" data-thinking="ultra-high" onclick="selectThinkingLevel('ultra-high')" class="thinking-option w-full px-4 py-3 flex items-start justify-between text-left hover:bg-white/8"><span><span class="block text-sm font-semibold text-slate-100">Ultra-High</span><span class="block text-xs text-slate-400 mt-0.5">Maximum analysis</span></span><span class="selected-check hidden text-emerald-300">✓</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <div class="flex items-center gap-3 text-xs font-mono text-slate-300">
+            <span><strong id="word-count" class="text-white">0</strong> words</span>
+            <span>•</span>
+            <span><strong id="char-count" class="text-white">0</strong> chars</span>
+            <span>•</span>
+            <span class="text-emerald-300">POST /api/audit</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <label for="txt-upload" class="ripple-btn inline-flex items-center px-5 py-3.5 rounded-2xl bg-white/8 hover:bg-white/12 text-slate-100 font-extrabold text-sm border border-white/15 transition cursor-pointer">Upload Document</label>
+            <input id="txt-upload" type="file" accept=".txt,.md,.pdf" class="hidden" onchange="handleTxtUpload(event)" />
+            <button type="button" onclick="clearInput()" class="px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-300 hover:text-rose-200 font-bold text-sm border border-white/10 transition cursor-pointer">Clear</button>
+            <button
+              type="button"
+              id="scan-submit-btn"
+              onclick="runAudit()"
+              class="ripple-btn inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 hover:from-emerald-300 hover:to-cyan-200 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-teal-500/25 transition cursor-pointer"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <span id="scan-btn-label">Run AI Audit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- #SEGMENT_07: STEP 03 — SAFETY SCORE & AUDIT VERDICT                 -->
+    <!-- =================================================================== -->
+    <section id="audit-verdict" class="page-section space-y-5 pt-4">
+      <div class="reveal-up flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-mono font-bold">
+            STEP 03
+          </span>
+          <h2 class="section-heading font-extrabold text-white">Safety Score &amp; Audit Verdict</h2>
+        </div>
+      </div>
+
+      <div class="reveal-scale frosted-glass-elevated rounded-3xl p-6 sm:p-10 grid lg:grid-cols-12 gap-8 items-center relative overflow-hidden">
+        <div class="xray-laser"></div>
+
+        <!-- Circular Gauge -->
+        <div class="lg:col-span-4 flex flex-col items-center justify-center text-center space-y-3">
+          <div class="relative w-44 h-44 flex items-center justify-center">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="12" />
+              <circle
+                id="score-ring-progress"
+                cx="80"
+                cy="80"
+                r="66"
+                fill="none"
+                stroke="#34d399"
+                stroke-width="12"
+                stroke-linecap="round"
+                stroke-dasharray="414.69"
+                stroke-dashoffset="414.69"
+              />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="verdict-score-num" class="text-4xl sm:text-5xl font-black text-white leading-none">--</span>
+              <span class="text-xs font-mono text-slate-400 mt-1">/ 100</span>
+            </div>
+          </div>
+
+          <span id="verdict-risk-badge" class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-white/10 border border-white/15 text-teal-200">
+            READY
+          </span>
+        </div>
+
+        <!-- Verdict Explanation -->
+        <div class="lg:col-span-8 space-y-4 lg:border-l lg:border-white/10 lg:pl-8">
+          <div class="text-xs font-mono uppercase tracking-wider text-cyan-300" id="verdict-subtitle">
+            Awaiting Backend Response
+          </div>
+
+          <h3 id="verdict-title" class="text-xl sm:text-2xl font-extrabold text-white">
+            Submit text above to run a live audit
+          </h3>
+
+          <p id="verdict-summary" class="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line">
+            Your backend's audit summary and risk assessment will appear here once you click Run AI Audit.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- #SEGMENT_08: STEP 04 — CLAUSE-BY-CLAUSE X-RAY BREAKDOWN             -->
+    <!-- =================================================================== -->
+    <section id="clause-breakdown" class="page-section space-y-5 pt-4">
+      <div class="reveal-up flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded-md bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-mono font-bold">
+            STEP 04
+          </span>
+          <h2 class="section-heading font-extrabold text-white">Clause-by-Clause X-Ray Breakdown</h2>
+        </div>
+        <span id="clause-count-badge" class="text-xs font-mono text-slate-400">0 clauses returned</span>
+      </div>
+
+      <div id="clauses-list" class="grid md:grid-cols-2 gap-5">
+        <div class="reveal-up frosted-glass rounded-3xl p-6 md:col-span-2 text-center space-y-2 border-dashed border-white/20">
+          <div class="text-sm font-bold text-white">No clauses displayed yet</div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Flagged quotes, statutory citations, and plain-English explanations returned by your backend will render here.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- #SEGMENT_09: STEP 05 — PUSHBACK COUNTER-REPLY                       -->
+    <!-- =================================================================== -->
+    <section id="pushback-reply" class="page-section space-y-5 pt-4">
+      <div class="reveal-up flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded-md bg-teal-500/20 border border-teal-400/40 text-teal-300 text-xs font-mono font-bold">
+            STEP 05
+          </span>
+          <h2 class="section-heading font-extrabold text-white">Pushback Counter-Reply</h2>
+        </div>
+
+        <button
+          type="button"
+          onclick="copyCounterReply()"
+          class="ripple-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 transition cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span id="copy-btn-text">Copy Reply</span>
+        </button>
+      </div>
+
+      <div class="reveal-scale frosted-glass-elevated rounded-3xl p-6 sm:p-8 space-y-4">
+        <textarea
+          id="counter-reply-box"
+          rows="6"
+          placeholder="The counter-reply or negotiation draft returned by your backend will appear here..."
+          class="frosted-input custom-scroll w-full rounded-2xl p-4 sm:p-5 text-sm text-slate-100 placeholder-slate-500 leading-relaxed"
+        ></textarea>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
+          <span>Edit the draft above before copying or sending.</span>
+          <button
+            type="button"
+            onclick="toggleChatDrawer(true)"
+            class="text-emerald-300 hover:text-emerald-200 font-semibold inline-flex items-center gap-1 cursor-pointer"
+          >
+            <span>Need adjustments? Ask ClauseGuard AI</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- #SEGMENT_10: OFFICIAL ESCALATION HELPLINES                          -->
+    <!-- =================================================================== -->
+    <section id="helplines" class="page-section space-y-5 pt-4 pb-8">
+      <div class="reveal-up text-center max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-300">Direct Escalation</span>
+        <h2 class="section-heading font-extrabold text-white">Official Reporting Channels</h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="reveal-up frosted-glass tilt-card rounded-3xl p-6 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-400/30 text-rose-200">CYBER CRIME</span>
+            <span class="text-lg font-black font-mono text-white">1930</span>
+          </div>
+          <h3 class="font-extrabold text-white text-base sm:text-lg">National Cyber Crime Portal</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Report fake "Digital Arrest" calls, fraudulent UPI clearance demands, and malicious APK links immediately.
+          </p>
+        </div>
+
+        <div class="reveal-up reveal-delay-1 frosted-glass tilt-card rounded-3xl p-6 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200">CONSUMER</span>
+            <span class="text-lg font-black font-mono text-white">1915</span>
+          </div>
+          <h3 class="font-extrabold text-white text-base sm:text-lg">National Consumer Helpline</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Escalate unfair PG security deposit forfeiture, deceptive auto-renewals, and app dark patterns.
+          </p>
+        </div>
+
+        <div class="reveal-up reveal-delay-2 frosted-glass tilt-card rounded-3xl p-6 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200">STUDENTS</span>
+            <span class="text-xs font-mono font-bold text-cyan-300">UGC GRIEVANCE</span>
+          </div>
+          <h3 class="font-extrabold text-white text-base sm:text-lg">Original Certificate Protection</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Institutions cannot retain original 10th/12th marksheets against UGC norms or enforce predatory exit bonds.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEGALAID CONTEXT-AWARE CONTRACT CHAT -->
+    <section id="legalaid-chat" class="page-section space-y-5 pt-4 pb-4">
+      <div class="reveal-up flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5"><span class="px-2.5 py-0.5 rounded-md bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-xs font-mono font-bold">FOLLOW-UP</span><h2 class="section-heading font-extrabold text-white">Chat With LegalAID</h2></div>
+        <span id="legalaid-status" class="text-xs font-mono text-slate-400">Context: Awaiting audit</span>
+      </div>
+      <div class="reveal-scale frosted-glass-elevated rounded-3xl overflow-hidden">
+        <div id="legalaid-messages" class="chat-scroll h-72 sm:h-80 overflow-y-auto p-5 space-y-3 text-sm"><div class="max-w-[88%] p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed">Hi, I'm LegalAID. Run an audit first, then ask me to explain a clause, compare risks, or draft a revised response.</div></div>
+        <form onsubmit="handleLegalaidSubmit(event)" class="p-3 border-t border-white/15 bg-black/20 flex items-center gap-2"><input id="legalaid-input" type="text" placeholder="Ask about this contract..." class="frosted-input flex-1 rounded-xl px-3.5 py-3 text-sm text-white placeholder-slate-400" /><button type="submit" class="ripple-btn px-4 py-3 rounded-xl bg-indigo-400 hover:bg-indigo-300 text-slate-950 font-bold transition">Send</button></form>
+      </div>
+
+      <div class="px-4 py-2 border-t border-white/10 flex gap-2 overflow-x-auto">
+        <button type="button" onclick="sendLegalaidPrompt('Explain the biggest risk in simple language.')" class="shrink-0 text-xs font-mono px-3 py-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-200 border border-white/10">Explain biggest risk</button>
+        <button type="button" onclick="sendLegalaidPrompt('Draft a firm pushback email requesting revisions.')" class="shrink-0 text-xs font-mono px-3 py-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-200 border border-white/10">Draft pushback email</button>
+        <button type="button" onclick="sendLegalaidPrompt('List the exact questions I should ask before signing.')" class="shrink-0 text-xs font-mono px-3 py-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-200 border border-white/10">Questions to ask</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- #SEGMENT_11: FLOATING AI CHATBOT -->
+  <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+    <div id="cg-chat-drawer" class="hidden w-[92vw] sm:w-[390px] frosted-glass-elevated rounded-3xl overflow-hidden border border-emerald-400/35 shadow-2xl fade-in-up">
+      <div class="px-4 py-3.5 bg-white/5 border-b border-white/15 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="text-xs sm:text-sm font-extrabold text-white leading-none">ClauseGuard AI Assistant</div>
+            <div class="text-xs font-mono text-emerald-300 mt-1 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Live Gemini Backend Guide</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="toggleChatDrawer(false)" aria-label="Close chat" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="cg-chat-messages" class="chat-scroll h-72 overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
+        <div class="p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed">
+          Hi! Ask me anything about the clause you're scanning, PG deposit rules, internship bonds, or Digital Arrest scams.
+        </div>
+      </div>
+
+      <div class="px-3.5 py-2 border-t border-white/10 bg-black/25 flex gap-1.5 overflow-x-auto">
+        <button type="button" onclick="sendSuggestedPrompt('Can my landlord forfeit 100% of my PG deposit?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">PG deposit rules</button>
+        <button type="button" onclick="sendSuggestedPrompt('Can a company keep my original marksheets?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Original marksheets</button>
+        <button type="button" onclick="sendSuggestedPrompt('How do I report a Digital Arrest scam?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Report scam</button>
+      </div>
+
+      <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-white/15 bg-black/25 flex items-center gap-2">
+        <input id="cg-chat-input" type="text" placeholder="Ask ClauseGuard AI..." class="frosted-input flex-1 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400" />
+        <button type="submit" aria-label="Send message" class="ripple-btn px-3.5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold transition cursor-pointer flex items-center justify-center">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x="22" y="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <button id="cg-chat-fab" type="button" onclick="toggleChatDrawer()" class="ripple-btn frosted-glass-elevated px-4 py-3 rounded-2xl border border-emerald-400/45 hover:border-emerald-300 text-white font-bold text-xs sm:text-sm shadow-xl shadow-slate-950/80 flex items-center gap-2.5 transition cursor-pointer">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+      </span>
+      <svg class="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>Ask ClauseGuard AI</span>
+    </button>
+  </div>
+
+  <!-- #SEGMENT_12: FOOTER & FRONTEND API LINKING SCRIPT -->
+  <footer class="relative z-10 frosted-glass border-t border-white/15 py-8 text-center text-xs sm:text-sm text-slate-400 space-y-2 mt-12">
+    <div class="font-bold text-white tracking-wide">Made by a couple thirteen year olds</div>
+    <div class="font-medium text-emerald-300 text-xs">ClauseGuard — Frosted 3D Fine-Print &amp; Scam Shield</div>
+    <div class="text-slate-500 text-xs">Informational AI Audit Only • Not Formal Legal Advice</div>
+  </footer>
+
+  <script>
+    // =====================================================================
+    // LINK YOUR FRIEND'S BACKEND URL HERE:
+    // =====================================================================
+    const API_BASE = window.location.origin;
+
+    let currentModule = 'general';
+    let currentThinkingLevel = 'low';
+    let activeAuditResult = null;
+    let scrollObserver = null;
+
+    function toggleThinkingMenu(event) {
+      if (event) event.stopPropagation();
+      document.getElementById('thinking-menu').classList.toggle('hidden');
+    }
+
+    function selectThinkingLevel(level) {
+      currentThinkingLevel = level === 'auto' ? 'low' : level;
+      const labels = { auto: 'AUTO', low: 'LOW', medium: 'MEDIUM', high: 'HIGH', 'ultra-high': 'ULTRA-HIGH' };
+      document.getElementById('thinking-current').textContent = labels[level];
+      document.querySelectorAll('.thinking-option').forEach((option) => {
+        const active = option.dataset.thinking === level;
+        option.classList.toggle('bg-white/5', active);
+        option.querySelector('.selected-check')?.classList.toggle('hidden', !active);
+      });
+      document.getElementById('thinking-menu').classList.add('hidden');
+    }
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('#thinking-selector')) document.getElementById('thinking-menu')?.classList.add('hidden');
+    });
+
+    function registerScrollReveals(root = document) {
+      const targets = root.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale');
+      if (!('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('is-visible'));
+        return;
+      }
+      if (!scrollObserver) {
+        scrollObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                scrollObserver.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -35px 0px' }
+        );
+      }
+      targets.forEach((el) => {
+        if (!el.classList.contains('is-visible')) scrollObserver.observe(el);
+      });
+    }
+
+    function updateCharStats() {
+      const val = document.getElementById('audit-input').value;
+      const trimmed = val.trim();
+      document.getElementById('word-count').textContent = trimmed ? trimmed.split(/\s+/).length : 0;
+      document.getElementById('char-count').textContent = val.length;
+    }
+
+    function clearInput() {
+      document.getElementById('audit-input').value = '';
+      updateCharStats();
+    }
+
+    async function handleTxtUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const input = document.getElementById('audit-input');
+      const previous = input.value;
+      input.value = `Extracting readable text from ${file.name}...`;
+
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch(`${API_BASE}/api/extract`, {
+          method: 'POST',
+          body: form
+        });
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.detail || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        input.value = String(data.text || '').trim();
+        if (!input.value) throw new Error('No readable text was found');
+        updateCharStats();
+      } catch (error) {
+        input.value = previous;
+        updateCharStats();
+        alert(`Document could not be extracted: ${error.message}`);
+      } finally {
+        event.target.value = '';
+      }
+    }
+
+    function setScoreGauge(rawScore) {
+      const numEl = document.getElementById('verdict-score-num');
+      const ringEl = document.getElementById('score-ring-progress');
+      const parsed = Number(rawScore);
+
+      if (Number.isNaN(parsed)) {
+        numEl.textContent = rawScore ?? '--';
+        ringEl.style.strokeDashoffset = '414.69';
+        return;
+      }
+
+      const clamped = Math.max(0, Math.min(100, parsed));
+      const circumference = 414.69;
+      ringEl.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
+      ringEl.style.stroke = clamped < 40 ? '#fb7185' : clamped < 70 ? '#fbbf24' : '#34d399';
+      numEl.textContent = clamped;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Calls your friend's POST /api/audit endpoint and renders its response
+    async function runAudit() {
+      const inputEl = document.getElementById('audit-input');
+      const text = inputEl.value.trim();
+      if (!text) {
+        inputEl.focus();
+        return;
+      }
+
+      const workspaceRoot = document.getElementById('workspace-root');
+      const btn = document.getElementById('scan-submit-btn');
+      const btnLabel = document.getElementById('scan-btn-label');
+      const statusText = document.getElementById('scan-status-text');
+      const statusDot = document.getElementById('scan-status-dot');
+
+      workspaceRoot.classList.add('is-scanning');
+      btn.disabled = true;
+      btnLabel.textContent = 'Scanning...';
+      statusText.textContent = 'Querying Backend...';
+      statusDot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-300 animate-ping';
+
+      document.getElementById('verdict-score-num').textContent = '...';
+      document.getElementById('verdict-risk-badge').textContent = 'SCANNING';
+      document.getElementById('verdict-subtitle').textContent = `Sending to ${API_BASE}/api/audit`;
+      document.getElementById('verdict-title').textContent = 'Analyzing document via your backend...';
+      document.getElementById('verdict-summary').textContent = 'Waiting for backend response...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/audit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, module: currentModule, thinking_level: currentThinkingLevel, context_text: document.getElementById('audit-input').value.trim() })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json();
+        activeAuditResult = result;
+        document.getElementById('legalaid-status').textContent = 'Context: Contract + audit attached';
+
+        setScoreGauge(result.score ?? result.safety_score ?? '--');
+        document.getElementById('verdict-risk-badge').textContent = result.risk_label ?? result.risk ?? 'AUDITED';
+        document.getElementById('verdict-subtitle').textContent = `Response from ${API_BASE}/api/audit`;
+        document.getElementById('verdict-title').textContent = result.title ?? result.flag_title ?? 'Audit Complete';
+        document.getElementById('verdict-summary').textContent = result.summary ?? result.explanation ?? result.reply ?? '';
+
+        const flags = Array.isArray(result.red_flags)
+          ? result.red_flags
+          : Array.isArray(result.clauses)
+            ? result.clauses
+            : Array.isArray(result.flagged_clauses)
+              ? result.flagged_clauses
+              : [];
+
+        const clausesList = document.getElementById('clauses-list');
+        document.getElementById('clause-count-badge').textContent = `${flags.length} clause${flags.length === 1 ? '' : 's'} returned`;
+
+        if (flags.length > 0) {
+          clausesList.innerHTML = flags
+            .map(
+              (item) => `
+              <div class="frosted-glass tilt-card rounded-3xl p-6 space-y-3 border-white/15 fade-in-up">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-200 border border-rose-400/35">
+                    ${escapeHtml(item.severity ?? item.risk ?? 'FLAGGED')}
+                  </span>
+                  <span class="text-xs font-mono text-cyan-300">${escapeHtml(item.citation ?? item.statute ?? item.category ?? '')}</span>
+                </div>
+                ${
+                  item.quote || item.clause
+                    ? `<blockquote class="rounded-2xl bg-black/35 border border-white/10 p-3.5 text-xs sm:text-sm text-rose-200 leading-relaxed">"${escapeHtml(item.quote ?? item.clause)}"</blockquote>`
+                    : ''
+                }
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  ${escapeHtml(item.explanation ?? item.reason ?? item.summary ?? '')}
+                </p>
+              </div>`
+            )
+            .join('');
+        } else {
+          clausesList.innerHTML = `
+            <div class="frosted-glass rounded-3xl p-6 md:col-span-2 text-center text-xs sm:text-sm text-slate-300">
+              No separate <code class="text-emerald-300 font-mono">red_flags</code> array returned by backend—see full summary above.
+            </div>`;
+        }
+
+        document.getElementById('counter-reply-box').value =
+          result.pushback_reply ?? result.counter_reply ?? result.draft ?? '';
+
+        document.getElementById('audit-verdict').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (_) {
+        setScoreGauge('--');
+        document.getElementById('verdict-risk-badge').textContent = 'OFFLINE';
+        document.getElementById('verdict-subtitle').textContent = 'Connection Failed';
+        document.getElementById('verdict-title').textContent = 'Backend Not Connected';
+        document.getElementById('verdict-summary').textContent = `Start your backend server on ${API_BASE} to run live audits here.`;
+      } finally {
+        workspaceRoot.classList.remove('is-scanning');
+        btn.disabled = false;
+        btnLabel.textContent = 'Run AI Audit';
+        statusText.textContent = 'Frosted  3D Clause Inspector';
+        statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+      }
+    }
+
+    async function copyCounterReply() {
+      const box = document.getElementById('counter-reply-box');
+      if (!box.value.trim()) return;
+      try {
+        await navigator.clipboard.writeText(box.value);
+        const label = document.getElementById('copy-btn-text');
+        label.textContent = 'Copied ✓';
+        setTimeout(() => {
+          label.textContent = 'Copy Reply';
+        }, 1800);
+      } catch (_) {
+        box.select();
+      }
+    }
+
+    // Floating Chatbot (same POST /api/chat contract as indexOP.html)
+    function toggleChatDrawer(forceState) {
+      const drawer = document.getElementById('cg-chat-drawer');
+      const shouldOpen = typeof forceState === 'boolean' ? forceState : drawer.classList.contains('hidden');
+      drawer.classList.toggle('hidden', !shouldOpen);
+      if (shouldOpen) document.getElementById('cg-chat-input').focus();
+    }
+
+    function appendChatBubble(sender, text) {
+      const box = document.getElementById('cg-chat-messages');
+      const isUser = sender === 'user';
+      const wrapper = document.createElement('div');
+      wrapper.className = isUser ? 'flex justify-end' : 'flex justify-start';
+      const bubble = document.createElement('div');
+      bubble.className = isUser
+        ? 'max-w-[85%] p-3 rounded-2xl rounded-tr-sm bg-emerald-400 text-slate-950 font-medium leading-relaxed'
+        : 'max-w-[88%] p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      box.appendChild(wrapper);
+      box.scrollTop = box.scrollHeight;
+      return bubble;
+    }
+
+    function appendLegalaidBubble(sender, text) {
+      const box = document.getElementById('legalaid-messages');
+      const wrapper = document.createElement('div');
+      wrapper.className = sender === 'user' ? 'flex justify-end' : 'flex justify-start';
+      const bubble = document.createElement('div');
+      bubble.className = sender === 'user'
+        ? 'max-w-[85%] p-3 rounded-2xl rounded-tr-sm bg-indigo-400 text-slate-950 font-medium leading-relaxed whitespace-pre-line'
+        : 'max-w-[88%] p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed whitespace-pre-line';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      box.appendChild(wrapper);
+      box.scrollTop = box.scrollHeight;
+      return bubble;
+    }
+
+    function sendSuggestedPrompt(promptText) {
+      document.getElementById('cg-chat-input').value = promptText;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    function sendLegalaidPrompt(promptText) {
+      document.getElementById('legalaid-input').value = promptText;
+      handleLegalaidSubmit(new Event('submit'));
+    }
+
+    async function handleChatSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById('cg-chat-input');
+      const userMsg = input.value.trim();
+      if (!userMsg) return;
+
+      input.value = '';
+      appendChatBubble('user', userMsg);
+      const botBubble = appendChatBubble('bot', 'Thinking...');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: userMsg,
+            module: currentModule,
+            context: document.getElementById('audit-input').value.trim()
+          })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        botBubble.textContent = data.reply || data.response || data.answer || 'No reply field returned by backend.';
+      } catch (_) {
+        botBubble.textContent = `Could not reach backend at ${API_BASE}. Make sure the FastAPI server is running.`;
+      }
+
+      const box = document.getElementById('cg-chat-messages');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleLegalaidSubmit(event) {
+      event.preventEvent?.();
+      event.preventDefault?.();
+      const input = document.getElementById('legalaid-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      input.value = '';
+      appendLegalaidBubble('user', message);
+      const botBubble = appendLegalaidBubble('bot', 'Reviewing the contract and audit...');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message,
+            module: currentModule,
+            thinking_level: currentThinkingLevel,
+            context_text: document.getElementById('audit-input').value.trim(),
+            documentText: document.getElementById('audit-input').value.trim(),
+            auditSummary: activeAuditResult,
+            audit_context: activeAuditResult
+          })
+        });
+
+        if (res.status === 429) {
+          botBubble.textContent = 'Too many messages. Try again later.';
+          return;
+        }
+        if (!res.ok) {
+          let detail = '';
+          try { detail = (await res.json()).detail || ''; } catch (_) {}
+          const lowered = `${res.status} ${detail}`.toLowerCase();
+          botBubble.textContent = lowered.includes('rate') || lowered.includes('quota') || lowered.includes('too many')
+            ? 'Too many messages. Try again later.'
+            : 'Could not reach LegalAID right now. Please try again.';
+          return;
+        }
+
+        const data = await res.json();
+        botBubble.textContent = data.reply || data.response || data.answer || 'No reply was returned.';
+      } catch (_) {
+        botBubble.textContent = 'Could not reach LegalAID right now. Please try again.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      registerScrollReveals(document);
+
+      const progressBar = document.getElementById('scroll-progress-bar');
+      const spyIds = ['inspector-hero', 'scanner-editor', 'audit-verdict', 'clause-breakdown', 'pushback-reply', 'helplines'];
+      const spyDots = document.querySelectorAll('.scroll-dot');
+
+      const updateScrollDynamics = () => {
+        const scrollY = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollY / docHeight) * 100)) : 0;
+        if (progressBar) progressBar.style.width = `${pct}%`;
+
+        let activeId = spyIds[0];
+        const scanLine = window.innerHeight * 0.45;
+        for (const id of spyIds) {
+          const sec = document.getElementById(id);
+          if (sec && sec.getBoundingClientRect().top <= scanLine) {
+            activeId = id;
+          }
+        }
+        spyDots.forEach((dot) => {
+          dot.classList.toggle('active', dot.getAttribute('data-spy') === activeId);
+        });
+      };
+
+      updateScrollDynamics();
+      window.addEventListener('scroll', updateScrollDynamics, { passive: true });
+      window.addEventListener('resize', updateScrollDynamics, { passive: true });
+
+      document.addEventListener('mousemove', (e) => {
+        const card = e.target.closest('.tilt-card');
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -4.5;
+        const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 4.5;
+        card.style.setProperty('--spot-x', `${x}px`);
+        card.style.setProperty('--spot-y', `${y}px`);
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-3px)`;
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const card = e.target.closest('.tilt-card');
+        if (card && !card.contains(e.relatedTarget)) {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.ripple-btn');
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height) * 1.4;
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+        ripple.className = 'btn-ripple-wave';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+      });
+    });
+  </script>
+</body>
+</html>
