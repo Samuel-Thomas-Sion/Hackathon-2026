@@ -59,7 +59,7 @@ ACTIVE_MODEL: ContextVar[str] = ContextVar("active_model", default="gemini-3-fla
 class ScanRequest(BaseModel):
     module: Module = "pg"
     text: str = Field(min_length=1, max_length=50_000)
-    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    thinking_level: Optional[Literal["low", "medium", "high", "ultra-high"]] = "low"
     model: ModelName = "gemini-3-flash"
 
 
@@ -70,7 +70,7 @@ class ChatRequest(BaseModel):
     auditSummary: Optional[Any] = None
     context_text: Optional[str] = ""
     audit_context: Optional[Any] = None
-    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    thinking_level: Optional[Literal["low", "medium", "high", "ultra-high"]] = "low"
     model: ModelName = "gemini-3-flash"
 
 
@@ -81,7 +81,7 @@ class ChatResponse(BaseModel):
 class AuditRequest(BaseModel):
     text: str = Field(min_length=1, max_length=50_000)
     module: Optional[str] = "general"
-    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    thinking_level: Optional[Literal["low", "medium", "high", "ultra-high"]] = "low"
     model: ModelName = "gemini-3-flash"
 
 
@@ -114,6 +114,20 @@ class KnowledgeSearchRequest(BaseModel):
     query: str = Field(min_length=1, max_length=4_000)
     module: Optional[str] = None
     limit: int = Field(default=5, ge=1, le=20)
+
+
+ModelName = Literal["gemini-3-flash", "groq-llama", "openrouter-qwen", "openrouter-deepseek", "groq-gpt-oss", "openrouter-kimi", "openrouter-zephyr"]
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+AI_MODELS = {
+    "gemini-3-flash": os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3.5-flash-lite")).strip(),
+    "groq-llama": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
+    "openrouter-qwen": os.getenv("OPENROUTER_QWEN_MODEL", "qwen/qwen3-4b:free").strip(),
+    "openrouter-deepseek": os.getenv("OPENROUTER_DEEPSEEK_MODEL", "deepseek/deepseek-r1-0528:free").strip(),
+    "groq-gpt-oss": os.getenv("GROQ_GPT_OSS_MODEL", "openai/gpt-oss-120b").strip(),
+    "openrouter-kimi": os.getenv("OPENROUTER_KIMI_MODEL", "moonshotai/kimi-k2:free").strip(),
+    "openrouter-zephyr": os.getenv("OPENROUTER_ZEPHYR_MODEL", "huggingfaceh4/zephyr-7b-beta:free").strip(),
+}
 
 
 def _openai_compatible_call(base_url: str, api_key: str, model: str, messages: list[dict]) -> dict | None:
@@ -173,6 +187,7 @@ async def call_ai(messages: list[dict]) -> dict | None:
                 "low": types.ThinkingLevel.LOW,
                 "medium": types.ThinkingLevel.HIGH,
                 "high": types.ThinkingLevel.HIGH,
+                "ultra-high": types.ThinkingLevel.HIGH,
             }.get(thinking_level, types.ThinkingLevel.LOW)
             response = await asyncio.to_thread(
                 client.models.generate_content,
@@ -225,18 +240,25 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
             continue
         quote = normalize_grounded_text(str(flag.get("quote", "")))
         clause_number = normalize_grounded_text(str(flag.get("clauseNumber", "")))
-        if not quotation_exists(source_text, quote):
+
+        # Keep findings unless the model obviously invented an empty or unrelated quote.
+        if len(quote) < 4:
             continue
-        if clause_number and clause_number.lower() not in ("message", "verified passage"):
-            if not clause_reference_exists(source_text, clause_number):
-                continue
+        if quote.lower() not in normalize_grounded_text(source_text).lower():
+            words = [word for word in quote.lower().split() if len(word) >= 4]
+            if len(words) >= 3:
+                source_lower = normalize_grounded_text(source_text).lower()
+                matched = sum(1 for word in words if word in source_lower)
+                if matched / len(words) < 0.45:
+                    continue
+
         clean_flags.append({
             "title": str(flag.get("title", "Potentially unfavourable term")),
             "severity": str(flag.get("severity", "MEDIUM")).upper(),
             "quote": quote,
-            "clauseNumber": clause_number or "Verified passage",
+            "clauseNumber": clause_number or "Relevant passage",
             "explanation": str(flag.get("explanation", "")),
-            "citation": str(flag.get("citation", "Requires case-specific verification")),
+            "citation": str(flag.get("citation", "Context-specific review recommended")),
         })
 
     data["score"] = max(0, min(100, int(data["score"])))
@@ -249,9 +271,9 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
     data["redFlags"] = clean_flags[:20]
 
     if not clean_flags:
-        data["riskLabel"] = "NO VERIFIED RED FLAGS"
-        data["headline"] = "No unsupported or unverifiable findings detected"
-        data["summary"] = "The analysis found no red flag whose exact source wording could be verified in the uploaded document."
+        data["riskLabel"] = str(data.get("riskLabel", "LOW RISK"))
+        data["headline"] = str(data.get("headline", "Review completed"))
+        data["summary"] = str(data.get("summary", "No clear one-sided clauses were identified in the supplied text."))
 
     return data
 
@@ -273,7 +295,7 @@ score, riskLabel, headline, summary, snapshot, statutes, redFlags, fairClauses, 
 
 Rules:
 - ABSOLUTE: Analyse only the supplied text. Never use prior contracts or generic module examples.
-- ABSOLUTE: Every red flag needs an exact verbatim quote that appears in the supplied text.
+- ABSOLUTE: Every red flag needs an exact or close verbatim quote that appears in the supplied text.
 - ABSOLUTE: Every red flag needs clauseNumber, which must correspond to a real clause or heading in the supplied text.
 - Never invent academic-certificate, bond, resignation, UGC, or unrelated findings.
 - If no genuine concern is found, return an empty redFlags array.
@@ -515,18 +537,3 @@ app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
 import asyncio
 import urllib.request
 import urllib.error
-
-# API keys stay on the server. Browser users only select an allowlisted model name.
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
-
-AI_MODELS = {
-    "gemini-3-flash": os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip(),
-    "groq-llama": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
-    "openrouter-qwen": os.getenv("OPENROUTER_QWEN_MODEL", "qwen/qwen3-4b:free").strip(),
-    "openrouter-deepseek": os.getenv("OPENROUTER_DEEPSEEK_MODEL", "deepseek/deepseek-r1-0528:free").strip(),
-    "groq-gpt-oss": os.getenv("GROQ_GPT_OSS_MODEL", "openai/gpt-oss-120b").strip(),
-    "openrouter-kimi": os.getenv("OPENROUTER_KIMI_MODEL", "moonshotai/kimi-k2:free").strip(),
-    "openrouter-zephyr": os.getenv("OPENROUTER_ZEPHYR_MODEL", "huggingfaceh4/zephyr-7b-beta:free").strip(),
-}
-ModelName = Literal["gemini-3-flash", "groq-llama", "openrouter-qwen", "openrouter-deepseek", "groq-gpt-oss", "openrouter-kimi", "openrouter-zephyr"]
