@@ -1,123 +1,230 @@
 # 🛡️ ClauseGuard
 
-ClauseGuard is a student-hackathon prototype that helps people review rental agreements, suspicious WhatsApp messages, app terms, and internship or job bonds. It uses a FastAPI backend and Google Gemini to translate selected text into a plain-language safety report with a risk score, relevant clauses, and a suggested counter-reply.
+### Don't just accept. Understand what you're agreeing to.
 
-This is an educational awareness tool, not legal advice and not a production legal-analysis system. Results can be inaccurate or incomplete, and human review remains necessary.
+ClauseGuard is an AI-powered legal awareness platform designed to help people identify potentially risky, misleading, or unfair terms before they sign an agreement, accept a service, or respond to a suspicious message.
 
-## 1. Project overview
+From rental agreements and internship bonds to app policies and WhatsApp scams, ClauseGuard turns complicated text into actionable, plain-language insights.
 
-**Problem:** Signing up, paying a deposit, accepting an app subscription, or responding to an urgent message often takes seconds, while understanding every condition can take much longer. Important clauses may contain one-sided penalties, automatic renewals, deposit-forfeiture rules, privacy permissions, or scam tactics.
+**Read less legal jargon. Recognise more red flags. Make informed decisions.**
 
-**Solution:** ClauseGuard sends the user's pasted text or uploaded document to a live backend for analysis. It then presents:
+---
 
-- A 0–100 safety score
-- An overall risk level
-- A plain-language explanation
-- Exact passages identified as concerns
-- Clause-specific explanations
-- A suggested pushback or counter-reply
-- A contextual follow-up chat
+## 🚀 Explore ClauseGuard
 
-The application is designed for four common scenarios:
+| Resource | Description |
+|---|---|
+| **Main Application** | AI-powered agreement and message analysis |
+| **Browser Extension** | Scan website terms and privacy policies |
+| **Backend API** | FastAPI-powered analysis and document processing |
+| **API Documentation** | Interactive API documentation at `/docs` |
 
-- **PG and rental leases**
-- **WhatsApp and cyber-scam messages**
-- **App terms and privacy policies**
-- **Internship or job bonds**
+### 🌐 Browser Extension
 
-ClauseGuard does not replace reading the agreement. It gives users a reason to pause and shows them where to begin.
+Want to explore ClauseGuard beyond the main web application?
 
-## 2. Live demo
+Check out our dedicated Chrome and Microsoft Edge browser extension repository.
 
-1. Open the landing page.
-2. Choose the scanner.
-3. Select a scenario or paste document text.
-4. Run the live audit.
-5. Review the risk score and highlighted clauses.
-6. Use the plain-language snapshot and counter-reply draft.
-7. Ask a follow-up question in the document-aware chat.
+**[🧩 Explore the ClauseGuard Browser Extension →](https://github.com/IceyVibes/clauseguard)**
 
-A raw PG lease, scam message, app terms example, or internship bond is also available from the scanner for a quick demonstration.
+The extension is maintained in a separate repository and provides:
 
-## 3. Architecture
+- Browser-based Terms and Conditions analysis.
+- Identification of potentially concerning clauses.
+- A locally running machine-learning classification system.
+- A dashboard for reviewing website policies.
+- Support for Chrome and Microsoft Edge.
+
+Visit the repository for its source code, installation instructions, architecture, and technical documentation.
+
+---
+
+## 1. The Problem
+
+Digital agreements have become part of everyday life.
+
+Users routinely encounter:
+- Rental agreements and PG contracts.
+- Internship and employment bonds.
+- Application Terms and Conditions.
+- Privacy policies and data-sharing permissions.
+- Suspicious messages requesting payments or personal information.
+
+However, understanding these documents is not always straightforward.
+
+Important provisions can be buried in lengthy documents, written in complicated legal language, or presented under circumstances that encourage users to act quickly.
+
+A single overlooked provision could mean losing a security deposit, accepting an unreasonable financial penalty, agreeing to automatic renewals, or surrendering important contractual rights.
+
+## 2. The Solution
+
+ClauseGuard provides an accessible first layer of review.
+
+Users can paste text or upload a document and receive an AI-generated analysis that highlights potentially problematic provisions.
+
+### Core capabilities
+
+| Feature | Description |
+|---|---|
+| Safety Score | A 0–100 assessment of potential contractual risk |
+| Risk Classification | An overall indication of the document's risk level |
+| Plain-language Analysis | Explanations of complicated provisions |
+| Red Flag Detection | Identification of potentially unfair or suspicious terms |
+| Clause References | Relevant passages and their associated explanations |
+| Counter-Reply Generator | Suggested responses for negotiating or questioning terms |
+| Contextual AI Chat | Follow-up questions based on the submitted document |
+| Document Extraction | Text extraction from supported uploaded files |
+
+### Supported scenarios
+
+**🏠 PG and Rental Agreements**
+
+Identify potentially problematic security deposit conditions, lock-in periods, termination provisions, maintenance obligations, and financial penalties.
+
+**📱 WhatsApp and Cyber Scams**
+
+Examine suspicious messages for urgency tactics, impersonation, unusual payment requests, and other potential warning signs.
+
+**📄 Application Terms and Privacy Policies**
+
+Understand automatic renewals, data collection permissions, cancellation restrictions, and other important provisions.
+
+**💼 Internship and Employment Bonds**
+
+Review training-cost recovery provisions, exit penalties, restrictive conditions, and potentially unreasonable contractual obligations.
+
+---
+
+## 3. How It Works
+
+The main application follows a straightforward analysis pipeline:
+
+1. **Submit:** Paste text or upload a supported document.
+2. **Select:** Choose the relevant analysis category.
+3. **Analyse:** The backend processes the submitted content using Google Gemini.
+4. **Validate:** The backend checks and validates the generated response.
+5. **Review:** Examine the risk score, flagged provisions, and explanations.
+6. **Respond:** Use the suggested counter-reply or ask contextual follow-up questions.
+
+### Architecture
 
 ```text
-User
-  |
-  | Paste text or upload a file
-  v
-Browser frontend
-  |
-  | POST /api/audit or /api/chat
-  v
-FastAPI backend
-  |
-  | Gemini API request
-  v
-Google Gemini
-  |
-  | Structured JSON response
-  v
-Backend validation
-  |
-  v
-Scanner UI
-  - Safety score
-  - Risk label
-  - Plain-language summary
-  - Flagged clauses
-  - Counter-reply
-  - Follow-up chat
+                  USER
+                    |
+                    v
+          HTML / JavaScript Frontend
+                    |
+          Text Submission / Upload
+                    |
+                    v
+             FastAPI Backend
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+     Gemini API         Document Extraction
+          |                   |
+          +---------+---------+
+                    |
+                    v
+           Response Validation
+                    |
+                    v
+              SCANNER UI
+                    |
+          +---------+---------+
+          |         |         |
+          v         v         v
+        Score    Red Flags  Explanation
+          |         |         |
+          +---------+---------+
+                    |
+                    v
+          Counter-Reply / AI Chat
 ```
 
-The frontend is a responsive HTML/JavaScript interface served by FastAPI. The backend calls Google Gemini and validates AI results before sending them to the browser.
+The main application and browser extension are maintained as separate projects with different analysis architectures.
 
-For extracted document text, the backend also performs grounding checks so a reported red flag is not accepted unless its quote and clause reference can be found in the supplied text.
+---
 
-## 4. Repository structure
-
-```text
-.
-├── indexOP.html          # Landing page
-├── scanner.html          # Audit and follow-up workspace
-├── upfront.js            # Visual effects
-├── backend/
-│   ├── main.py           # FastAPI routes and AI integration
-│   └── test_main.py      # Backend tests
-├── requirements.txt      # Python dependencies
-├── README.md             # Judge-facing project overview
-└── README_BACKEND.md     # Additional backend notes
-```
-
-## 5. Technology
+## 4. Technology Stack
 
 | Component | Technology |
 |---|---|
-| Frontend | HTML, CSS, JavaScript, Tailwind CSS |
+| Frontend | HTML, CSS, JavaScript |
+| Styling | Tailwind CSS |
 | Backend | Python, FastAPI |
 | Server | Uvicorn |
-| AI | Google Gemini through `google-genai` |
-| PDF extraction | PyPDF |
-| Image OCR | Pillow and Tesseract |
+| AI Integration | Google Gemini |
+| AI SDK | `google-genai` |
+| PDF Processing | PyPDF |
+| Image Processing | Pillow, Tesseract OCR |
 | Testing | pytest |
 
-## 6. Native setup
+---
+
+## 5. Repository Structure
+
+```text
+.
+├── indexOP.html
+├── scanner.html
+├── upfront.js
+│
+├── backend/
+│   ├── main.py
+│   └── test_main.py
+│
+├── requirements.txt
+├── README.md
+└── README_BACKEND.md
+```
+
+The main repository contains the web application and its backend. The browser extension is maintained separately.
+
+**Extension repository:** https://github.com/IceyVibes/clauseguard
+
+---
+
+## 6. Installation and Setup
 
 ### Prerequisites
 
-- Python 3.10 or newer
-- A Google Gemini API key
-- Tesseract OCR if image upload is needed
+- Python 3.10 or newer.
+- Google Gemini API key.
+- Tesseract OCR (required for image-based document extraction).
 
-### Linux/macOS
+### Step 1 — Clone the repository
 
 ```bash
-cd Hackathon-2026
+git clone <MAIN-REPOSITORY-URL>
+cd <PROJECT-DIRECTORY>
+```
+
+### Step 2 — Create a virtual environment
+
+**Windows PowerShell**
+
+```powershell
+py -3.11 -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+**Linux / macOS**
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+### Step 3 — Install dependencies
+
+```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+### Step 4 — Configure environment variables
 
 Create a `.env` file in the project root:
 
@@ -126,144 +233,141 @@ GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-3-flash-preview
 ```
 
-Start the server:
+Replace the placeholder with your own API key.
+
+**Never commit API keys or other secrets to GitHub.**
+
+### Step 5 — Start the backend
 
 ```bash
-python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Windows PowerShell
-
-```powershell
-cd Hackathon-2026
-py -3.11 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Create `.env`, add the same Gemini settings, and start Uvicorn:
-
-```powershell
 python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Demo URLs
+### Step 6 — Open the application
 
-- **Landing page:** http://127.0.0.1:8000/indexOP.html
-- **Scanner:** http://127.0.0.1:8000/scanner.html
-- **API documentation:** http://127.0.0.1:8000/docs
-- **Health endpoint:** http://127.0.0.1:8000/api/health
+| Resource | Local URL |
+|---|---|
+| Landing Page | http://127.0.0.1:8000/indexOP.html |
+| Scanner | http://127.0.0.1:8000/scanner.html |
+| API Documentation | http://127.0.0.1:8000/docs |
+| Health Check | http://127.0.0.1:8000/api/health |
 
-The top-right gear menu in the scanner allows the backend URL and `/api/audit` and `/api/chat` routes to be adjusted.
+---
 
-## 7. API endpoints
+## 7. API Reference
 
-| Method | Endpoint | Purpose |
+The backend exposes the following endpoints:
+
+| Method | Endpoint | Function |
 |---|---|---|
-| `GET` | `/api/health` | Check backend and AI status |
-| `GET` | `/health` | Check service status |
-| `POST` | `/api/audit` | Analyze pasted text |
-| `POST` | `/api/chat` | Answer a follow-up question with document context |
-| `POST` | `/api/extract` | Extract text from TXT, PDF, PNG, JPG, or JPEG uploads |
-| `GET` | `/api/knowledge/stats` | Report knowledge-base storage and chunk counts |
-| `POST` | `/api/knowledge/documents` | Add a document; text is automatically chunked and indexed |
-| `GET` | `/api/knowledge/documents` | List stored knowledge documents |
-| `POST` | `/api/knowledge/search` | Retrieve relevant indexed passages for a question |
-| `DELETE` | `/api/knowledge/documents/{document_id}` | Delete a document and all indexed chunks |
+| GET | `/api/health` | Backend and AI health status |
+| GET | `/health` | Service health check |
+| POST | `/api/audit` | Analyse submitted text |
+| POST | `/api/chat` | Document-aware follow-up chat |
+| POST | `/api/extract` | Extract text from uploaded files |
+| GET | `/api/knowledge/stats` | Knowledge-base statistics |
+| POST | `/api/knowledge/documents` | Add and index documents |
+| GET | `/api/knowledge/documents` | List stored documents |
+| POST | `/api/knowledge/search` | Search indexed passages |
+| DELETE | `/api/knowledge/documents/{document_id}` | Delete a document and its indexed chunks |
 
-Example audit request:
+### Example API Request
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/audit \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "Clause 7: Tenants lose 100 percent of the security deposit for leaving early.",
+    "text": "Clause 7: Tenants lose 100 percent of their security deposit for leaving early.",
     "module": "pg"
   }'
 ```
 
-The supported `module` values are `pg`, `whatsapp`, `app`, and `bond`.
+Supported analysis modules:
 
-## 8. Five-minute judge demo
+- `pg`
+- `whatsapp`
+- `app`
+- `bond`
 
-### 0:00–0:45 — Problem
+For the complete request and response schemas, visit `/docs` after starting the backend.
 
-Explain that users often need to sign or pay quickly, while rental agreements, app terms, and suspicious messages contain details that are easy to overlook.
+---
 
-### 0:45–1:30 — Categories
+## 8. Running Tests
 
-Open the scanner and show the four use cases. Explain that each category changes the context sent to the AI, but the interaction remains consistent.
-
-### 1:30–2:30 — Live rental audit
-
-Load the PG lease sample and run the audit. Walk through:
-
-- The overall risk score
-- The plain-language explanation
-- The exact deposit and lock-in clauses
-- The suggested counter-reply
-
-### 2:30–3:20 — Document grounding
-
-Explain that the backend attempts to verify that quote and clause references appear in the submitted text before presenting them.
-
-### 3:20–4:15 — Cross-context demo
-
-Load the WhatsApp scam sample and show how the same interface identifies urgency tactics and requests for money or personal action.
-
-### 4:15–5:00 — Responsible conclusion
-
-Open the API documentation or health endpoint, then close with:
-
-> ClauseGuard does not replace reading the agreement. It gives users a reason to pause and shows them where to begin.
-
-## 9. Testing
-
-Run the backend tests:
+Run the backend test suite:
 
 ```bash
 pytest -q
 ```
 
-## 10. Troubleshooting
+---
 
-| Symptom | Check |
-|---|---|
-| Backend request failed | Confirm Uvicorn is running on port 8000 |
-| Missing AI results | Confirm `GEMINI_API_KEY` is set and restart the server |
-| Port 8000 is already in use | Stop the existing process or start Uvicorn on another port |
-| CORS or connection error | Open the app from the backend URL and confirm CORS settings |
-| PDF extraction fails | Install `pypdf` from `requirements.txt` |
-| Image OCR fails | Install Pillow, `pytesseract`, and the Tesseract executable |
-| Wrong API route | Open the scanner gear menu and verify `/api/audit` and `/api/chat` |
+## 9. Demonstration
 
-## 11. Limitations
+A typical demonstration can follow this sequence:
 
-- AI findings may contain mistakes or omit important context.
-- Clauses are interpreted without a full jurisdiction-specific legal review.
-- OCR quality depends on document image quality.
-- PDF layouts can produce imperfect text extraction.
-- The system depends on internet access and Gemini availability.
-- Safety scores express the prototype's risk assessment, not legal certainty.
+1. Open the ClauseGuard landing page.
+2. Navigate to the scanner.
+3. Select a scenario, such as a PG agreement.
+4. Load a sample agreement or submit custom text.
+5. Run the audit.
+6. Examine the safety score and flagged clauses.
+7. Review the explanations and suggested counter-reply.
+8. Ask a follow-up question using the contextual chat.
+
+For a cross-project demonstration, the browser extension can also be explored through its dedicated repository.
+
+---
+
+## 10. Limitations
+
+ClauseGuard is an experimental educational prototype.
+
+Its current limitations include:
+
+- AI-generated explanations can be inaccurate or incomplete.
+- Risk scores are indicative rather than legally authoritative.
+- Legal interpretations may not account for every jurisdiction or applicable regulation.
+- OCR accuracy depends on the quality of uploaded images.
+- PDF extraction may not perfectly preserve document formatting.
+- AI analysis depends on internet connectivity and Gemini service availability.
 - False positives and false negatives are possible.
 
-## 12. Responsible-AI disclaimer
+A flagged provision is not automatically illegal, and an unflagged provision is not necessarily safe.
 
-ClauseGuard uses a live AI model and should not be treated as legal advice. Its purpose is to improve awareness and make text easier to understand. Users should verify important terms, preserve documents and payment records, and consult a qualified professional when needed.
+---
 
-## 13. Future improvements
+## 11. Future Development
 
-- Expert-reviewed datasets and clause categories
-- Jurisdiction-aware Indian consumer-law guidance
-- Multi-language support
-- Better PDF table and layout extraction
-- Comparison between two versions of an agreement
-- Downloadable audit reports
-- Audit history with privacy controls
-- Bias, robustness, and hallucination testing
-- Optional on-device or locally hosted inference
+Potential areas of further development include:
+
+- Jurisdiction-aware legal analysis, particularly Indian contract and consumer law.
+- Expert-reviewed datasets and more reliable clause classification.
+- Multilingual document analysis.
+- Improved document comparison and version tracking.
+- Downloadable audit reports.
+- Privacy-conscious analysis history.
+- More extensive testing for bias, robustness, and hallucinations.
+- Expanded browser-extension coverage.
+- Greater transparency in AI-generated risk assessments.
+
+---
+
+## 12. Responsible Use
+
+ClauseGuard is an educational legal-awareness tool, not a substitute for a qualified lawyer or professional legal review.
+
+Its purpose is to make complicated documents easier to understand, highlight provisions deserving closer attention, and encourage informed decision-making.
+
+Users should independently verify important contractual provisions and seek professional advice before making significant legal or financial decisions.
+
+---
 
 ## License
 
-Add a license before public release.
+A formal open-source licence should be added before the project is distributed under an explicit reuse permission.
+
+---
+
+**ClauseGuard — Understand the terms before you accept them.**
