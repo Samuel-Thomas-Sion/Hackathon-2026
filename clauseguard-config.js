@@ -8,6 +8,6 @@
 // Secrets (AI provider keys) are NEVER set here. They live only in Cloudflare
 // Worker secrets / environment bindings. See CLOUDFLARE_DEPLOY.md.
 window.CLAUSEGUARD_CONFIG = {
-  API_BASE: '',
+  API_BASE: 'https://clauseguard-api.samuel-thomas-7f8.workers.dev',
   GEMINI_MODEL: 'gemini-3.5-flash-lite'
 };
