@@ -30,9 +30,9 @@ await cp(join(root, 'data'), join(dist, 'data'), { recursive: true });
 await mkdir(join(dist, 'backend'), { recursive: true });
 await cp(join(root, 'backend', 'knowledge_contract_law.json'), join(dist, 'backend', 'knowledge_contract_law.json'));
 
-// The site opens on the v2 home page (with Teen Check). v1 stays at /indexOP. (Pages serves teen.html at /teen.)
-await cp(join(root, 'indexOP-v2.html'), join(dist, 'index.html'));
-// v2 also lives at its own short address: /teencheck
+// The main address (/) shows v1, the team's original page.
+// v2 (teen-first, with Teen Check) lives at /teencheck. Pages serves teen.html at /teen.
+await cp(join(root, 'indexOP.html'), join(dist, 'index.html'));
 await cp(join(root, 'indexOP-v2.html'), join(dist, 'teencheck.html'));
 
 // Basic safety headers for every page.

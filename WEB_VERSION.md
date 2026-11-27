@@ -22,9 +22,9 @@ ClauseGuard has two versions:
 - answers in English, Hindi, Kannada, Tamil, Telugu or Malayalam
 - "Ask about these terms": questions in your own words, answered only from the terms
 
-**Home page v2 (`indexOP-v2.html`)** is the team's original home page with Teen Check built in as a new section (right after "Four Dedicated Protection Modules"), in the same frosted-glass style. On the website it opens at `/`.
+**Home page v2 (`indexOP-v2.html`)** is the team's home page made teen-first: Teen Check is in the hero and the result shows in the same frosted-glass style. On the website it opens at **`/teencheck`**.
 
-- v1 (`indexOP.html`) is kept as it was, at `/indexOP`. It has only a "Teen Check" link added.
+- v1 (`indexOP.html`) is the team's original page and is the website's main address (`/`). Only the top-bar Ask AI button was removed.
 - v2 also opens at **`/teencheck`** (shared links look like `/teencheck?site=discord`). `teen.html` (`/teen`) is the same feature as a plain stand-alone page.
 - Both use the same `teen.js`, so a fix in one place fixes both.
 
@@ -93,7 +93,7 @@ You need a Cloudflare account, this repository on GitHub, and a **free-tier** Ge
 4. **Connect the limits.** **Settings → Bindings → Add → KV namespace**
    - Variable name: `CG_KV`, KV namespace: `clauseguard-limits` → **Save**
 5. **Redeploy** so steps 3–4 take effect: **Deployments** → latest → **⋯ → Retry deployment**.
-6. **Check it.** Open `https://<project-name>.pages.dev/api/health`. You should see `"ai_configured": true` and `"daily_limits": "on"`. Then open `https://<project-name>.pages.dev/teen` and try Discord.
+6. **Check it.** Open `https://<project-name>.pages.dev/api/health`. You should see `"ai_configured": true` and `"daily_limits": "on"`. Then open `https://<project-name>.pages.dev/teencheck` and try Discord.
 
 ### Optional: "are you human?" check (Turnstile)
 
