@@ -1,0 +1,35 @@
+# ClauseGuard — Cloudflare configuration
+#
+# This repo ships TWO Cloudflare targets:
+#   1. A static frontend (indexOP.html, scanner.html, *.js, *.json) -> Cloudflare Pages
+#   2. An API Worker (worker/src/index.js) -> /api/health, /api/audit, /api/chat
+#
+# The Worker name is also the Pages project's API hostname when using Pages
+# Functions; here we deploy the Worker standalone and point the frontend at it
+# via CLAUSEGUARD_CONFIG.API_BASE (clauseguard-config.js).
+#
+# Secrets are set with `wrangler secret put` and are never committed.
+
+name = "clauseguard-api"
+main = "worker/src/index.js"
+compatibility_date = "2026-11-27"
+
+# Static frontend assets for local `wrangler dev` (optional). Production
+# frontend is deployed with `wrangler pages deploy .`.
+# [assets]
+# directory = "."
+# not_found_handling = "single-page-application"
+
+[vars]
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+# Lock CORS to your Pages origin after first deploy, e.g.
+# ALLOWED_ORIGIN = "https://clauseguard.pages.dev"
+ALLOWED_ORIGIN = "*"
+
+# --- Cloudflare Pages (static frontend) ---
+# The Pages project is deployed separately and serves the static files:
+#   wrangler pages deploy . --project-name=clauseguard
+# The Worker above serves the API at /api/*.
+
+[observability]
+enabled = true

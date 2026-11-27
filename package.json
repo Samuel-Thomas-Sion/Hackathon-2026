@@ -1,0 +1,16 @@
+{
+  "name": "clauseguard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ClauseGuard — AI contract & scam fine-print auditor (Cloudflare Workers + Pages).",
+  "scripts": {
+    "dev:worker": "wrangler dev",
+    "dev:pages": "wrangler pages dev . --port 8788",
+    "deploy:worker": "wrangler deploy",
+    "deploy:pages": "wrangler pages deploy . --project-name=clauseguard",
+    "secret:gemini": "wrangler secret put GEMINI_API_KEY"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
