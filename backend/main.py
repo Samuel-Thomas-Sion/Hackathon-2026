@@ -490,4 +490,9 @@ def serve_homepage():
     return FileResponse(ROOT / "indexOP.html")
 
 
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok", "service": "clauseguard-api"}
+
+
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
