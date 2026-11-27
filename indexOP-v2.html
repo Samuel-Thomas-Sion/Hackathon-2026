@@ -386,8 +386,8 @@
   <!-- #FLOATING_SCROLL_SPY_RAIL (Desktop Quick-Jump Dots) -->
   <aside aria-label="Section navigation" class="hidden xl:flex fixed right-5 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-3.5 px-2 py-3 rounded-full frosted-glass border border-white/15">
     <a href="#hero-top" data-spy="hero-top" title="Top" class="scroll-dot active w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
-    <a href="#modules" data-spy="modules" title="Modules" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
     <a href="#teen-check" data-spy="teen-check" title="Teen Check" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#modules" data-spy="modules" title="Modules" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
     <a href="#how-it-works" data-spy="how-it-works" title="How It Works" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
     <a href="#clause-xray" data-spy="clause-xray" title="Live X-Ray" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
     <a href="#extension" data-spy="extension" title="Browser Extension" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
@@ -519,6 +519,94 @@
 
   <!-- #SEGMENT_06: ANIMATED TRUST METRICS -->
   <main class="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-24">
+    <!-- #SEGMENT_V2: TEEN CHECK - "Is this site OK for teens?" (logic in teen.js) -->
+    <section id="teen-check" class="teen-font frosted-glass-elevated rounded-3xl p-6 sm:p-10 space-y-7 relative overflow-hidden">
+      <div class="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-emerald-500/20 blur-[110px] pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <div class="space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Teen Check</span>
+          </div>
+          <h2 class="section-heading font-extrabold text-white">
+            Is this site <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">OK for teens?</span>
+          </h2>
+        </div>
+        <p class="text-sm text-slate-300 max-w-md leading-relaxed">
+          The verdict, the vibe, and the receipts: what this app can do with your stuff, explained like a friend would.
+        </p>
+      </div>
+
+      <div id="result-placeholder" class="relative z-10 glass rounded-3xl p-6 text-center teen-font">
+        <p class="text-3xl">👆</p>
+        <p class="text-lg font-bold text-white">Type a site in the search box at the top</p>
+        <p class="text-sm text-slate-400">Your result shows up right here.</p>
+      </div>
+
+      <!-- Result (filled in by teen.js) -->
+      <div id="result" class="hidden relative z-10 space-y-5" aria-live="polite">
+        <div id="verdict-card" class="glass rounded-3xl p-5 sm:p-7 space-y-3">
+          <div class="flex flex-wrap items-center gap-3">
+            <span id="verdict-badge" class="px-3 py-1 rounded-full text-sm font-extrabold"></span>
+            <h3 id="site-title" class="text-xl sm:text-2xl font-extrabold text-white"></h3>
+          </div>
+          <p id="verdict-reason" class="text-lg text-slate-100"></p>
+          <p id="summary" class="text-slate-300"></p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="glass rounded-3xl p-5 space-y-2">
+            <h4 class="text-xs font-mono uppercase tracking-widest text-emerald-300">🎂 Age check</h4>
+            <p id="age-value" class="text-2xl font-extrabold text-white"></p>
+            <blockquote id="age-quote" class="quote pl-3 text-sm text-slate-300 italic hidden"></blockquote>
+          </div>
+          <div class="glass rounded-3xl p-5 space-y-2">
+            <h4 class="text-xs font-mono uppercase tracking-widest text-amber-300">🇮🇳 Under 18?</h4>
+            <p id="india-note" class="text-slate-200"></p>
+            <p class="text-sm text-slate-400">Quick chat with a parent before you sign up 🙂</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-lg font-extrabold text-white">📋 What you're signing up for</h4>
+          <div id="points" class="grid md:grid-cols-2 gap-3"></div>
+          <p id="no-points" class="hidden text-sm text-slate-400">Hmm, we couldn't find proof for any points in these terms 🤷 Try pasting the terms text instead.</p>
+        </div>
+
+        <div class="glass rounded-3xl p-5 space-y-2">
+          <h4 class="text-lg font-extrabold text-white">✨ Pro moves</h4>
+          <ul id="tips" class="list-disc pl-5 space-y-1 text-slate-200"></ul>
+        </div>
+
+        <div class="text-sm text-slate-400 space-y-1">
+          <p id="source-line"></p>
+          <ul id="source-links" class="space-y-1"></ul>
+          <p>🧾 Every point comes with receipts: we check each quote against the real terms and drop any that don't match.</p>
+        </div>
+      </div>
+
+      <!-- Questions about the checked terms -->
+      <div id="chat" class="hidden relative z-10 glass rounded-3xl p-5 sm:p-6 space-y-4">
+        <div>
+          <h4 class="text-lg font-extrabold text-white">💬 Ask anything about these terms</h4>
+          <p class="text-sm text-slate-400">Type it your way: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Don't share personal stuff 🙏</p>
+        </div>
+        <div id="chat-chips" class="flex flex-wrap gap-2"></div>
+        <div id="chat-messages" class="space-y-3 max-h-[28rem] overflow-y-auto"></div>
+        <form id="chat-form" class="flex gap-2" autocomplete="off">
+          <label for="chat-input" class="sr-only">Your question</label>
+          <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. can strangers DM me?"
+            class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
+          <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Send ➤</button>
+        </form>
+      </div>
+
+      <p class="relative z-10 text-xs text-slate-500">
+        Explanations are written by an AI (Google Gemini) from the site's own terms and can be wrong, so always check the quoted sentences. Website text and your questions are sent to Google to be analysed. Information only, not legal advice.
+      </p>
+    </section>
+
 
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="reveal-up frosted-glass rounded-2xl p-5 space-y-2">
@@ -663,94 +751,6 @@
     </section>
 
     <!-- #SCROLL_SCRUBBED_TIMELINE: HOW CLAUSEGUARD WORKS -->
-    <!-- #SEGMENT_V2: TEEN CHECK - "Is this site OK for teens?" (logic in teen.js) -->
-    <section id="teen-check" class="teen-font reveal-scale frosted-glass-elevated rounded-3xl p-6 sm:p-10 space-y-7 relative overflow-hidden">
-      <div class="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-emerald-500/20 blur-[110px] pointer-events-none"></div>
-
-      <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div class="space-y-3">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Teen Check</span>
-          </div>
-          <h2 class="section-heading font-extrabold text-white">
-            Is this site <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">OK for teens?</span>
-          </h2>
-        </div>
-        <p class="text-sm text-slate-300 max-w-md leading-relaxed">
-          The verdict, the vibe, and the receipts: what this app can do with your stuff, explained like a friend would.
-        </p>
-      </div>
-
-      <div id="result-placeholder" class="relative z-10 glass rounded-3xl p-6 text-center teen-font">
-        <p class="text-3xl">👆</p>
-        <p class="text-lg font-bold text-white">Type a site in the search box at the top</p>
-        <p class="text-sm text-slate-400">Your result shows up right here.</p>
-      </div>
-
-      <!-- Result (filled in by teen.js) -->
-      <div id="result" class="hidden relative z-10 space-y-5" aria-live="polite">
-        <div id="verdict-card" class="glass rounded-3xl p-5 sm:p-7 space-y-3">
-          <div class="flex flex-wrap items-center gap-3">
-            <span id="verdict-badge" class="px-3 py-1 rounded-full text-sm font-extrabold"></span>
-            <h3 id="site-title" class="text-xl sm:text-2xl font-extrabold text-white"></h3>
-          </div>
-          <p id="verdict-reason" class="text-lg text-slate-100"></p>
-          <p id="summary" class="text-slate-300"></p>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-4">
-          <div class="glass rounded-3xl p-5 space-y-2">
-            <h4 class="text-xs font-mono uppercase tracking-widest text-emerald-300">🎂 Age check</h4>
-            <p id="age-value" class="text-2xl font-extrabold text-white"></p>
-            <blockquote id="age-quote" class="quote pl-3 text-sm text-slate-300 italic hidden"></blockquote>
-          </div>
-          <div class="glass rounded-3xl p-5 space-y-2">
-            <h4 class="text-xs font-mono uppercase tracking-widest text-amber-300">🇮🇳 Under 18?</h4>
-            <p id="india-note" class="text-slate-200"></p>
-            <p class="text-sm text-slate-400">Quick chat with a parent before you sign up 🙂</p>
-          </div>
-        </div>
-
-        <div class="space-y-3">
-          <h4 class="text-lg font-extrabold text-white">📋 What you're signing up for</h4>
-          <div id="points" class="grid md:grid-cols-2 gap-3"></div>
-          <p id="no-points" class="hidden text-sm text-slate-400">Hmm, we couldn't find proof for any points in these terms 🤷 Try pasting the terms text instead.</p>
-        </div>
-
-        <div class="glass rounded-3xl p-5 space-y-2">
-          <h4 class="text-lg font-extrabold text-white">✨ Pro moves</h4>
-          <ul id="tips" class="list-disc pl-5 space-y-1 text-slate-200"></ul>
-        </div>
-
-        <div class="text-sm text-slate-400 space-y-1">
-          <p id="source-line"></p>
-          <ul id="source-links" class="space-y-1"></ul>
-          <p>🧾 Every point comes with receipts: we check each quote against the real terms and drop any that don't match.</p>
-        </div>
-      </div>
-
-      <!-- Questions about the checked terms -->
-      <div id="chat" class="hidden relative z-10 glass rounded-3xl p-5 sm:p-6 space-y-4">
-        <div>
-          <h4 class="text-lg font-extrabold text-white">💬 Ask anything about these terms</h4>
-          <p class="text-sm text-slate-400">Type it your way: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Don't share personal stuff 🙏</p>
-        </div>
-        <div id="chat-chips" class="flex flex-wrap gap-2"></div>
-        <div id="chat-messages" class="space-y-3 max-h-[28rem] overflow-y-auto"></div>
-        <form id="chat-form" class="flex gap-2" autocomplete="off">
-          <label for="chat-input" class="sr-only">Your question</label>
-          <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. can strangers DM me?"
-            class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
-          <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Send ➤</button>
-        </form>
-      </div>
-
-      <p class="relative z-10 text-xs text-slate-500">
-        Explanations are written by an AI (Google Gemini) from the site's own terms and can be wrong, so always check the quoted sentences. Website text and your questions are sent to Google to be analysed. Information only, not legal advice.
-      </p>
-    </section>
-
     <section id="how-it-works" class="space-y-8">
       <div class="reveal-up text-center max-w-2xl mx-auto space-y-2">
         <span class="text-xs font-mono uppercase tracking-widest text-cyan-300">Scroll-Driven Audit Pipeline</span>
@@ -1371,7 +1371,7 @@
       const workflowEl = document.getElementById('workflow-timeline');
       const workflowLine = document.getElementById('workflow-progress-line');
       const workflowCards = document.querySelectorAll('.workflow-step-card');
-      const spyIds = ['hero-top', 'modules', 'teen-check', 'how-it-works', 'clause-xray', 'extension', 'comparison', 'faq'];
+      const spyIds = ['hero-top', 'teen-check', 'modules', 'how-it-works', 'clause-xray', 'extension', 'comparison', 'faq'];
       const spyDots = document.querySelectorAll('.scroll-dot');
 
       const updateScrollDynamics = () => {
