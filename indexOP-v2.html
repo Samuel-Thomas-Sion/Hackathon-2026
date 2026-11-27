@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- #SEGMENT_01: HEAD, METADATA & TAILWIND CONFIG -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="ClauseGuard audits PG rental leases, internship bonds, app Terms & Conditions, and WhatsApp scams—pinpointing hidden traps and generating instant counter-replies."
+  />
+  <meta name="theme-color" content="#131926" />
+  <title>ClauseGuard v2 — Teen Check, Fine-Print, Lease &amp; Cyber Scam Shield</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./clauseguard-static.js"></script>
+  <script src="./clauseguard-config.js"></script>
+  <script src="./clauseguard-api.js"></script>
+  <script src="./teen.js" defer></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bg: '#131926',
+            surface: '#1a2234',
+            surfaceHover: '#222d44',
+            border: '#2c374f',
+            accent: '#10b981'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- #SEGMENT_02: FROSTED 3D GLASSMORPHISM & SCROLL-DOWN ANIMATIONS -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #131926;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hero-heading {
+      font-size: clamp(2.15rem, 3.8vw, 3.35rem);
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+    }
+
+    .section-heading {
+      font-size: clamp(1.55rem, 2.4vw, 2.1rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .sub-heading {
+      font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+      line-height: 1.35;
+    }
+
+    /* Spring-Eased Scroll Appearing Animations */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(38px) scale(0.975);
+      transition:
+        opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-38px);
+      transition:
+        opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(38px);
+      transition:
+        opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.93) translateY(24px);
+      transition:
+        opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-up.is-visible,
+    .reveal-left.is-visible,
+    .reveal-right.is-visible,
+    .reveal-scale.is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    .reveal-delay-1 { transition-delay: 90ms; }
+    .reveal-delay-2 { transition-delay: 180ms; }
+    .reveal-delay-3 { transition-delay: 270ms; }
+    .reveal-delay-4 { transition-delay: 360ms; }
+
+    /* Frosted 3D Glass */
+    .frosted-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(26, 34, 52, 0.54) 48%, rgba(16, 185, 129, 0.05) 100%);
+      backdrop-filter: blur(22px) saturate(165%);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(255, 255, 255, 0.26);
+      border-left: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 20px 48px -12px rgba(4, 8, 18, 0.65), inset 0 1px 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    .frosted-glass-elevated {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.11) 0%, rgba(26, 35, 56, 0.68) 52%, rgba(6, 182, 212, 0.08) 100%);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-top: 1px solid rgba(255, 255, 255, 0.34);
+      border-left: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 28px 60px -15px rgba(2, 6, 16, 0.8), 0 0 28px -6px rgba(16, 185, 129, 0.14), inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    .frosted-input {
+      background: rgba(11, 16, 28, 0.56);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.42);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .frosted-input:focus {
+      outline: none;
+      background: rgba(13, 19, 34, 0.72);
+      border-color: rgba(16, 185, 129, 0.65);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(16, 185, 129, 0.16);
+    }
+
+    /* 3D Card Tilt & Spotlight */
+    .tilt-card {
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .tilt-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(400px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255, 255, 255, 0.14), rgba(16, 185, 129, 0.08) 40%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .tilt-card:hover::before { opacity: 1; }
+
+    /* Scroll-Animated Metric Bar */
+    .metric-bar-fill {
+      width: 0%;
+      transition: width 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .is-visible .metric-bar-fill {
+      width: var(--target-w, 85%);
+    }
+
+    /* Scroll-Scrubbed Workflow Step Highlight */
+    .workflow-step-card {
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+    }
+    .workflow-step-card.step-active {
+      border-color: rgba(52, 211, 153, 0.52);
+      box-shadow: 0 22px 50px -12px rgba(4, 8, 18, 0.78), 0 0 24px -4px rgba(16, 185, 129, 0.22);
+      transform: translateY(-2px);
+    }
+    .workflow-step-badge {
+      transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+    }
+    .workflow-step-card.step-active .workflow-step-badge {
+      background-color: #10b981;
+      color: #042f2e;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.65);
+      transform: scale(1.08);
+    }
+
+    /* X-Ray Laser Sweep */
+    .xray-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #34d399, #38bdf8, transparent);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.85);
+      animation: xraySweep 3.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes xraySweep {
+      0%, 100% { top: 6%; opacity: 0.25; }
+      50% { top: 92%; opacity: 1; }
+    }
+
+    /* Scroll Cue Mouse Wheel */
+    .scroll-wheel-dot {
+      animation: scrollWheelBounce 1.8s ease-in-out infinite;
+    }
+    @keyframes scrollWheelBounce {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      60% { transform: translateY(7px); opacity: 0.25; }
+    }
+
+    .chessigma-grid {
+      background-image: radial-gradient(rgba(52, 211, 153, 0.13) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .orb-float-1 { animation: orbDriftOne 15s ease-in-out infinite alternate; }
+    .orb-float-2 { animation: orbDriftTwo 18s ease-in-out infinite alternate; }
+    .orb-float-3 { animation: orbDriftThree 13s ease-in-out infinite alternate; }
+    @keyframes orbDriftOne { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(45px,-35px,0) scale(1.1); } }
+    @keyframes orbDriftTwo { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(-50px,30px,0) scale(1.08); } }
+    @keyframes orbDriftThree { 0% { transform: translate3d(0,0,0) scale(0.96); } 100% { transform: translate3d(30px,40px,0) scale(1.06); } }
+
+    .ripple-btn { position: relative; overflow: hidden; }
+    .btn-ripple-wave {
+      position: absolute;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.38);
+      transform: scale(0);
+      animation: rippleExpand 0.65s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleExpand { to { transform: scale(2.3); opacity: 0; } }
+
+    .fade-in-up { animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Collapsible FAQ (Closed until clicked) */
+    .faq-answer {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+    }
+    .faq-item.is-open .faq-answer {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    .faq-answer-inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+    .faq-chevron { transition: transform 0.25s ease; }
+    .faq-item.is-open .faq-chevron { transform: rotate(180deg); }
+
+    /* Right-Side Scroll-Spy Dots */
+    .scroll-dot {
+      transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .scroll-dot.active {
+      background-color: #34d399;
+      transform: scale(1.45);
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.85);
+    }
+
+    .chat-scroll::-webkit-scrollbar { width: 5px; }
+    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 9999px; }
+
+    /* ===== Browser Extension 3D Showcase ===== */
+    .ext-scene {
+      perspective: 1400px;
+      perspective-origin: 50% 40%;
+    }
+    .ext-browser {
+      transform-style: preserve-3d;
+      animation: extFloat 7s ease-in-out infinite;
+      box-shadow: 0 40px 80px -28px rgba(4, 8, 18, 0.9), 0 0 60px -18px rgba(16, 185, 129, 0.4);
+    }
+    @keyframes extFloat {
+      0%, 100% { transform: rotateX(6deg) rotateY(-9deg) translateY(0); }
+      50% { transform: rotateX(4deg) rotateY(-4deg) translateY(-14px); }
+    }
+    .ext-3d-icon {
+      transform-style: preserve-3d;
+      animation: extIconSpin 9s ease-in-out infinite;
+      filter: drop-shadow(0 18px 28px rgba(16, 185, 129, 0.55));
+    }
+    @keyframes extIconSpin {
+      0%, 100% { transform: rotateY(0deg) rotateX(8deg); }
+      50% { transform: rotateY(180deg) rotateX(8deg); }
+    }
+    .ext-scan-beam {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #34d399, #38bdf8, transparent);
+      box-shadow: 0 0 18px rgba(52, 211, 153, 0.9);
+      animation: extScan 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+      pointer-events: none;
+      z-index: 20;
+    }
+    @keyframes extScan {
+      0% { top: 8%; opacity: 0; }
+      12% { opacity: 1; }
+      88% { opacity: 1; }
+      100% { top: 90%; opacity: 0; }
+    }
+    .ext-flag {
+      animation: extFlagPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes extFlagPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(248, 113, 113, 0); }
+    }
+    .ext-badge-pop {
+      animation: extBadgePop 3.4s ease-in-out infinite;
+    }
+    @keyframes extBadgePop {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.04); }
+    }
+    .ext-download-glow {
+      background-size: 200% 200%;
+      animation: extGlowShift 4s ease infinite;
+    }
+    @keyframes extGlowShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .ext-step-line {
+      background: linear-gradient(180deg, #34d399, #22d3ee);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.7);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .reveal-up, .reveal-left, .reveal-right, .reveal-scale { opacity: 1 !important; transform: none !important; }
+      .tilt-card { transform: none !important; }
+      .ext-browser, .ext-3d-icon, .ext-scan-beam, .ext-flag, .ext-badge-pop, .ext-download-glow { animation: none !important; }
+    }
+    /* ---- v2: Teen Check segment ---- */
+    .glass { background: rgba(19, 25, 38, 0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.10); }
+    .quote { border-left: 3px solid rgba(52, 211, 153, 0.6); }
+    .chip { cursor: pointer; }
+    .spinner { width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,.25); border-top-color: #34d399; border-radius: 9999px; animation: cg-spin .8s linear infinite; display: inline-block; vertical-align: -2px; }
+    @keyframes cg-spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="chessigma-grid min-h-screen flex flex-col relative">
+
+  <!-- #SEGMENT_03: AMBIENT AURORA ORBS -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div id="aurora-orb-1" class="orb-float-1 absolute -top-24 left-[10%] w-[34rem] h-[34rem] rounded-full bg-emerald-500/20 blur-[125px]"></div>
+    <div id="aurora-orb-2" class="orb-float-2 absolute top-[32%] -right-24 w-[36rem] h-[36rem] rounded-full bg-cyan-500/18 blur-[130px]"></div>
+    <div id="aurora-orb-3" class="orb-float-3 absolute bottom-[4%] left-[20%] w-[30rem] h-[30rem] rounded-full bg-teal-400/15 blur-[120px]"></div>
+  </div>
+
+  <!-- #FLOATING_SCROLL_SPY_RAIL (Desktop Quick-Jump Dots) -->
+  <aside aria-label="Section navigation" class="hidden xl:flex fixed right-5 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-3.5 px-2 py-3 rounded-full frosted-glass border border-white/15">
+    <a href="#hero-top" data-spy="hero-top" title="Top" class="scroll-dot active w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#modules" data-spy="modules" title="Modules" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#teen-check" data-spy="teen-check" title="Teen Check" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#how-it-works" data-spy="how-it-works" title="How It Works" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#clause-xray" data-spy="clause-xray" title="Live X-Ray" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#extension" data-spy="extension" title="Browser Extension" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#comparison" data-spy="comparison" title="Why ClauseGuard" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+    <a href="#faq" data-spy="faq" title="FAQ" class="scroll-dot w-2 h-2 rounded-full bg-white/35 hover:bg-emerald-300"></a>
+  </aside>
+
+  <!-- #SEGMENT_04: STICKY NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 frosted-glass border-b border-white/15">
+    <div id="scroll-progress-bar" class="h-[2px] w-0 bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 transition-[width] duration-75"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="#hero-top" class="flex items-center gap-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-inner group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white">Clause<span class="text-emerald-400">Guard</span></span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
+        <a href="#teen-check" class="text-emerald-300 hover:text-white font-semibold transition">Teen Check</a>
+        <a href="#modules" class="hover:text-white transition">Modules</a>
+        <a href="#how-it-works" class="hover:text-white transition">How It Works</a>
+        <a href="#clause-xray" class="hover:text-white transition">Live X-Ray</a>
+        <a href="#extension" class="hover:text-white transition">Extension</a>
+        <a href="#comparison" class="hover:text-white transition">Why ClauseGuard</a>
+        <a href="#faq" class="hover:text-white transition">FAQ</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <button
+          type="button"
+          onclick="toggleChatDrawer(true)"
+          class="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/35 px-3.5 py-2 rounded-xl transition cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>Ask AI</span>
+        </button>
+
+        <a
+          href="scanner.html"
+          class="ripple-btn inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/25 transition"
+        >
+          <span>Open Scanner</span>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- #SEGMENT_05: CENTERED HERO + VIVID MULTI-COLOR 3D GEODESIC CRYSTAL -->
+  <section id="hero-top" class="relative w-full min-h-[610px] sm:min-h-[670px] flex items-center justify-center overflow-hidden border-b border-white/10">
+    <div id="upfront-canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- Subtle radial vignette so the 3D crystal & glowing torus rings shine clearly behind the title -->
+    <div
+      class="absolute inset-0 pointer-events-none z-[1]"
+      style="background: radial-gradient(circle at 50% 50%, rgba(19, 25, 38, 0.30) 0%, rgba(19, 25, 38, 0.20) 48%, rgba(19, 25, 38, 0.08) 100%);"
+    ></div>
+
+    <div id="hero-parallax-stack" class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center flex flex-col items-center space-y-6 will-change-transform">
+      <div class="reveal-up is-visible inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131926]/85 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-xs font-mono shadow-lg">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>AI Fine-Print, Contract &amp; Scam Protection</span>
+      </div>
+
+      <h1 class="reveal-up is-visible reveal-delay-1 hero-heading font-black text-white drop-shadow-[0_6px_28px_rgba(4,8,18,0.94)]">
+        Catch predatory clauses before you <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">sign or pay.</span>
+      </h1>
+
+      <p class="reveal-up is-visible reveal-delay-2 text-sm sm:text-base text-slate-100 leading-relaxed max-w-2xl drop-shadow-[0_3px_18px_rgba(4,8,18,0.96)]">
+        ClauseGuard audits PG rental agreements, internship bonds, app Terms &amp; Conditions, and WhatsApp scams—pinpointing hidden traps, scoring risk, and generating ready-to-send pushback replies.
+      </p>
+
+      <div class="reveal-up is-visible reveal-delay-3 flex flex-wrap items-center justify-center gap-3.5 pt-1">
+        <a
+          href="scanner.html"
+          class="ripple-btn inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-emerald-500/35 transition"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <span>Launch Audit Workspace</span>
+        </a>
+
+        <a
+          href="#teen-check"
+          class="ripple-btn inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl frosted-glass hover:bg-white/15 text-slate-100 font-bold text-sm sm:text-base transition"
+        >
+          <span>Is this site OK for teens?</span>
+          <span class="text-emerald-300">→</span>
+        </a>
+
+        <a
+          href="scanner.html?sample=whatsapp"
+          class="ripple-btn inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl frosted-glass hover:bg-white/15 text-slate-100 font-bold text-sm sm:text-base transition"
+        >
+          <span>Test Scam Detector</span>
+          <span class="text-emerald-300">→</span>
+        </a>
+      </div>
+
+      <div class="reveal-up is-visible reveal-delay-4 flex flex-wrap items-center justify-center gap-5 pt-2 text-xs font-mono text-slate-200">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131926]/80 backdrop-blur-md border border-white/15">
+          <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          100% Free Web App
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131926]/80 backdrop-blur-md border border-white/15">
+          <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Instant Clause X-Ray &amp; Pushback Reply
+        </span>
+      </div>
+
+      <!-- Animated Scroll-Down Cue -->
+      <a href="#modules" aria-label="Scroll to explore" class="pt-4 inline-flex flex-col items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-slate-300 hover:text-emerald-300 transition">
+        <span>Scroll to Explore</span>
+        <span class="w-5 h-8 rounded-full border border-white/30 bg-[#131926]/50 backdrop-blur-sm flex items-start justify-center p-1">
+          <span class="scroll-wheel-dot w-1 h-2 rounded-full bg-emerald-400"></span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- #SEGMENT_06: ANIMATED TRUST METRICS -->
+  <main class="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-24">
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="reveal-up frosted-glass rounded-2xl p-5 space-y-2">
+        <div class="text-2xl sm:text-3xl font-black text-white"><span class="count-up" data-target="4">0</span></div>
+        <div class="text-xs font-mono uppercase tracking-wider text-emerald-300">Protection Modules</div>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Leases, Cyber Scams, App Terms &amp; Student Bonds.</p>
+        <div class="h-1 w-full rounded-full bg-white/10 overflow-hidden">
+          <div class="metric-bar-fill h-full rounded-full bg-emerald-400" style="--target-w: 100%;"></div>
+        </div>
+      </div>
+
+      <div class="reveal-up reveal-delay-1 frosted-glass rounded-2xl p-5 space-y-2">
+        <div class="text-2xl sm:text-3xl font-black text-white">&lt; <span class="count-up" data-target="15">0</span>s</div>
+        <div class="text-xs font-mono uppercase tracking-wider text-cyan-300">Instant Clause Audit</div>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Isolates predatory quotes and hidden traps in seconds.</p>
+        <div class="h-1 w-full rounded-full bg-white/10 overflow-hidden">
+          <div class="metric-bar-fill h-full rounded-full bg-cyan-400" style="--target-w: 92%;"></div>
+        </div>
+      </div>
+
+      <div class="reveal-up reveal-delay-2 frosted-glass rounded-2xl p-5 space-y-2">
+        <div class="text-2xl sm:text-3xl font-black text-white"><span class="count-up" data-target="1">0</span>-Click</div>
+        <div class="text-xs font-mono uppercase tracking-wider text-teal-300">Counter-Reply Synthesis</div>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Generates polite, ready-to-send negotiation drafts.</p>
+        <div class="h-1 w-full rounded-full bg-white/10 overflow-hidden">
+          <div class="metric-bar-fill h-full rounded-full bg-teal-400" style="--target-w: 88%;"></div>
+        </div>
+      </div>
+
+      <div class="reveal-up reveal-delay-3 frosted-glass rounded-2xl p-5 space-y-2">
+        <div class="text-2xl sm:text-3xl font-black text-white">0–<span class="count-up" data-target="100">0</span></div>
+        <div class="text-xs font-mono uppercase tracking-wider text-emerald-300">Objective Safety Score</div>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Clear risk breakdown so you never sign or pay blind.</p>
+        <div class="h-1 w-full rounded-full bg-white/10 overflow-hidden">
+          <div class="metric-bar-fill h-full rounded-full bg-emerald-400" style="--target-w: 96%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- #SEGMENT_07: FOUR DEDICATED PROTECTION MODULES -->
+    <section id="modules" class="space-y-6">
+      <div class="reveal-up flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-widest text-emerald-300">Core Protection Areas</span>
+          <h2 class="section-heading font-extrabold text-white mt-1">Four Dedicated Protection Modules</h2>
+        </div>
+        <p class="text-sm text-slate-300 max-w-md leading-relaxed">
+          Click any module below to load a real-world trap directly inside the ClauseGuard Audit Workspace.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <a href="scanner.html?sample=pg" class="reveal-up frosted-glass tilt-card rounded-3xl p-6 flex flex-col justify-between space-y-5 group hover:border-emerald-400/50">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-300 group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-300">LEASE</span>
+            </div>
+            <h3 class="sub-heading font-extrabold text-white">Rental &amp; PG Leases</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Flags 100% security deposit forfeiture, unfair lock-in periods, mandatory painting fees &amp; 24-hour eviction threats.
+            </p>
+          </div>
+          <div class="text-sm font-bold text-emerald-300 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+            <span>Test PG Lease Sample</span>
+            <span>→</span>
+          </div>
+        </a>
+
+        <a href="scanner.html?sample=whatsapp" class="reveal-up reveal-delay-1 frosted-glass tilt-card rounded-3xl p-6 flex flex-col justify-between space-y-5 group hover:border-cyan-400/50">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="w-11 h-11 rounded-2xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center text-cyan-300 group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-cyan-300">SCAMS</span>
+            </div>
+            <h3 class="sub-heading font-extrabold text-white">WhatsApp &amp; Cyber Scams</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Exposes fake "Digital Arrest" warrants, fraudulent UPI clearance demands, and malicious e-Challan APK links.
+            </p>
+          </div>
+          <div class="text-sm font-bold text-cyan-300 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+            <span>Test Cyber Scam Sample</span>
+            <span>→</span>
+          </div>
+        </a>
+
+        <a href="scanner.html?sample=app" class="reveal-up reveal-delay-2 frosted-glass tilt-card rounded-3xl p-6 flex flex-col justify-between space-y-5 group hover:border-teal-400/50">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="w-11 h-11 rounded-2xl bg-teal-500/15 border border-teal-400/30 flex items-center justify-center text-teal-300 group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                  <line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-teal-300">PRIVACY</span>
+            </div>
+            <h3 class="sub-heading font-extrabold text-white">App Terms &amp; Dark Patterns</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Catches roach-motel subscription renewals, drip pricing, and unbundled harvesting of contacts &amp; gallery photos.
+            </p>
+          </div>
+          <div class="text-sm font-bold text-teal-300 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+            <span>Test App Terms Sample</span>
+            <span>→</span>
+          </div>
+        </a>
+
+        <a href="scanner.html?sample=bond" class="reveal-up reveal-delay-3 frosted-glass tilt-card rounded-3xl p-6 flex flex-col justify-between space-y-5 group hover:border-purple-400/50">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="w-11 h-11 rounded-2xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center text-purple-300 group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+              </div>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-purple-300">BONDS</span>
+            </div>
+            <h3 class="sub-heading font-extrabold text-white">Student &amp; Internship Bonds</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Protects students against illegal retention of original 10th/12th marksheets, refund denials &amp; ₹2L exit bonds.
+            </p>
+          </div>
+          <div class="text-sm font-bold text-purple-300 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+            <span>Test Student Bond Sample</span>
+            <span>→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- #SCROLL_SCRUBBED_TIMELINE: HOW CLAUSEGUARD WORKS -->
+    <!-- #SEGMENT_V2: TEEN CHECK - "Is this site OK for teens?" (logic in teen.js) -->
+    <section id="teen-check" class="reveal-scale frosted-glass-elevated rounded-3xl p-6 sm:p-10 space-y-7 relative overflow-hidden">
+      <div class="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-emerald-500/20 blur-[110px] pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <div class="space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>NEW in v2 · Teen Check</span>
+          </div>
+          <h2 class="section-heading font-extrabold text-white">
+            Is this site <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">OK for teens?</span>
+          </h2>
+        </div>
+        <p class="text-sm text-slate-300 max-w-md leading-relaxed">
+          Type any website. ClauseGuard reads its Terms &amp; Privacy Policy and explains what you're agreeing to in plain words, with the exact sentences as proof.
+        </p>
+      </div>
+
+      <div class="relative z-10 space-y-4">
+        <form id="check-form" class="frosted-glass rounded-3xl p-3 sm:p-4 flex flex-col sm:flex-row gap-2" autocomplete="off">
+          <label for="site-input" class="sr-only">Website name or link</label>
+          <input id="site-input" type="text" inputmode="url" maxlength="300" placeholder="instagram.com, discord, or paste a link"
+            class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-base text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
+          <label for="lang-select" class="sr-only">Language</label>
+          <select id="lang-select" class="rounded-2xl bg-black/30 border border-white/15 px-3 py-3 text-base text-white outline-none focus:border-emerald-400">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+            <option value="ml">മലയാളം</option>
+          </select>
+          <button id="check-btn" type="submit" class="ripple-btn rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold px-6 py-3 shadow-xl shadow-emerald-500/30 transition">Check</button>
+        </form>
+
+        <div id="popular-chips" class="flex flex-wrap gap-2" aria-label="Popular sites"></div>
+
+        <details id="paste-box" class="frosted-glass rounded-2xl">
+          <summary class="cursor-pointer px-4 py-3 text-sm text-slate-300">Can't find a site? <span class="text-emerald-300 font-semibold">Paste its terms instead</span></summary>
+          <div class="px-4 pb-4 space-y-2">
+            <label for="paste-input" class="sr-only">Paste terms text</label>
+            <textarea id="paste-input" rows="6" maxlength="60000" placeholder="Open the site's Terms or Privacy page, copy the text, and paste it here."
+              class="w-full rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-sm text-white placeholder-slate-400 outline-none focus:border-emerald-400"></textarea>
+            <button id="paste-btn" type="button" class="rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-4 py-2 text-sm">Check pasted text</button>
+          </div>
+        </details>
+
+        <div id="turnstile-box" class="flex justify-center"></div>
+        <p id="status" class="min-h-[1.5rem] text-sm text-slate-300" aria-live="polite"></p>
+      </div>
+
+      <!-- Result (filled in by teen.js) -->
+      <div id="result" class="hidden relative z-10 space-y-5" aria-live="polite">
+        <div id="verdict-card" class="glass rounded-3xl p-5 sm:p-7 space-y-3">
+          <div class="flex flex-wrap items-center gap-3">
+            <span id="verdict-badge" class="px-3 py-1 rounded-full text-sm font-extrabold"></span>
+            <h3 id="site-title" class="text-xl sm:text-2xl font-extrabold text-white"></h3>
+          </div>
+          <p id="verdict-reason" class="text-lg text-slate-100"></p>
+          <p id="summary" class="text-slate-300"></p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="glass rounded-3xl p-5 space-y-2">
+            <h4 class="text-xs font-mono uppercase tracking-widest text-emerald-300">Minimum age</h4>
+            <p id="age-value" class="text-2xl font-extrabold text-white"></p>
+            <blockquote id="age-quote" class="quote pl-3 text-sm text-slate-300 italic hidden"></blockquote>
+          </div>
+          <div class="glass rounded-3xl p-5 space-y-2">
+            <h4 class="text-xs font-mono uppercase tracking-widest text-amber-300">Under 18 in India?</h4>
+            <p id="india-note" class="text-slate-200"></p>
+            <p class="text-sm text-slate-400">If you're under 18, check with a parent before signing up.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-lg font-extrabold text-white">What you're agreeing to</h4>
+          <div id="points" class="grid md:grid-cols-2 gap-3"></div>
+          <p id="no-points" class="hidden text-sm text-slate-400">No points could be backed up with exact quotes from the terms, so nothing is shown here. Try pasting the terms text instead.</p>
+        </div>
+
+        <div class="glass rounded-3xl p-5 space-y-2">
+          <h4 class="text-lg font-extrabold text-white">What you can do</h4>
+          <ul id="tips" class="list-disc pl-5 space-y-1 text-slate-200"></ul>
+        </div>
+
+        <div class="text-sm text-slate-400 space-y-1">
+          <p id="source-line"></p>
+          <ul id="source-links" class="space-y-1"></ul>
+          <p>✔ Every point quotes the terms word-for-word. ClauseGuard checks each quote against the real text and removes any that don't match.</p>
+        </div>
+      </div>
+
+      <!-- Questions about the checked terms -->
+      <div id="chat" class="hidden relative z-10 glass rounded-3xl p-5 sm:p-6 space-y-4">
+        <div>
+          <h4 class="text-lg font-extrabold text-white">Ask about these terms</h4>
+          <p class="text-sm text-slate-400">Ask in your own words: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Please don't type personal details.</p>
+        </div>
+        <div id="chat-chips" class="flex flex-wrap gap-2"></div>
+        <div id="chat-messages" class="space-y-3 max-h-[28rem] overflow-y-auto"></div>
+        <form id="chat-form" class="flex gap-2" autocomplete="off">
+          <label for="chat-input" class="sr-only">Your question</label>
+          <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. Can strangers message me?"
+            class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
+          <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Ask</button>
+        </form>
+      </div>
+
+      <p class="relative z-10 text-xs text-slate-500">
+        Explanations are written by an AI (Google Gemini) from the site's own terms and can be wrong, so always check the quoted sentences. Website text and your questions are sent to Google to be analysed. Information only, not legal advice.
+      </p>
+    </section>
+
+    <section id="how-it-works" class="space-y-8">
+      <div class="reveal-up text-center max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-cyan-300">Scroll-Driven Audit Pipeline</span>
+        <h2 class="section-heading font-extrabold text-white">How ClauseGuard Protects You in 3 Steps</h2>
+      </div>
+
+      <div id="workflow-timeline" class="relative max-w-4xl mx-auto pl-10 sm:pl-14 space-y-6">
+        <div class="absolute left-4 sm:left-6 top-4 bottom-4 w-[2px] bg-white/10 rounded-full"></div>
+        <div id="workflow-progress-line" class="absolute left-4 sm:left-6 top-4 w-[2px] h-0 bg-gradient-to-b from-emerald-400 via-teal-300 to-cyan-400 rounded-full shadow-[0_0_12px_rgba(52,211,153,0.85)] transition-[height] duration-100"></div>
+
+        <div class="reveal-up workflow-step-card step-active frosted-glass rounded-3xl p-6 sm:p-7 relative" data-step="0">
+          <div class="workflow-step-badge absolute -left-10 sm:-left-14 top-6 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1a2234] border border-emerald-400/50 flex items-center justify-center font-mono font-black text-xs sm:text-sm text-emerald-300">
+            01
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <h3 class="sub-heading font-extrabold text-white">Paste Fine Print or Pick a Trap</h3>
+            <span class="text-xs font-mono text-emerald-300">Input Stage</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Drop in any PG rental agreement, internship offer bond, app Terms &amp; Conditions, or suspicious WhatsApp message—or load a 1-click sample scenario inside the workspace.
+          </p>
+        </div>
+
+        <div class="reveal-up reveal-delay-1 workflow-step-card frosted-glass rounded-3xl p-6 sm:p-7 relative" data-step="1">
+          <div class="workflow-step-badge absolute -left-10 sm:-left-14 top-6 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1a2234] border border-emerald-400/50 flex items-center justify-center font-mono font-black text-xs sm:text-sm text-emerald-300">
+            02
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <h3 class="sub-heading font-extrabold text-white">Clause-by-Clause X-Ray &amp; Safety Score</h3>
+            <span class="text-xs font-mono text-cyan-300">Forensic Scan</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            ClauseGuard isolates the exact predatory lines, calculates a weighted <strong>0–100 Safety Score</strong>, and explains the financial or privacy trap in plain English without confusing jargon.
+          </p>
+        </div>
+
+        <div class="reveal-up reveal-delay-2 workflow-step-card frosted-glass rounded-3xl p-6 sm:p-7 relative" data-step="2">
+          <div class="workflow-step-badge absolute -left-10 sm:-left-14 top-6 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1a2234] border border-emerald-400/50 flex items-center justify-center font-mono font-black text-xs sm:text-sm text-emerald-300">
+            03
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <h3 class="sub-heading font-extrabold text-white">Copy Pushback Draft or Escalate</h3>
+            <span class="text-xs font-mono text-teal-300">Action Stage</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Copy a ready-to-send polite negotiation reply to push back before signing—or tap direct reporting channels like <span class="font-mono text-emerald-300">1930</span> (Cyber Crime) and <span class="font-mono text-emerald-300">1915</span> (Consumer Helpline).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- #SEGMENT_08: INTERACTIVE CLAUSE X-RAY SHOWCASE -->
+    <section id="clause-xray" class="reveal-scale frosted-glass-elevated rounded-3xl p-7 sm:p-10 grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+      <div class="reveal-left lg:col-span-5 space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
+          <span>Interactive Clause X-Ray</span>
+        </div>
+
+        <h2 class="section-heading font-extrabold text-white">
+          See how hidden fine print gets dissected in real time.
+        </h2>
+
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          Switch between four real-world scenarios on the right to inspect how ClauseGuard isolates predatory sentences, scores financial risk, and explains the red flags clearly.
+        </p>
+
+        <div class="space-y-3 pt-1">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/35 flex items-center justify-center text-emerald-300 text-xs font-mono font-bold shrink-0 mt-0.5">01</div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <strong class="text-white">Verbatim Quote Isolation:</strong> Highlights the exact unfair sentence rather than summarizing the whole page.
+            </p>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/35 flex items-center justify-center text-cyan-300 text-xs font-mono font-bold shrink-0 mt-0.5">02</div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <strong class="text-white">Plain-English Risk Breakdown:</strong> Explains why a clause is unfair or dangerous without confusing legal jargon.
+            </p>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-teal-500/20 border border-teal-400/35 flex items-center justify-center text-teal-300 text-xs font-mono font-bold shrink-0 mt-0.5">03</div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <strong class="text-white">One-Click Workspace Launch:</strong> Jump directly into the full scanner with that exact case preloaded.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-right lg:col-span-7">
+        <div class="frosted-glass tilt-card rounded-3xl p-6 sm:p-7 space-y-5 relative border-white/15">
+          <div class="xray-laser"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3.5 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-mono text-slate-400 ml-1">CLAUSE X-RAY</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="switchHeroPreview('pg')" data-preview="pg" class="preview-tab text-xs font-mono px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 transition cursor-pointer">PG Lease</button>
+              <button type="button" onclick="switchHeroPreview('whatsapp')" data-preview="whatsapp" class="preview-tab text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 transition cursor-pointer">Scam Call</button>
+              <button type="button" onclick="switchHeroPreview('app')" data-preview="app" class="preview-tab text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 transition cursor-pointer">App Terms</button>
+              <button type="button" onclick="switchHeroPreview('bond')" data-preview="bond" class="preview-tab text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 transition cursor-pointer">Intern Bond</button>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-black/35 border border-white/10 p-4 sm:p-5 space-y-2">
+            <div class="text-xs font-mono uppercase tracking-wider text-slate-400" id="preview-doc-title">PG ACCOMMODATION AGREEMENT • CLAUSE 7</div>
+            <p id="preview-quote" class="text-xs sm:text-sm text-red-200 leading-relaxed font-medium">
+              "If the tenant vacates before completing the 11-month lock-in period for any reason, 100% of the ₹35,000 security deposit shall be forfeited automatically."
+            </p>
+          </div>
+
+          <div class="grid sm:grid-cols-12 gap-4 items-center p-4 rounded-2xl bg-white/5 border border-white/10">
+            <div class="sm:col-span-4 flex items-center gap-3">
+              <div id="preview-score-badge" class="w-14 h-14 rounded-2xl bg-red-500/20 border border-red-400/40 flex flex-col items-center justify-center shrink-0">
+                <span id="preview-score-num" class="text-lg font-black text-red-300 leading-none">28</span>
+                <span class="text-[11px] font-mono text-red-300/80 mt-0.5">/100</span>
+              </div>
+              <div>
+                <div class="text-xs font-mono text-red-300 font-bold" id="preview-risk-label">HIGH RISK</div>
+                <div class="text-xs sm:text-sm text-slate-200 font-semibold" id="preview-flag-title">Blanket Forfeiture</div>
+              </div>
+            </div>
+
+            <div class="sm:col-span-8 sm:border-l sm:border-white/10 sm:pl-4">
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="preview-explanation">
+                Unfair blanket penalty. Landlords can only deduct proven unpaid bills or documented damages—never 100% of your deposit automatically.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <span class="text-xs font-mono text-slate-400">Want the full report &amp; copyable pushback draft?</span>
+            <a id="preview-open-link" href="scanner.html?sample=pg" class="ripple-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/35 text-xs sm:text-sm font-bold transition">
+              <span>Run Full Audit in Workspace</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- #SEGMENT_08B: BROWSER EXTENSION 3D SHOWCASE -->
+    <section id="extension" class="reveal-scale frosted-glass-elevated rounded-3xl p-7 sm:p-10 grid lg:grid-cols-12 gap-8 lg:gap-10 items-center relative overflow-hidden">
+      <div class="absolute -top-20 -right-16 w-72 h-72 rounded-full bg-cyan-500/20 blur-[110px] pointer-events-none"></div>
+
+      <div class="reveal-left lg:col-span-5 space-y-5 relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span>ClauseGuard Browser Extension</span>
+        </div>
+
+        <h2 class="section-heading font-extrabold text-white">
+          One click on any website scans its <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">Terms &amp; Conditions</span> in place.
+        </h2>
+
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          Install the ClauseGuard extension, open any page, and tap the shield. It reads the fine print right there in your browser, highlights predatory clauses, and shows a live safety score—no copy-pasting required.
+        </p>
+
+        <div class="space-y-3 pt-1">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/35 flex items-center justify-center text-emerald-300 text-xs font-mono font-bold shrink-0 mt-0.5">01</div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <strong class="text-white">One-Tap Scan:</strong> Click the extension icon to instantly audit the open site's terms.
+            </p>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/35 flex items-center justify-center text-cyan-300 text-xs font-mono font-bold shrink-0 mt-0.5">02</div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <strong class="text-white">On-Page Highlighting:</strong> Predatory sentences are flagged directly on the page you're viewing.
+            </p>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-teal-500/20 border border-teal-400/35 flex items-center justify-center text-teal-300 text-xs font-mono font-bold shrink-0 mt-0.5">03</div>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <strong class="text-white">Free &amp; Open Source:</strong> Get it from the GitHub repo and follow the README to build and load it.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+          <a href="https://github.com/IceyVibes/clauseguard" target="_blank" rel="noopener noreferrer" class="ripple-btn ext-download-glow inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/35 transition">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.75.41-1.27.74-1.56-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.41-2.69 5.38-5.26 5.67.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+            <span>Download from GitHub</span>
+            <span>→</span>
+          </a>
+          <span class="text-xs font-mono text-slate-400 text-center sm:text-left">github.com/IceyVibes/clauseguard</span>
+        </div>
+      </div>
+
+      <div class="reveal-right lg:col-span-7 relative z-10">
+        <div class="ext-scene relative">
+          <!-- Floating 3D extension icon -->
+          <div class="ext-3d-icon absolute -top-6 right-6 z-30 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-2xl">
+            <svg class="w-8 h-8 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+
+          <div class="ext-browser frosted-glass tilt-card rounded-3xl overflow-hidden border-white/15 relative">
+            <div class="ext-scan-beam"></div>
+
+            <!-- Browser chrome -->
+            <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-white/10 bg-black/25">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              </div>
+              <div class="flex-1 max-w-xs mx-auto px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-slate-400 truncate text-center">https://any-website.com/terms</div>
+              <div class="ext-badge-pop w-7 h-7 rounded-lg bg-emerald-500/25 border border-emerald-400/50 flex items-center justify-center text-emerald-300">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+            </div>
+
+            <!-- Fake page content with highlighted clauses -->
+            <div class="p-4 sm:p-5 space-y-3 bg-black/30">
+              <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Terms &amp; Conditions</div>
+              <div class="space-y-2 text-[11px] sm:text-xs leading-relaxed">
+                <p class="text-slate-400">1. By using this service you agree to the following terms and conditions of use.</p>
+                <p class="ext-flag rounded-lg bg-red-500/15 border border-red-400/40 px-3 py-1.5 text-red-200">4. Your subscription renews automatically every month and non-refundable fees apply.</p>
+                <p class="text-slate-400">5. We may update these terms at any time without prior notice to the user.</p>
+                <p class="ext-flag rounded-lg bg-red-500/15 border border-red-400/40 px-3 py-1.5 text-red-200">6. All disputes are subject to arbitration in a distant city at your own cost.</p>
+              </div>
+
+              <!-- Floating score card -->
+              <div class="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10">
+                <div class="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex flex-col items-center justify-center shrink-0">
+                  <span class="text-base font-black text-red-300 leading-none">24</span>
+                  <span class="text-[10px] font-mono text-red-300/80">/100</span>
+                </div>
+                <div class="flex-1">
+                  <div class="text-xs font-mono text-red-300 font-bold">2 HIGH-RISK CLAUSES FOUND</div>
+                  <div class="text-[11px] sm:text-xs text-slate-300">Auto-renewal &amp; forced arbitration flagged on this page.</div>
+                </div>
+                <span class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-200 border border-emerald-400/35 text-[11px] font-mono">Rescan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- #SEGMENT_09: GENERIC AI VS CLAUSEGUARD -->
+    <section id="comparison" class="space-y-6">
+      <div class="reveal-up text-center max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-300">Purpose-Built Risk Forensics</span>
+        <h2 class="section-heading font-extrabold text-white">Why Not Just Paste Into a Generic Chatbot?</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="reveal-left frosted-glass tilt-card rounded-3xl p-6 sm:p-7 space-y-4 border-white/10 opacity-90">
+          <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Generic AI Chatbots</div>
+          <ul class="space-y-3 text-sm text-slate-300 leading-relaxed">
+            <li class="flex items-start gap-2.5"><span class="text-red-400 font-bold">✕</span><span>Gives long, generic summaries without pinpointing the exact predatory sentence.</span></li>
+            <li class="flex items-start gap-2.5"><span class="text-red-400 font-bold">✕</span><span>No objective risk scoring—leaves you guessing whether a clause is normal or dangerous.</span></li>
+            <li class="flex items-start gap-2.5"><span class="text-red-400 font-bold">✕</span><span>Requires manual prompting every time and gives no ready-to-send pushback reply.</span></li>
+          </ul>
+        </div>
+
+        <div class="reveal-right frosted-glass-elevated tilt-card rounded-3xl p-6 sm:p-7 space-y-4 border-emerald-400/40">
+          <div class="text-xs font-mono uppercase tracking-wider text-emerald-300 font-bold">ClauseGuard Engine</div>
+          <ul class="space-y-3 text-sm text-slate-100 leading-relaxed">
+            <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span>Isolates verbatim predatory quotes and explains the exact financial or privacy trap in plain English.</span></li>
+            <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span>Computes a weighted <strong>0–100 Safety Score</strong> alongside a 1-click copyable negotiation reply.</span></li>
+            <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span>Includes an AI follow-up assistant, 4 specialized modules, and direct <span class="font-mono text-emerald-300">1930 / 1915</span> escalation links.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- #SEGMENT_10: COLLAPSIBLE FAQ ACCORDION -->
+    <section id="faq" class="space-y-6">
+      <div class="reveal-up text-center max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-cyan-300">Common Questions</span>
+        <h2 class="section-heading font-extrabold text-white">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="max-w-3xl mx-auto space-y-3" id="faq-list">
+        <div class="reveal-up faq-item frosted-glass rounded-2xl overflow-hidden">
+          <button type="button" onclick="toggleFaqItem(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-white/5 transition cursor-pointer">
+            <span class="font-bold text-sm sm:text-base text-white">Is ClauseGuard free to use for students and tenants?</span>
+            <svg class="faq-chevron w-4 h-4 text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <div class="px-6 pb-4 pt-2 border-t border-white/10 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Yes—100% free. The web audit workspace and AI assistant run without paywalls or subscriptions so students, tenants, and everyday users can check fine print before paying deposits or fees.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal-up reveal-delay-1 faq-item frosted-glass rounded-2xl overflow-hidden">
+          <button type="button" onclick="toggleFaqItem(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-white/5 transition cursor-pointer">
+            <span class="font-bold text-sm sm:text-base text-white">How is ClauseGuard different from pasting a contract into ChatGPT?</span>
+            <svg class="faq-chevron w-4 h-4 text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <div class="px-6 pb-4 pt-2 border-t border-white/10 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                ClauseGuard isolates verbatim predatory clauses, assigns an objective 0–100 Safety Score, generates a ready-to-send pushback message, and highlights official reporting channels like 1930 (Cyber Crime) and 1915 (Consumer Helpline).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal-up reveal-delay-2 faq-item frosted-glass rounded-2xl overflow-hidden">
+          <button type="button" onclick="toggleFaqItem(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-white/5 transition cursor-pointer">
+            <span class="font-bold text-sm sm:text-base text-white">Is my pasted lease or message stored or shared?</span>
+            <svg class="faq-chevron w-4 h-4 text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <div class="px-6 pb-4 pt-2 border-t border-white/10 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                No. ClauseGuard audits your pasted text on the fly to flag predatory clauses and generate your counter-reply without selling or publishing your personal documents.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal-up reveal-delay-3 faq-item frosted-glass rounded-2xl overflow-hidden">
+          <button type="button" onclick="toggleFaqItem(this)" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-white/5 transition cursor-pointer">
+            <span class="font-bold text-sm sm:text-base text-white">Does ClauseGuard replace a licensed advocate?</span>
+            <svg class="faq-chevron w-4 h-4 text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <div class="px-6 pb-4 pt-2 border-t border-white/10 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                No. ClauseGuard is an informational early-warning and awareness tool that flags red-flag clauses in plain English so you know when to negotiate or consult a qualified legal professional.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- #SEGMENT_11: FINAL CTA -->
+    <section class="reveal-scale frosted-glass-elevated rounded-3xl p-8 sm:p-12 text-center space-y-5 relative overflow-hidden">
+      <h2 class="section-heading font-black text-white">
+        Ready to put fine print under the microscope?
+      </h2>
+      <p class="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
+        Open the ClauseGuard workspace, pick a sample trap in one click, or paste your own lease, bond, or suspicious message.
+      </p>
+      <div class="pt-2">
+        <a href="scanner.html" class="ripple-btn inline-flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-emerald-500/30 transition">
+          <span>Open ClauseGuard Scanner</span>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- #SEGMENT_12: FLOATING AI CHATBOT -->
+  <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+    <div id="cg-chat-drawer" class="hidden w-[92vw] sm:w-[390px] frosted-glass-elevated rounded-3xl overflow-hidden border border-emerald-400/35 shadow-2xl fade-in-up">
+      <div class="px-4 py-3.5 bg-white/5 border-b border-white/15 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="text-xs sm:text-sm font-extrabold text-white leading-none">ClauseGuard AI Assistant</div>
+            <div class="text-xs font-mono text-emerald-300 mt-1 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Quick Fine-Print &amp; Scam Guide</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="toggleChatDrawer(false)" aria-label="Close chat" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="cg-chat-messages" class="chat-scroll h-72 overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
+        <div class="p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed">
+          Hi! Ask me anything about PG deposit rules, Digital Arrest WhatsApp scams, internship bonds, or how ClauseGuard works.
+        </div>
+      </div>
+
+      <div class="px-3.5 py-2 border-t border-white/10 bg-black/20 flex gap-1.5 overflow-x-auto">
+        <button type="button" onclick="sendSuggestedPrompt('Can my landlord forfeit 100% of my PG deposit?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">PG deposit rules</button>
+        <button type="button" onclick="sendSuggestedPrompt('Can a company keep my original marksheets?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Original marksheets</button>
+        <button type="button" onclick="sendSuggestedPrompt('How do I report a Digital Arrest scam?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Report scam</button>
+      </div>
+
+      <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-white/15 bg-black/25 flex items-center gap-2">
+        <input id="cg-chat-input" type="text" placeholder="Ask ClauseGuard AI..." class="frosted-input flex-1 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400" />
+        <button type="submit" aria-label="Send message" class="ripple-btn px-3.5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold transition cursor-pointer flex items-center justify-center">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <button id="cg-chat-fab" type="button" onclick="toggleChatDrawer()" class="ripple-btn frosted-glass-elevated px-4 py-3 rounded-2xl border border-emerald-400/45 hover:border-emerald-300 text-white font-bold text-xs sm:text-sm shadow-xl shadow-emerald-950/60 flex items-center gap-2.5 transition cursor-pointer">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+      </span>
+      <svg class="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>Ask ClauseGuard AI</span>
+    </button>
+  </div>
+
+  <!-- #SEGMENT_13: FOOTER & SCROLL ANIMATION ENGINE -->
+  <footer class="relative z-10 frosted-glass border-t border-white/15 py-8 text-center text-xs sm:text-sm text-slate-400 space-y-2 mt-12">
+    <div class="font-bold text-white tracking-wide">Made by a couple thirteen year olds</div>
+    <div class="font-medium text-emerald-300 text-xs">ClauseGuard — Frosted 3D Fine-Print &amp; Scam Shield</div>
+    <div class="text-slate-500 text-xs">Informational AI Audit Only • Not Formal Legal Advice</div>
+  </footer>
+
+  <script>
+    // Replace this with the HTTPS backend URL from Render/Railway.
+    const API_BASE = 'https://YOUR-BACKEND-NAME.onrender.com';
+    let pulse3DSphere = () => {};
+    let sync3DScroll = () => {};
+    let scrollObserver = null;
+
+    function animateCounter(el) {
+      if (!el || el.dataset.counted === 'true') return;
+      el.dataset.counted = 'true';
+      const target = parseInt(el.dataset.target || '0', 10);
+      const duration = 1000;
+      const startTime = performance.now();
+
+      function tick(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(tick);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function registerScrollReveals(root = document) {
+      const targets = root.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale');
+      if (!('IntersectionObserver' in window)) {
+        targets.forEach((el) => {
+          el.classList.add('is-visible');
+          el.querySelectorAll('.count-up').forEach(animateCounter);
+        });
+        return;
+      }
+      if (!scrollObserver) {
+        scrollObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                entry.target.querySelectorAll('.count-up').forEach(animateCounter);
+                scrollObserver.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -35px 0px' }
+        );
+      }
+      targets.forEach((el) => {
+        if (!el.classList.contains('is-visible')) scrollObserver.observe(el);
+      });
+    }
+
+    // Raw input texts ONLY — no hardcoded verdicts or scores
+    const XRAY_INPUTS = {
+      pg: {
+
+        docTitle: 'PG ACCOMMODATION AGREEMENT • CLAUSE 7',
+        quote: '"If the tenant vacates before completing the 11-month lock-in period for any reason, 100% of the ₹35,000 security deposit shall be forfeited automatically."',
+        link: 'scanner.html?sample=pg'
+      },
+      whatsapp: {
+        docTitle: 'WHATSAPP CYBER CELL NOTICE • INCOMING',
+        quote: '"A DIGITAL ARREST WARRANT has been issued. Join Skype Officer Verification immediately and transfer ₹24,500 refundable clearance via UPI."',
+        link: 'scanner.html?sample=whatsapp'
+      },
+      app: {
+        docTitle: 'APP TERMS & PRIVACY POLICY • SECTION 4.2',
+        quote: '"3-day free trial renews at ₹4,999/year. Cancellation accepted only via notarized physical letter sent 30 days prior. Grants perpetual access to device contacts."',
+        link: 'scanner.html?sample=app'
+      },
+      bond: {
+        docTitle: 'INTERNSHIP & TRAINING BOND • CLAUSE 1 & 2',
+        quote: '"Selected intern must submit original Class 10th, 12th & University marksheets for 24 months. Leaving early requires paying ₹2,00,000 penalty."',
+        link: 'scanner.html?sample=bond'
+      }
+    };
+
+    async function switchHeroPreview(key) {
+      const item = XRAY_INPUTS[key];
+      if (!item) return;
+
+      document.getElementById('preview-doc-title').textContent = item.docTitle;
+      document.getElementById('preview-quote').textContent = item.quote;
+      document.getElementById('preview-open-link').setAttribute('href', item.link);
+
+      document.querySelectorAll('.preview-tab').forEach((btn) => {
+        const active = btn.getAttribute('data-preview') === key;
+        btn.className = active
+          ? 'preview-tab text-xs font-mono px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 transition cursor-pointer'
+          : 'preview-tab text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 transition cursor-pointer';
+      });
+
+      // Live audit from friend's backend
+      document.getElementById('preview-score-num').textContent = '...';
+      document.getElementById('preview-risk-label').textContent = 'SCANNING';
+      document.getElementById('preview-flag-title').textContent = 'Querying Backend';
+      document.getElementById('preview-explanation').textContent = 'Analyzing clause against your backend knowledge base...';
+
+      pulse3DSphere(true);
+      try {
+        const result = await window.ClausesGuardStatic.audit({ text: item.quote, module: key });
+
+        document.getElementById('preview-score-num').textContent = result.score ?? '--';
+        document.getElementById('preview-risk-label').textContent = result.risk_label ?? 'AUDITED';
+        document.getElementById('preview-flag-title').textContent = result.title ?? 'Clause Audit';
+        document.getElementById('preview-explanation').textContent = result.summary ?? 'No summary returned.';
+      } catch (err) {
+        document.getElementById('preview-score-num').textContent = '--';
+        document.getElementById('preview-risk-label').textContent = 'OFFLINE';
+        document.getElementById('preview-flag-title').textContent = 'Static AI Unavailable';
+        document.getElementById('preview-explanation').textContent = err.message || 'Enter a valid Gemini API key to run this browser-only audit.';
+      } finally {
+        pulse3DSphere(false);
+      }
+    }
+
+    function toggleFaqItem(buttonEl) {
+      const item = buttonEl.closest('.faq-item');
+      if (item) item.classList.toggle('is-open');
+    }
+
+    function toggleChatDrawer(forceState) {
+      const drawer = document.getElementById('cg-chat-drawer');
+      const shouldOpen = typeof forceState === 'boolean' ? forceState : drawer.classList.contains('hidden');
+      drawer.classList.toggle('hidden', !shouldOpen);
+      if (shouldOpen) document.getElementById('cg-chat-input').focus();
+    }
+
+    function appendChatBubble(sender, text) {
+      const box = document.getElementById('cg-chat-messages');
+      const isUser = sender === 'user';
+      const wrapper = document.createElement('div');
+      wrapper.className = isUser ? 'flex justify-end' : 'flex justify-start';
+      const bubble = document.createElement('div');
+      bubble.className = isUser
+        ? 'max-w-[85%] p-3 rounded-2xl rounded-tr-sm bg-emerald-400 text-slate-950 font-medium leading-relaxed'
+        : 'max-w-[88%] p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed whitespace-pre-line';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      box.appendChild(wrapper);
+      box.scrollTop = box.scrollHeight;
+      return bubble;
+    }
+
+    function sendSuggestedPrompt(promptText) {
+      document.getElementById('cg-chat-input').value = promptText;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    async function handleChatSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById('cg-chat-input');
+      const userMsg = input.value.trim();
+      if (!userMsg) return;
+
+      input.value = '';
+      appendChatBubble('user', userMsg);
+      const botBubble = appendChatBubble('bot', 'Searching knowledge base...');
+
+      try {
+        const data = await window.ClausesGuardStatic.chat({ message: userMsg, module: 'home' });
+        botBubble.textContent = data.reply || 'No reply returned by the backend.';
+      } catch (err) {
+        botBubble.textContent = err.message || 'Could not reach the protected backend.';
+      }
+
+      const box = document.getElementById('cg-chat-messages');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      registerScrollReveals(document);
+      switchHeroPreview('pg');
+
+      const progressBar = document.getElementById('scroll-progress-bar');
+      const heroSection = document.getElementById('hero-top');
+      const heroStack = document.getElementById('hero-parallax-stack');
+      const workflowEl = document.getElementById('workflow-timeline');
+      const workflowLine = document.getElementById('workflow-progress-line');
+      const workflowCards = document.querySelectorAll('.workflow-step-card');
+      const spyIds = ['hero-top', 'modules', 'teen-check', 'how-it-works', 'clause-xray', 'extension', 'comparison', 'faq'];
+      const spyDots = document.querySelectorAll('.scroll-dot');
+
+      const updateScrollDynamics = () => {
+        const scrollY = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollY / docHeight) * 100)) : 0;
+        if (progressBar) progressBar.style.width = `${pct}%`;
+
+        if (heroSection && heroStack) {
+          const heroH = heroSection.offsetHeight || 650;
+          const heroProgress = Math.min(1, Math.max(0, scrollY / heroH));
+          sync3DScroll(heroProgress);
+          heroStack.style.transform = `translate3d(0, ${(heroProgress * 46).toFixed(1)}px, 0)`;
+          heroStack.style.opacity = `${Math.max(0.18, 1 - heroProgress * 0.95).toFixed(3)}`;
+        }
+
+        if (workflowEl && workflowLine) {
+          const rect = workflowEl.getBoundingClientRect();
+          const triggerPoint = window.innerHeight * 0.62;
+          const ratio = Math.min(1, Math.max(0, (triggerPoint - rect.top) / rect.height));
+          workflowLine.style.height = `calc(${(ratio * 100).toFixed(1)}% - 2rem)`;
+
+          workflowCards.forEach((card, idx) => {
+            const threshold = idx * 0.34;
+            card.classList.toggle('step-active', ratio >= threshold);
+          });
+        }
+
+        let activeId = spyIds[0];
+        const scanLine = window.innerHeight * 0.42;
+        for (const id of spyIds) {
+          const sec = document.getElementById(id);
+          if (sec && sec.getBoundingClientRect().top <= scanLine) {
+            activeId = id;
+          }
+        }
+        spyDots.forEach((dot) => {
+          dot.classList.toggle('active', dot.getAttribute('data-spy') === activeId);
+        });
+      };
+
+      updateScrollDynamics();
+      window.addEventListener('scroll', updateScrollDynamics, { passive: true });
+      window.addEventListener('resize', updateScrollDynamics, { passive: true });
+
+      document.addEventListener('mousemove', (e) => {
+        const card = e.target.closest('.tilt-card');
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -4.5;
+        const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 4.5;
+        card.style.setProperty('--spot-x', `${x}px`);
+        card.style.setProperty('--spot-y', `${y}px`);
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-3px)`;
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const card = e.target.closest('.tilt-card');
+        if (card && !card.contains(e.relatedTarget)) {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.ripple-btn');
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height) * 1.4;
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+        ripple.className = 'btn-ripple-wave';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+      });
+    });
+  </script>
+
+  <!-- #THREE_JS_3D_GEODESIC_NODE_SPHERE_LOADER -->
+  <script type="module">
+    try {
+      const { initUpfrontScene, setUpfrontScanState, setUpfrontScrollProgress } = await import('./upfront.js');
+      initUpfrontScene('upfront-canvas-container');
+      pulse3DSphere = setUpfrontScanState;
+      sync3DScroll = setUpfrontScrollProgress;
+    } catch (err) {
+      console.warn('upfront.js 3D geodesic scene skipped:', err);
+    }
+  </script>
+</body>
+</html>

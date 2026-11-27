@@ -11,6 +11,8 @@
   <meta name="theme-color" content="#131926" />
   <title>ClauseGuard Scanner — Frosted 3D Clause Inspector</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./clauseguard-config.js"></script>
+  <script src="./clauseguard-api.js"></script>
 
   <script>
     tailwind.config = {
@@ -404,7 +406,7 @@
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <a href="indexOP.html" class="flex items-center gap-2.5 group">
+        <a href="indexOP-v2.html" class="flex items-center gap-2.5 group">
           <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-inner group-hover:scale-105 transition-transform">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -420,13 +422,14 @@
 
       <div class="flex items-center gap-5">
         <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-slate-300">
-          <a href="indexOP.html#comparison" class="hover:text-white transition">Why ClauseGuard</a>
+          <a href="teen.html" class="text-emerald-300 hover:text-white font-semibold transition">Teen Check</a>
+          <a href="indexOP-v2.html#comparison" class="hover:text-white transition">Why ClauseGuard</a>
           <a href="#audit-verdict" class="hover:text-white transition">Architecture</a>
           <a href="#helplines" class="hover:text-white transition">Helplines</a>
         </nav>
 
         <a
-          href="indexOP.html"
+          href="indexOP-v2.html"
           class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-200 bg-white/5 hover:bg-white/10 border border-white/15 px-3.5 py-1.5 rounded-xl transition"
         >
           <span>← Home</span>
@@ -959,7 +962,8 @@
     // =====================================================================
     // LINK YOUR FRIEND'S BACKEND URL HERE:
     // =====================================================================
-    const API_BASE = 'https://YOUR-BACKEND-NAME.onrender.com';
+    // Web version: the API lives on the same website (see clauseguard-config.js).
+    const API_BASE = String((window.CLAUSEGUARD_CONFIG || {}).API_BASE || '').replace(/\/$/, '');
 
     let currentModule = 'general';
     let currentThinkingLevel = 'low';
@@ -1032,17 +1036,8 @@
       input.value = `Extracting readable text from ${file.name}...`;
 
       try {
-        const form = new FormData();
-        form.append('file', file);
-        const res = await fetch(`${API_BASE}/api/extract`, {
-          method: 'POST',
-          body: form
-        });
-        if (!res.ok) {
-          const error = await res.json().catch(() => ({}));
-          throw new Error(error.detail || `HTTP ${res.status}`);
-        }
-        const data = await res.json();
+        // Web version: TXT / MD / PDF text is extracted right here in the browser.
+        const data = await window.ClausesGuardStatic.extract(file);
         input.value = String(data.text || '').trim();
         if (!input.value) throw new Error('No readable text was found');
         updateCharStats();
@@ -1114,7 +1109,10 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text, module: currentModule, thinking_level: currentThinkingLevel, context_text: document.getElementById('audit-input').value.trim() })
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          const failure = await res.json().catch(() => ({}));
+          throw new Error(failure.detail || `HTTP ${res.status}`);
+        }
         const result = await res.json();
         activeAuditResult = result;
         document.getElementById('legalaid-status').textContent = 'Context: Contract + audit attached';
@@ -1169,12 +1167,12 @@
           result.pushback_reply ?? result.counter_reply ?? result.draft ?? '';
 
         document.getElementById('audit-verdict').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } catch (_) {
+      } catch (error) {
         setScoreGauge('--');
         document.getElementById('verdict-risk-badge').textContent = 'OFFLINE';
-        document.getElementById('verdict-subtitle').textContent = 'Connection Failed';
-        document.getElementById('verdict-title').textContent = 'Backend Not Connected';
-        document.getElementById('verdict-summary').textContent = `Start your backend server on ${API_BASE} to run live audits here.`;
+        document.getElementById('verdict-subtitle').textContent = 'Audit Failed';
+        document.getElementById('verdict-title').textContent = 'Could not run the audit';
+        document.getElementById('verdict-summary').textContent = error.message || 'Please try again in a moment.';
       } finally {
         workspaceRoot.classList.remove('is-scanning');
         btn.disabled = false;
