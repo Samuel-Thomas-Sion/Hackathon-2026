@@ -32,6 +32,8 @@ await cp(join(root, 'backend', 'knowledge_contract_law.json'), join(dist, 'backe
 
 // The site opens on the v2 home page (with Teen Check). v1 stays at /indexOP. (Pages serves teen.html at /teen.)
 await cp(join(root, 'indexOP-v2.html'), join(dist, 'index.html'));
+// v2 also lives at its own short address: /teencheck
+await cp(join(root, 'indexOP-v2.html'), join(dist, 'teencheck.html'));
 
 // Basic safety headers for every page.
 await writeFile(

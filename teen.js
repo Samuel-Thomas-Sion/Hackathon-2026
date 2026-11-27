@@ -199,7 +199,7 @@
   }
 
   async function shareCheck(site, label, tldr, button) {
-    const url = `${location.origin}/teen?site=${encodeURIComponent(site)}`;
+    const url = `${location.origin}/teencheck?site=${encodeURIComponent(site)}`;
     const text = `${label}${tldr ? ` – ${tldr}` : ''} (ClauseGuard Teen Check)`;
     try {
       if (navigator.share) {

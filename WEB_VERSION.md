@@ -25,7 +25,7 @@ ClauseGuard has two versions:
 **Home page v2 (`indexOP-v2.html`)** is the team's original home page with Teen Check built in as a new section (right after "Four Dedicated Protection Modules"), in the same frosted-glass style. On the website it opens at `/`.
 
 - v1 (`indexOP.html`) is kept as it was, at `/indexOP`. It has only a "Teen Check" link added.
-- `teen.html` is the same feature as a stand-alone page, handy for sharing links like `/teen?site=discord`.
+- v2 also opens at **`/teencheck`** (shared links look like `/teencheck?site=discord`). `teen.html` (`/teen`) is the same feature as a plain stand-alone page.
 - Both use the same `teen.js`, so a fix in one place fixes both.
 
 ## How it works
