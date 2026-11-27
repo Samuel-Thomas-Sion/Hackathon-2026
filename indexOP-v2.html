@@ -15,6 +15,9 @@
   <script src="./clauseguard-config.js"></script>
   <script src="./clauseguard-api.js"></script>
   <script src="./teen.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Baloo+Tamma+2:wght@500;700&family=Baloo+Thambi+2:wght@500;700&family=Baloo+Tammudu+2:wght@500;700&family=Baloo+Chettan+2:wght@500;700&display=swap" rel="stylesheet" />
 
   <script>
     tailwind.config = {
@@ -360,6 +363,7 @@
       .ext-browser, .ext-3d-icon, .ext-scan-beam, .ext-flag, .ext-badge-pop, .ext-download-glow { animation: none !important; }
     }
     /* ---- v2: Teen Check segment ---- */
+    .teen-font, .teen-font input, .teen-font select, .teen-font button, .teen-font textarea { font-family: 'Baloo 2', 'Baloo Tamma 2', 'Baloo Thambi 2', 'Baloo Tammudu 2', 'Baloo Chettan 2', ui-rounded, system-ui, sans-serif; }
     .glass { background: rgba(19, 25, 38, 0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.10); }
     .quote { border-left: 3px solid rgba(52, 211, 153, 0.6); }
     .chip { cursor: pointer; }
@@ -404,7 +408,6 @@
       </a>
 
       <nav class="hidden lg:flex items-center gap-5 whitespace-nowrap text-sm font-medium text-slate-300 min-w-0">
-        <a href="#teen-check" class="text-emerald-300 hover:text-white font-semibold transition">Teen Check</a>
         <a href="#modules" class="hover:text-white transition">Modules</a>
         <a href="#how-it-works" class="hover:text-white transition">How It Works</a>
         <a href="#clause-xray" class="hover:text-white transition">Live X-Ray</a>
@@ -416,10 +419,10 @@
       <div class="flex items-center gap-2.5 shrink-0">
 
         <a
-          href="scanner.html"
-          class="ripple-btn inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/25 transition"
+          href="#teen-check"
+          class="ripple-btn inline-flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm font-extrabold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/25 transition"
         >
-          <span>Open Scanner</span>
+          <span>👀 Teen Check</span>
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"/>
             <polyline points="12 5 19 12 12 19"/>
@@ -442,44 +445,48 @@
     <div id="hero-parallax-stack" class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center flex flex-col items-center space-y-6 will-change-transform">
       <div class="reveal-up is-visible inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131926]/85 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-xs font-mono shadow-lg">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>AI Fine-Print, Contract &amp; Scam Protection</span>
+        <span>For teens · Free · No sign-up</span>
       </div>
 
-      <h1 class="reveal-up is-visible reveal-delay-1 hero-heading font-black text-white drop-shadow-[0_6px_28px_rgba(4,8,18,0.94)]">
-        Catch predatory clauses before you <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">sign or pay.</span>
+      <h1 class="reveal-up is-visible reveal-delay-1 hero-heading teen-font font-extrabold text-white drop-shadow-[0_6px_28px_rgba(4,8,18,0.94)]">
+        Before you tap “I agree” 👀 <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">know what you’re signing up for.</span>
       </h1>
 
       <p class="reveal-up is-visible reveal-delay-2 text-sm sm:text-base text-slate-100 leading-relaxed max-w-2xl drop-shadow-[0_3px_18px_rgba(4,8,18,0.96)]">
-        ClauseGuard audits PG rental agreements, internship bonds, app Terms &amp; Conditions, and WhatsApp scams—pinpointing hidden traps, scoring risk, and generating ready-to-send pushback replies.
+        Type any app or website. We read the long, boring Terms &amp; Privacy stuff and tell you in plain words what you’re really agreeing to, with receipts. 🧾
       </p>
 
-      <div class="reveal-up is-visible reveal-delay-3 flex flex-wrap items-center justify-center gap-3.5 pt-1">
-        <a
-          href="scanner.html"
-          class="ripple-btn inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-emerald-500/35 transition"
-        >
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <span>Launch Audit Workspace</span>
-        </a>
+      <div class="reveal-up is-visible reveal-delay-3 w-full max-w-2xl space-y-3 text-left teen-font">
+        <form id="check-form" class="frosted-glass rounded-3xl p-3 sm:p-4 flex flex-col sm:flex-row gap-2" autocomplete="off">
+          <label for="site-input" class="sr-only">Website name or link</label>
+          <input id="site-input" type="text" inputmode="url" maxlength="300" placeholder="instagram, discord, roblox… or paste a link"
+            class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-base text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
+          <label for="lang-select" class="sr-only">Language</label>
+          <select id="lang-select" class="rounded-2xl bg-black/30 border border-white/15 px-3 py-3 text-base text-white outline-none focus:border-emerald-400">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+            <option value="ml">മലയാളം</option>
+          </select>
+          <button id="check-btn" type="submit" class="ripple-btn rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold px-6 py-3 shadow-xl shadow-emerald-500/30 transition">Check 👀</button>
+        </form>
 
-        <a
-          href="#teen-check"
-          class="ripple-btn inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl frosted-glass hover:bg-white/15 text-slate-100 font-bold text-sm sm:text-base transition"
-        >
-          <span>Is this site OK for teens?</span>
-          <span class="text-emerald-300">→</span>
-        </a>
+        <div id="popular-chips" class="flex flex-wrap justify-center gap-2" aria-label="Popular sites"></div>
 
-        <a
-          href="scanner.html?sample=whatsapp"
-          class="ripple-btn inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl frosted-glass hover:bg-white/15 text-slate-100 font-bold text-sm sm:text-base transition"
-        >
-          <span>Test Scam Detector</span>
-          <span class="text-emerald-300">→</span>
-        </a>
+        <details id="paste-box" class="frosted-glass rounded-2xl">
+          <summary class="cursor-pointer px-4 py-3 text-sm text-slate-300">Can't find a site? <span class="text-emerald-300 font-semibold">Paste its terms instead</span></summary>
+          <div class="px-4 pb-4 space-y-2">
+            <label for="paste-input" class="sr-only">Paste terms text</label>
+            <textarea id="paste-input" rows="6" maxlength="60000" placeholder="Open the site's Terms or Privacy page, copy the text, and paste it here."
+              class="w-full rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-sm text-white placeholder-slate-400 outline-none focus:border-emerald-400"></textarea>
+            <button id="paste-btn" type="button" class="rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-4 py-2 text-sm">Check pasted text</button>
+          </div>
+        </details>
+
+        <div id="turnstile-box" class="flex justify-center"></div>
+        <p id="status" class="min-h-[1.5rem] text-sm text-slate-200 text-center" aria-live="polite"></p>
       </div>
 
       <div class="reveal-up is-visible reveal-delay-4 flex flex-wrap items-center justify-center gap-5 pt-2 text-xs font-mono text-slate-200">
@@ -487,19 +494,19 @@
           <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
-          100% Free Web App
+          100% free
         </span>
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131926]/80 backdrop-blur-md border border-white/15">
           <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
-          Instant Clause X-Ray &amp; Pushback Reply
+          Every point comes with proof
         </span>
       </div>
 
       <!-- Animated Scroll-Down Cue -->
-      <a href="#modules" aria-label="Scroll to explore" class="pt-4 inline-flex flex-col items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-slate-300 hover:text-emerald-300 transition">
-        <span>Scroll to Explore</span>
+      <a href="#teen-check" aria-label="Scroll to your result" class="pt-4 inline-flex flex-col items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-slate-300 hover:text-emerald-300 transition">
+        <span>Your result is below</span>
         <span class="w-5 h-8 rounded-full border border-white/30 bg-[#131926]/50 backdrop-blur-sm flex items-start justify-center p-1">
           <span class="scroll-wheel-dot w-1 h-2 rounded-full bg-emerald-400"></span>
         </span>
@@ -654,55 +661,28 @@
 
     <!-- #SCROLL_SCRUBBED_TIMELINE: HOW CLAUSEGUARD WORKS -->
     <!-- #SEGMENT_V2: TEEN CHECK - "Is this site OK for teens?" (logic in teen.js) -->
-    <section id="teen-check" class="reveal-scale frosted-glass-elevated rounded-3xl p-6 sm:p-10 space-y-7 relative overflow-hidden">
+    <section id="teen-check" class="teen-font reveal-scale frosted-glass-elevated rounded-3xl p-6 sm:p-10 space-y-7 relative overflow-hidden">
       <div class="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-emerald-500/20 blur-[110px] pointer-events-none"></div>
 
       <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div class="space-y-3">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>NEW in v2 · Teen Check</span>
+            <span>Teen Check</span>
           </div>
           <h2 class="section-heading font-extrabold text-white">
             Is this site <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">OK for teens?</span>
           </h2>
         </div>
         <p class="text-sm text-slate-300 max-w-md leading-relaxed">
-          Type any website. ClauseGuard reads its Terms &amp; Privacy Policy and explains what you're agreeing to in plain words, with the exact sentences as proof.
+          The verdict, the vibe, and the receipts: what this app can do with your stuff, explained like a friend would.
         </p>
       </div>
 
-      <div class="relative z-10 space-y-4">
-        <form id="check-form" class="frosted-glass rounded-3xl p-3 sm:p-4 flex flex-col sm:flex-row gap-2" autocomplete="off">
-          <label for="site-input" class="sr-only">Website name or link</label>
-          <input id="site-input" type="text" inputmode="url" maxlength="300" placeholder="instagram.com, discord, or paste a link"
-            class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-base text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
-          <label for="lang-select" class="sr-only">Language</label>
-          <select id="lang-select" class="rounded-2xl bg-black/30 border border-white/15 px-3 py-3 text-base text-white outline-none focus:border-emerald-400">
-            <option value="en">English</option>
-            <option value="hi">हिन्दी</option>
-            <option value="kn">ಕನ್ನಡ</option>
-            <option value="ta">தமிழ்</option>
-            <option value="te">తెలుగు</option>
-            <option value="ml">മലയാളം</option>
-          </select>
-          <button id="check-btn" type="submit" class="ripple-btn rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold px-6 py-3 shadow-xl shadow-emerald-500/30 transition">Check</button>
-        </form>
-
-        <div id="popular-chips" class="flex flex-wrap gap-2" aria-label="Popular sites"></div>
-
-        <details id="paste-box" class="frosted-glass rounded-2xl">
-          <summary class="cursor-pointer px-4 py-3 text-sm text-slate-300">Can't find a site? <span class="text-emerald-300 font-semibold">Paste its terms instead</span></summary>
-          <div class="px-4 pb-4 space-y-2">
-            <label for="paste-input" class="sr-only">Paste terms text</label>
-            <textarea id="paste-input" rows="6" maxlength="60000" placeholder="Open the site's Terms or Privacy page, copy the text, and paste it here."
-              class="w-full rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-sm text-white placeholder-slate-400 outline-none focus:border-emerald-400"></textarea>
-            <button id="paste-btn" type="button" class="rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-4 py-2 text-sm">Check pasted text</button>
-          </div>
-        </details>
-
-        <div id="turnstile-box" class="flex justify-center"></div>
-        <p id="status" class="min-h-[1.5rem] text-sm text-slate-300" aria-live="polite"></p>
+      <div id="result-placeholder" class="relative z-10 glass rounded-3xl p-6 text-center teen-font">
+        <p class="text-3xl">👆</p>
+        <p class="text-lg font-bold text-white">Type a site in the search box at the top</p>
+        <p class="text-sm text-slate-400">Your result shows up right here.</p>
       </div>
 
       <!-- Result (filled in by teen.js) -->
@@ -718,48 +698,48 @@
 
         <div class="grid sm:grid-cols-2 gap-4">
           <div class="glass rounded-3xl p-5 space-y-2">
-            <h4 class="text-xs font-mono uppercase tracking-widest text-emerald-300">Minimum age</h4>
+            <h4 class="text-xs font-mono uppercase tracking-widest text-emerald-300">🎂 Age check</h4>
             <p id="age-value" class="text-2xl font-extrabold text-white"></p>
             <blockquote id="age-quote" class="quote pl-3 text-sm text-slate-300 italic hidden"></blockquote>
           </div>
           <div class="glass rounded-3xl p-5 space-y-2">
-            <h4 class="text-xs font-mono uppercase tracking-widest text-amber-300">Under 18 in India?</h4>
+            <h4 class="text-xs font-mono uppercase tracking-widest text-amber-300">🇮🇳 Under 18?</h4>
             <p id="india-note" class="text-slate-200"></p>
-            <p class="text-sm text-slate-400">If you're under 18, check with a parent before signing up.</p>
+            <p class="text-sm text-slate-400">Quick chat with a parent before you sign up 🙂</p>
           </div>
         </div>
 
         <div class="space-y-3">
-          <h4 class="text-lg font-extrabold text-white">What you're agreeing to</h4>
+          <h4 class="text-lg font-extrabold text-white">📋 What you're signing up for</h4>
           <div id="points" class="grid md:grid-cols-2 gap-3"></div>
-          <p id="no-points" class="hidden text-sm text-slate-400">No points could be backed up with exact quotes from the terms, so nothing is shown here. Try pasting the terms text instead.</p>
+          <p id="no-points" class="hidden text-sm text-slate-400">Hmm, we couldn't find proof for any points in these terms 🤷 Try pasting the terms text instead.</p>
         </div>
 
         <div class="glass rounded-3xl p-5 space-y-2">
-          <h4 class="text-lg font-extrabold text-white">What you can do</h4>
+          <h4 class="text-lg font-extrabold text-white">✨ Pro moves</h4>
           <ul id="tips" class="list-disc pl-5 space-y-1 text-slate-200"></ul>
         </div>
 
         <div class="text-sm text-slate-400 space-y-1">
           <p id="source-line"></p>
           <ul id="source-links" class="space-y-1"></ul>
-          <p>✔ Every point quotes the terms word-for-word. ClauseGuard checks each quote against the real text and removes any that don't match.</p>
+          <p>🧾 Every point comes with receipts: we check each quote against the real terms and drop any that don't match.</p>
         </div>
       </div>
 
       <!-- Questions about the checked terms -->
       <div id="chat" class="hidden relative z-10 glass rounded-3xl p-5 sm:p-6 space-y-4">
         <div>
-          <h4 class="text-lg font-extrabold text-white">Ask about these terms</h4>
-          <p class="text-sm text-slate-400">Ask in your own words: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Please don't type personal details.</p>
+          <h4 class="text-lg font-extrabold text-white">💬 Ask anything about these terms</h4>
+          <p class="text-sm text-slate-400">Type it your way: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Don't share personal stuff 🙏</p>
         </div>
         <div id="chat-chips" class="flex flex-wrap gap-2"></div>
         <div id="chat-messages" class="space-y-3 max-h-[28rem] overflow-y-auto"></div>
         <form id="chat-form" class="flex gap-2" autocomplete="off">
           <label for="chat-input" class="sr-only">Your question</label>
-          <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. Can strangers message me?"
+          <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. can strangers DM me?"
             class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-emerald-400" />
-          <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Ask</button>
+          <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Send ➤</button>
         </form>
       </div>
 

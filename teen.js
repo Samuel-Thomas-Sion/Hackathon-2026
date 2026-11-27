@@ -9,22 +9,27 @@
   const TURNSTILE_SITE_KEY = String(config.TURNSTILE_SITE_KEY || '').trim();
 
   const VERDICT_STYLE = {
-    green: { label: '🟢 Looks OK for teens', cls: 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40' },
-    amber: { label: '🟡 Use with care', cls: 'bg-amber-500/20 text-amber-200 border border-amber-400/40' },
-    red: { label: '🔴 Not great for teens', cls: 'bg-rose-500/20 text-rose-200 border border-rose-400/40' },
+    green: { emoji: '😎', label: 'Looks chill', sub: 'pretty safe for teens', cls: 'from-emerald-500/25 to-teal-500/5 border-emerald-400/40' },
+    amber: { emoji: '🤔', label: 'Kinda sus', sub: 'OK, but read the heads-ups', cls: 'from-amber-500/25 to-orange-500/5 border-amber-400/40' },
+    red: { emoji: '🚩', label: 'Big red flags', sub: 'think twice before signing up', cls: 'from-rose-500/25 to-pink-500/5 border-rose-400/40' },
   };
   const LEVEL_STYLE = {
-    good: { icon: '✅', cls: 'border-emerald-400/30' },
-    caution: { icon: '⚠️', cls: 'border-amber-400/30' },
-    warning: { icon: '🚩', cls: 'border-rose-400/40' },
+    good: { chip: '✅ All good', chipCls: 'bg-emerald-500/20 text-emerald-200', cls: 'border-emerald-400/30' },
+    caution: { chip: '👀 Heads up', chipCls: 'bg-amber-500/20 text-amber-200', cls: 'border-amber-400/30' },
+    warning: { chip: '🚩 Red flag', chipCls: 'bg-rose-500/20 text-rose-200', cls: 'border-rose-400/40' },
   };
+  const TOPIC_EMOJI = {
+    age: '🎂', data_collected: '🕵️', data_shared: '🤝', photos_content: '📸', location: '📍', contact: '💬',
+    ads_tracking: '🎯', money: '💸', delete_account: '🗑️', disputes: '⚖️', changes: '🔄',
+  };
+  // [what the button shows, what is asked]
   const CHAT_CHIPS = [
-    'Can strangers message me?',
-    'Can they use my photos or videos?',
-    'Do they sell or share my data?',
-    'How do I delete my account?',
-    'Is it OK for my age?',
-    'Kya ye app mera data bechti hai?',
+    ['💬 Can strangers DM me?', 'Can strangers message me?'],
+    ['📸 Can they use my pics?', 'Can they use my photos or videos?'],
+    ['🤝 Do they sell my data?', 'Do they sell or share my data?'],
+    ['🗑️ How do I delete my account?', 'How do I delete my account?'],
+    ['🎂 Is it OK for my age?', 'Is it OK for my age?'],
+    ['🇮🇳 Kya ye app mera data bechti hai?', 'Kya ye app mera data bechti hai?'],
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -42,7 +47,7 @@
     s.textContent = '';
     if (message === 'loading') {
       s.appendChild(el('span', 'spinner'));
-      s.appendChild(document.createTextNode('  Reading the terms and asking the AI… this can take up to 30 seconds.'));
+      s.appendChild(document.createTextNode('  Reading the fine print so you don’t have to… 📖 (can take up to 30 sec)'));
     } else {
       s.textContent = message || '';
     }
@@ -149,46 +154,120 @@
     }
   }
 
+  function renderVerdict(data) {
+    const r = data.result || {};
+    const v = VERDICT_STYLE[r.verdict] || VERDICT_STYLE.amber;
+    const card = $('verdict-card');
+    card.textContent = '';
+    card.className = `rounded-3xl p-5 sm:p-7 space-y-4 border bg-gradient-to-br ${v.cls}`;
+
+    const top = el('div', 'flex items-start gap-4');
+    top.appendChild(el('div', 'text-5xl sm:text-6xl leading-none select-none', v.emoji));
+    const names = el('div', 'flex-1 min-w-0');
+    names.appendChild(el('p', 'text-2xl sm:text-3xl font-extrabold text-white leading-tight', v.label));
+    names.appendChild(el('p', 'text-slate-300', `${data.source?.name || data.site || 'Pasted terms'} · ${v.sub}`));
+    top.appendChild(names);
+    if (data.site) {
+      const share = el('button', 'shrink-0 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-2 text-sm font-bold', '📤 Share');
+      share.type = 'button';
+      share.addEventListener('click', () => shareCheck(data.site, v.label, r.tldr, share));
+      top.appendChild(share);
+    }
+    card.appendChild(top);
+
+    if (r.tldr) {
+      const tldr = el('p', 'text-xl sm:text-2xl font-bold text-white');
+      tldr.appendChild(el('span', 'text-xs font-mono uppercase tracking-widest text-slate-400 mr-2 align-middle', 'TL;DR'));
+      tldr.appendChild(document.createTextNode(r.tldr));
+      card.appendChild(tldr);
+    }
+
+    // vibe meter: red (sus) -> green (chill)
+    const score = Math.max(0, Math.min(100, Number(r.vibe_score) || 50));
+    const meter = el('div', 'space-y-1');
+    const labels = el('div', 'flex justify-between text-xs font-bold text-slate-300');
+    labels.append(el('span', '', '🚩 Sus'), el('span', '', `Vibe meter · ${score}/100`), el('span', '', 'Chill 😎'));
+    const track = el('div', 'relative h-3 rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-400');
+    const dot = el('div', 'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-4 border-slate-900 shadow-lg');
+    dot.style.left = `${score}%`;
+    track.appendChild(dot);
+    meter.append(labels, track);
+    card.appendChild(meter);
+
+    if (r.verdict_reason) card.appendChild(el('p', 'text-lg text-slate-100', r.verdict_reason));
+    if (r.summary) card.appendChild(el('p', 'text-slate-300', r.summary));
+  }
+
+  async function shareCheck(site, label, tldr, button) {
+    const url = `${location.origin}/teen?site=${encodeURIComponent(site)}`;
+    const text = `${label}${tldr ? ` – ${tldr}` : ''} (ClauseGuard Teen Check)`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'ClauseGuard Teen Check', text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      button.textContent = '✅ Link copied';
+    } catch {
+      /* the visitor closed the share sheet */
+    }
+  }
+
+  function renderPoint(p) {
+    const style = LEVEL_STYLE[p.level] || LEVEL_STYLE.caution;
+    const card = el('article', `glass rounded-3xl p-4 space-y-2 border ${style.cls}`);
+    const head = el('div', 'flex items-start gap-3');
+    head.appendChild(el('div', 'shrink-0 w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-2xl select-none', TOPIC_EMOJI[p.topic] || '📄'));
+    const titles = el('div', 'flex-1 min-w-0');
+    titles.appendChild(el('h4', 'font-extrabold text-white text-lg leading-snug', p.title));
+    titles.appendChild(el('span', `inline-block mt-0.5 px-2 py-0.5 rounded-full text-xs font-bold ${style.chipCls}`, style.chip));
+    head.appendChild(titles);
+    card.appendChild(head);
+    card.appendChild(el('p', 'text-slate-200', p.explanation));
+    const receipts = el('details', 'text-sm');
+    receipts.appendChild(el('summary', 'cursor-pointer text-emerald-300 font-bold select-none', '🧾 Receipts'));
+    receipts.appendChild(el('blockquote', 'quote pl-3 mt-2 text-slate-400 italic', `“${p.quote}”`));
+    card.appendChild(receipts);
+    return card;
+  }
+
   function renderResult(data) {
     const r = data.result || {};
-    const verdict = VERDICT_STYLE[r.verdict] || VERDICT_STYLE.amber;
+    renderVerdict(data);
 
-    const badge = $('verdict-badge');
-    badge.textContent = verdict.label;
-    badge.className = `px-3 py-1 rounded-full text-sm font-extrabold ${verdict.cls}`;
-    $('site-title').textContent = data.source?.name || data.site || 'Pasted terms';
-    $('verdict-reason').textContent = r.verdict_reason || '';
-    $('summary').textContent = r.summary || '';
-
-    $('age-value').textContent = r.min_age ? `${r.min_age}+` : 'Not stated in the terms';
+    $('age-value').textContent = r.min_age ? `${r.min_age}+` : 'Not mentioned 🤷';
     const ageQuote = $('age-quote');
-    ageQuote.textContent = r.min_age_quote ? `“${r.min_age_quote}”` : '';
+    ageQuote.textContent = r.min_age_quote ? `🧾 “${r.min_age_quote}”` : '';
     ageQuote.classList.toggle('hidden', !r.min_age_quote);
     $('india-note').textContent = data.india_note || '';
 
     const points = $('points');
     points.textContent = '';
-    (r.points || []).forEach((p) => {
-      const style = LEVEL_STYLE[p.level] || LEVEL_STYLE.caution;
-      const card = el('article', `glass rounded-2xl p-4 space-y-2 border ${style.cls}`);
-      const head = el('h4', 'font-bold', `${style.icon} ${p.title}`);
-      const body = el('p', 'text-slate-200 text-sm', p.explanation);
-      const quote = el('blockquote', 'quote pl-3 text-sm text-slate-400 italic', `“${p.quote}”`);
-      card.append(head, body, quote);
-      points.appendChild(card);
-    });
+    (r.points || []).forEach((p) => points.appendChild(renderPoint(p)));
     $('no-points').classList.toggle('hidden', (r.points || []).length > 0);
 
     const tips = $('tips');
     tips.textContent = '';
-    (r.tips || []).forEach((t) => tips.appendChild(el('li', '', t)));
+    tips.className = 'space-y-2';
+    (r.tips || []).forEach((t) => {
+      const li = el('li');
+      const label = el('label', 'flex items-start gap-3 cursor-pointer');
+      const box = document.createElement('input');
+      box.type = 'checkbox';
+      box.className = 'mt-1.5 w-4 h-4 accent-emerald-400 shrink-0';
+      const text = el('span', 'text-slate-200', t);
+      box.addEventListener('change', () => text.classList.toggle('line-through', box.checked));
+      label.append(box, text);
+      li.appendChild(label);
+      tips.appendChild(li);
+    });
 
     const src = data.source || {};
     const line = $('source-line');
-    if (src.type === 'pasted') line.textContent = 'Checked from the text you pasted.';
-    else if (src.type === 'saved') line.textContent = `This site blocks automatic reading, so a saved copy was used${src.saved_at ? ` (saved ${new Date(src.saved_at).toLocaleDateString()})` : ''}. It may be out of date.`;
-    else if (src.type === 'mixed') line.textContent = 'Read live from the site, with a saved copy filling in a page the site blocked:';
-    else line.textContent = 'Read live from the site just now:';
+    if (src.type === 'pasted') line.textContent = '📚 Checked from the text you pasted.';
+    else if (src.type === 'saved') line.textContent = `📚 This site blocks automatic reading, so we used a saved copy${src.saved_at ? ` (saved ${new Date(src.saved_at).toLocaleDateString()})` : ''}. It might be a bit old.`;
+    else if (src.type === 'mixed') line.textContent = '📚 Read live from the site, plus a saved copy for a page the site blocked:';
+    else line.textContent = '📚 Read live from the site just now:';
     const links = $('source-links');
     links.textContent = '';
     (src.pages || []).forEach((p) => {
@@ -200,6 +279,8 @@
 
     state.documentText = data.document_text || '';
     $('chat-messages').textContent = '';
+    const placeholder = document.getElementById('result-placeholder');
+    if (placeholder) placeholder.classList.add('hidden');
     $('result').classList.remove('hidden');
     $('chat').classList.toggle('hidden', !state.documentText);
     $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -211,12 +292,12 @@
     const bubble = el(
       'div',
       who === 'you'
-        ? 'max-w-[85%] rounded-2xl rounded-tr-sm bg-emerald-400 text-slate-950 font-medium px-4 py-2.5 whitespace-pre-line'
-        : 'max-w-[90%] rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 px-4 py-3 space-y-2'
+        ? 'max-w-[85%] rounded-3xl rounded-br-md bg-emerald-400 text-slate-950 font-semibold px-4 py-2.5 whitespace-pre-line shadow-lg'
+        : 'max-w-[90%] rounded-3xl rounded-bl-md bg-white/10 border border-white/10 px-4 py-3 space-y-2'
     );
     const p = el('p', 'whitespace-pre-line', text);
     bubble.appendChild(p);
-    (quotes || []).forEach((q) => bubble.appendChild(el('blockquote', 'quote pl-3 text-sm text-slate-400 italic', `“${q}”`)));
+    (quotes || []).forEach((q) => bubble.appendChild(el('blockquote', 'quote pl-3 text-sm text-slate-400 italic', `🧾 “${q}”`)));
     wrap.appendChild(bubble);
     $('chat-messages').appendChild(wrap);
     $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
@@ -230,7 +311,7 @@
     $('chat-btn').disabled = true;
     $('chat-input').value = '';
     addBubble('you', message);
-    const pending = addBubble('bot', 'Thinking…');
+    const pending = addBubble('bot', 'typing… ✍️');
     try {
       const token = await getTurnstileToken();
       const { ok, status, data } = await post('/api/chat', {
@@ -275,10 +356,10 @@
     loadTurnstile();
     loadPopular();
 
-    CHAT_CHIPS.forEach((q) => {
-      const chip = el('button', 'chip px-3 py-1.5 rounded-full text-sm bg-white/5 hover:bg-white/10 border border-white/15', q);
+    CHAT_CHIPS.forEach(([label, question]) => {
+      const chip = el('button', 'chip px-3 py-1.5 rounded-full text-sm bg-white/5 hover:bg-white/10 border border-white/15', label);
       chip.type = 'button';
-      chip.addEventListener('click', () => ask(q));
+      chip.addEventListener('click', () => ask(question));
       $('chat-chips').appendChild(chip);
     });
 

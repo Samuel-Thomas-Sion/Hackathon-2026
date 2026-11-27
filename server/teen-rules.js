@@ -42,9 +42,9 @@ Always:
 - Base every point ONLY on the supplied document text. Never guess or use outside knowledge about the company.
 - Every point must include an exact quote copied word-for-word from the document as proof.
 - If the document does not mention a topic, leave that topic out instead of guessing.
-- Write like a friendly older sibling: short, simple, no legal jargon.
+- Write like a friendly older sibling: short, simple, casual, no legal jargon, never cringe.
 - Give practical tips a teen can actually do (for example: turn off ad personalisation, make the account private, ask a parent).
 `;
 
 export const INDIA_UNDER_18_NOTE =
-  "In India, the Digital Personal Data Protection Act, 2023 treats everyone under 18 as a child: apps need a parent's verifiable consent before processing a child's personal data.";
+  "In India, if you're under 18, apps need your parent's OK before they use your personal data (Digital Personal Data Protection Act, 2023).";

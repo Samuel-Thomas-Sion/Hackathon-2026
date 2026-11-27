@@ -126,6 +126,10 @@ test('AI points without real proof are removed', () => {
   assert.equal(result.points_without_proof_removed, 1);
   assert.equal(result.min_age, '13');
   assert.equal(cleanTeenResult({ verdict: 'purple', points: 'nope' }, LEGAL_TEXT).verdict, 'amber');
+  // the vibe score always agrees with the verdict
+  assert.equal(cleanTeenResult({ verdict: 'red', vibe_score: 95 }, LEGAL_TEXT).vibe_score, 34);
+  assert.equal(cleanTeenResult({ verdict: 'green', vibe_score: 'lots' }, LEGAL_TEXT).vibe_score, 85);
+  assert.equal(cleanTeenResult({ verdict: 'amber', tldr: 'Kinda sus but fine 👀' }, LEGAL_TEXT).tldr, 'Kinda sus but fine 👀');
 });
 
 // ---------- API protections

@@ -8,8 +8,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="./clauseguard-config.js"></script>
   <script src="./teen.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Baloo+Tamma+2:wght@500;700&family=Baloo+Thambi+2:wght@500;700&family=Baloo+Tammudu+2:wght@500;700&family=Baloo+Chettan+2:wght@500;700&display=swap" rel="stylesheet" />
   <style>
     body { background: radial-gradient(1200px 600px at 10% -10%, rgba(16,185,129,.18), transparent 60%), radial-gradient(900px 500px at 110% 10%, rgba(34,211,238,.12), transparent 60%), #070b14; }
+    body, input, select, button, textarea { font-family: 'Baloo 2', 'Baloo Tamma 2', 'Baloo Thambi 2', 'Baloo Tammudu 2', 'Baloo Chettan 2', ui-rounded, system-ui, sans-serif; }
     .glass { background: rgba(19,25,38,.72); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.10); }
     .chip { cursor: pointer; }
     .quote { border-left: 3px solid rgba(52,211,153,.6); }
@@ -37,8 +41,8 @@
   <main class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-8">
     <!-- Search -->
     <section class="text-center space-y-4">
-      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight">Is this site <span class="text-emerald-400">OK for teens?</span></h1>
-      <p class="text-slate-300 max-w-2xl mx-auto">Type any website. ClauseGuard reads its Terms &amp; Privacy Policy and tells you, in plain words, what you're agreeing to — with the exact sentences as proof.</p>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight">Is this app <span class="text-emerald-400">OK for teens?</span> 👀</h1>
+      <p class="text-slate-300 max-w-2xl mx-auto">Type any app or website. We read the long, boring Terms &amp; Privacy stuff and tell you in plain words what you’re really agreeing to, with receipts. 🧾</p>
 
       <form id="check-form" class="glass rounded-3xl p-3 sm:p-4 max-w-3xl mx-auto flex flex-col sm:flex-row gap-2 text-left" autocomplete="off">
         <label for="site-input" class="sr-only">Website name or link</label>
@@ -53,7 +57,7 @@
           <option value="te">తెలుగు</option>
           <option value="ml">മലയാളം</option>
         </select>
-        <button id="check-btn" type="submit" class="rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold px-6 py-3">Check</button>
+        <button id="check-btn" type="submit" class="rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold px-6 py-3">Check 👀</button>
       </form>
 
       <div id="popular-chips" class="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto" aria-label="Popular sites"></div>
@@ -85,25 +89,25 @@
 
       <div class="grid sm:grid-cols-2 gap-4">
         <div class="glass rounded-3xl p-5 space-y-2">
-          <h3 class="text-sm font-mono uppercase tracking-wider text-emerald-300">Minimum age</h3>
+          <h3 class="text-sm font-mono uppercase tracking-wider text-emerald-300">🎂 Age check</h3>
           <p id="age-value" class="text-2xl font-extrabold"></p>
           <blockquote id="age-quote" class="quote pl-3 text-sm text-slate-300 italic hidden"></blockquote>
         </div>
         <div class="glass rounded-3xl p-5 space-y-2">
-          <h3 class="text-sm font-mono uppercase tracking-wider text-amber-300">Under 18 in India?</h3>
+          <h3 class="text-sm font-mono uppercase tracking-wider text-amber-300">🇮🇳 Under 18?</h3>
           <p id="india-note" class="text-slate-200"></p>
-          <p class="text-sm text-slate-400">If you're under 18, check with a parent before signing up.</p>
+          <p class="text-sm text-slate-400">Quick chat with a parent before you sign up 🙂</p>
         </div>
       </div>
 
       <div class="space-y-3">
-        <h3 class="text-lg font-extrabold">What you're agreeing to</h3>
+        <h3 class="text-lg font-extrabold">📋 What you're signing up for</h3>
         <div id="points" class="grid gap-3"></div>
-        <p id="no-points" class="hidden text-sm text-slate-400">No points could be backed up with exact quotes from the terms, so nothing is shown here. Try pasting the terms text instead.</p>
+        <p id="no-points" class="hidden text-sm text-slate-400">Hmm, we couldn't find proof for any points in these terms 🤷 Try pasting the terms text instead.</p>
       </div>
 
       <div class="glass rounded-3xl p-5 space-y-2">
-        <h3 class="text-lg font-extrabold">What you can do</h3>
+        <h3 class="text-lg font-extrabold">✨ Pro moves</h3>
         <ul id="tips" class="list-disc pl-5 space-y-1 text-slate-200"></ul>
       </div>
 
@@ -117,16 +121,16 @@
     <!-- Chat -->
     <section id="chat" class="hidden glass rounded-3xl p-5 sm:p-6 space-y-4">
       <div>
-        <h3 class="text-lg font-extrabold">Ask about these terms</h3>
-        <p class="text-sm text-slate-400">Ask in your own words — English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Please don't type personal details.</p>
+        <h3 class="text-lg font-extrabold">💬 Ask anything about these terms</h3>
+        <p class="text-sm text-slate-400">Type it your way: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Don't share personal stuff 🙏</p>
       </div>
       <div id="chat-chips" class="flex flex-wrap gap-2"></div>
       <div id="chat-messages" class="space-y-3 max-h-[28rem] overflow-y-auto"></div>
       <form id="chat-form" class="flex gap-2" autocomplete="off">
         <label for="chat-input" class="sr-only">Your question</label>
-        <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. Can strangers message me?"
+        <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. can strangers DM me?"
           class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-emerald-400" />
-        <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Ask</button>
+        <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Send ➤</button>
       </form>
     </section>
   </main>
