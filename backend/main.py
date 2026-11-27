@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import io
+import json
 import os
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Literal, Optional, Any
-import json
 from contextvars import ContextVar
 
 from dotenv import load_dotenv
@@ -31,12 +34,35 @@ except ImportError:
     pytesseract = None
 
 Module = Literal["pg", "whatsapp", "app", "bond", "home"]
+ModelName = Literal[
+    "gemini-3-flash",
+    "groq-llama",
+    "openrouter-qwen",
+    "openrouter-deepseek",
+    "groq-gpt-oss",
+    "openrouter-kimi",
+    "openrouter-zephyr",
+]
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-AI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("CLAUSEGUARD_API_KEY", "")).strip()
-AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip()
-client = genai.Client(api_key=AI_API_KEY) if AI_API_KEY else None
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+CLAUSEGUARD_API_KEY = os.getenv("CLAUSEGUARD_API_KEY", "").strip()
+CLAUSEGUARD_API_BASE = os.getenv("CLAUSEGUARD_API_BASE", "").strip().rstrip("/")
+AI_MODEL = os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3.5-flash-lite")).strip()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+AI_CONFIGURED = any((GEMINI_API_KEY, CLAUSEGUARD_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY))
+AI_MODELS = {
+    "gemini-3-flash": AI_MODEL,
+    "groq-llama": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
+    "openrouter-qwen": os.getenv("OPENROUTER_QWEN_MODEL", "qwen/qwen3-4b:free").strip(),
+    "openrouter-deepseek": os.getenv("OPENROUTER_DEEPSEEK_MODEL", "deepseek/deepseek-r1-0528:free").strip(),
+    "groq-gpt-oss": os.getenv("GROQ_GPT_OSS_MODEL", "openai/gpt-oss-120b").strip(),
+    "openrouter-kimi": os.getenv("OPENROUTER_KIMI_MODEL", "moonshotai/kimi-k2:free").strip(),
+    "openrouter-zephyr": os.getenv("OPENROUTER_ZEPHYR_MODEL", "huggingfaceh4/zephyr-7b-beta:free").strip(),
+}
+client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 app = FastAPI(title="ClauseGuard API", version="1.0.0")
 app.add_middleware(
@@ -51,12 +77,18 @@ knowledge_base = KnowledgeBase()
 
 ACTIVE_THINKING_LEVEL: ContextVar[str] = ContextVar("active_thinking_level", default="low")
 ACTIVE_MODEL: ContextVar[str] = ContextVar("active_model", default="gemini-3-flash")
+AI_ERROR: ContextVar[str] = ContextVar("ai_error", default="")
+
+
+def is_rate_limited(error: str) -> bool:
+    lowered = error.lower()
+    return any(marker in lowered for marker in ("429", "rate limit", "rate_limit", "resource_exhausted", "quota", "too many requests"))
 
 
 class ScanRequest(BaseModel):
     module: Module = "pg"
     text: str = Field(min_length=1, max_length=50_000)
-    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    thinking_level: Optional[Literal["low", "medium", "high", "ultra-high"]] = "low"
     model: ModelName = "gemini-3-flash"
 
 
@@ -67,7 +99,7 @@ class ChatRequest(BaseModel):
     auditSummary: Optional[Any] = None
     context_text: Optional[str] = ""
     audit_context: Optional[Any] = None
-    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    thinking_level: Optional[Literal["low", "medium", "high", "ultra-high"]] = "low"
     model: ModelName = "gemini-3-flash"
 
 
@@ -78,25 +110,8 @@ class ChatResponse(BaseModel):
 class AuditRequest(BaseModel):
     text: str = Field(min_length=1, max_length=50_000)
     module: Optional[str] = "general"
-    thinking_level: Optional[Literal["low", "medium", "high"]] = "low"
+    thinking_level: Optional[Literal["low", "medium", "high", "ultra-high"]] = "low"
     model: ModelName = "gemini-3-flash"
-
-
-class FlaggedClause(BaseModel):
-    quote: str
-    title: str
-    severity: Literal["HIGH", "MEDIUM", "LOW"]
-    explanation: str
-
-
-class AuditResponse(BaseModel):
-    score: int
-    risk_label: Literal["CRITICAL SCAM", "HIGH RISK", "MODERATE RISK", "LOW RISK"]
-    title: str
-    summary: str
-    snapshot: str
-    clauses: list[FlaggedClause]
-    counter_reply: str
 
 
 class KnowledgeDocumentRequest(BaseModel):
@@ -154,6 +169,15 @@ async def call_ai(messages: list[dict]) -> dict | None:
 
     try:
         if selected == "gemini-3-flash":
+            if CLAUSEGUARD_API_BASE and CLAUSEGUARD_API_KEY:
+                return await asyncio.to_thread(
+                    _openai_compatible_call,
+                    CLAUSEGUARD_API_BASE,
+                    CLAUSEGUARD_API_KEY,
+                    AI_MODELS[selected],
+                    ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
+                )
+
             if client is None:
                 return None
             thinking_level = ACTIVE_THINKING_LEVEL.get().lower()
@@ -161,6 +185,7 @@ async def call_ai(messages: list[dict]) -> dict | None:
                 "low": types.ThinkingLevel.LOW,
                 "medium": types.ThinkingLevel.HIGH,
                 "high": types.ThinkingLevel.HIGH,
+                "ultra-high": types.ThinkingLevel.HIGH,
             }.get(thinking_level, types.ThinkingLevel.LOW)
             response = await asyncio.to_thread(
                 client.models.generate_content,
@@ -187,7 +212,7 @@ async def call_ai(messages: list[dict]) -> dict | None:
                 ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
             )
 
-        if selected in ("openrouter-qwen", "openrouter-deepseek"):
+        if selected in ("openrouter-qwen", "openrouter-deepseek", "openrouter-kimi", "openrouter-zephyr"):
             if not OPENROUTER_API_KEY:
                 return None
             return await asyncio.to_thread(
@@ -198,7 +223,8 @@ async def call_ai(messages: list[dict]) -> dict | None:
                 ([{"role": "system", "content": system_instruction}] if system_instruction else []) + chat_messages,
             )
 
-    except (Exception, urllib.error.URLError):
+    except Exception as exc:
+        AI_ERROR.set(str(exc))
         return None
 
 
@@ -213,11 +239,13 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
             continue
         quote = normalize_grounded_text(str(flag.get("quote", "")))
         clause_number = normalize_grounded_text(str(flag.get("clauseNumber", "")))
+
         if not quotation_exists(source_text, quote):
             continue
         if clause_number and clause_number.lower() not in ("message", "verified passage"):
             if not clause_reference_exists(source_text, clause_number):
                 continue
+
         clean_flags.append({
             "title": str(flag.get("title", "Potentially unfavourable term")),
             "severity": str(flag.get("severity", "MEDIUM")).upper(),
@@ -239,7 +267,7 @@ def validate_ai_report(data: dict, source_text: str) -> dict:
     if not clean_flags:
         data["riskLabel"] = "NO VERIFIED RED FLAGS"
         data["headline"] = "No unsupported or unverifiable findings detected"
-        data["summary"] = "The analysis found no red flag whose exact source wording could be verified in the uploaded document."
+        data["summary"] = "The analysis found no red flag whose source wording could be verified in the uploaded document."
 
     return data
 
@@ -260,11 +288,14 @@ Return ONLY valid JSON with exactly these keys:
 score, riskLabel, headline, summary, snapshot, statutes, redFlags, fairClauses, reply
 
 Rules:
+- ABSOLUTE: Analyse the text use the knowledge base as a supporting text to help analyse the text given by user. Never use prior contracts or generic module examples.
 - ABSOLUTE: Every red flag needs an exact or close verbatim quote that appears in the supplied text.
 - ABSOLUTE: Every red flag needs clauseNumber, which must correspond to a real clause or heading in the supplied text.
 - Never invent academic-certificate, bond, resignation, UGC, or unrelated findings.
 - If no genuine concern is found, return an empty redFlags array.
-- score is 0-100 safety/trust, where lower means more risk.
+- When the document has enough substantive clauses, return at least 4 redFlags and preferably 4-8 distinct findings.
+- Split separate obligations, fees, exclusions, renewals, termination, privacy, liability, or dispute terms into separate entries.
+- score is 0-100 safety/trust, where lower means more risky.
 - redFlags is an array of objects with title, severity, clauseNumber, quote, explanation, citation.
 - ABSOLUTE: The `snapshot` must be one clear plain-language paragraph for a non-lawyer. Explain what the contract generally means, the main obligations, and the biggest risks.
 - ABSOLUTE: Do not reproduce clause, contract, law, or statute wording verbatim in `snapshot`. Refer to clauses by their number or title, and explain the concern in simple words.
@@ -283,22 +314,10 @@ Contract text:
     finally:
         ACTIVE_THINKING_LEVEL.reset(thinking_token)
         ACTIVE_MODEL.reset(model_token)
-    if not result:
-        return None
-    try:
-        return validate_ai_report(result, text)
-    except (ValueError, TypeError, KeyError):
-        return None
+    if is_rate_limited(AI_ERROR.get()):
+        raise HTTPException(status_code=429, detail="Too many messages. Try again later.")
 
-
-@app.get("/api/health")
-def api_health():
-    return {"status": "ok", "service": "clauseguard", "aiConfigured": bool(AI_API_KEY), "aiModel": AI_MODEL}
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok", "model": AI_MODEL}
+    return validate_ai_report(result, text) if isinstance(result, dict) else None
 
 
 @app.post("/api/audit")
@@ -314,60 +333,29 @@ async def audit_document(req: AuditRequest):
         "title": ai_report["headline"],
         "summary": ai_report["summary"],
         "snapshot": ai_report["snapshot"],
-        "clauses": [{
-            "quote": flag["quote"],
-            "title": flag["title"],
-            "severity": flag["severity"],
-            "explanation": flag["explanation"],
-        } for flag in ai_report["redFlags"]],
+        "clauses": [{"quote": flag["quote"], "title": flag["title"], "severity": flag["severity"], "explanation": flag["explanation"]} for flag in ai_report["redFlags"]],
         "counter_reply": ai_report["reply"],
     }
 
 
-@app.post("/api/scan")
-async def scan(req: ScanRequest):
-    if text_is_unreliable_placeholder(req.text):
-        raise HTTPException(
-            status_code=422,
-            detail="No supported document text was supplied. Upload a readable document or paste contract text.",
-        )
-
-    ai_report = await ai_audit(req.text, req.module, req.thinking_level or "low", req.model)
-    if ai_report is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Live AI analysis is unavailable. Verify the backend API key/provider and try again.",
-        )
-    return ai_report
-
-
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
+    AI_ERROR.set("")
     retrieved = knowledge_base.search(req.message, module=req.module, limit=5)
-    knowledge_context = "\n\n".join(
-        f"[{item['title']}] {item['text']}" for item in retrieved
-    ) or "No matching knowledge-base material found."
-
-    prompt = f"""Answer as ClauseGuard, a cautious Indian consumer-law and scam-safety assistant.
-Do not invent statutes. State that this is informational, not formal legal advice.
-Use the retrieved knowledge-base material only as supporting context. It is not user-document evidence and it must not override exact wording in the supplied document.
-
-Module: {req.module}
-Document text: {(req.context_text or req.documentText or "")[:10000]}
-Active audit: {req.audit_context if req.audit_context is not None else req.auditSummary}
-Retrieved knowledge-base context:
-{knowledge_context}
-User question: {req.message}"""
+    knowledge_context = "\n\n".join(f"[{item['title']}] {item['text']}" for item in retrieved) or "No matching knowledge-base material found."
+    prompt = f"""Answer as LegalAID, a cautious contract and legal-information assistant.\nUse the supplied document and active audit as primary context. Explain clauses plainly and offer draft text when asked. State that this is informational, not formal legal advice.\nDocument: {(req.context_text or req.documentText or '')[:10000]}\nActive audit: {req.audit_context if req.audit_context is not None else req.auditSummary}\nKnowledge: {knowledge_context}\nQuestion: {req.message}"""
     model_token = ACTIVE_MODEL.set(req.model)
     thinking_token = ACTIVE_THINKING_LEVEL.set(req.thinking_level or "low")
     try:
         result = await call_ai([
-            {"role": "system", "content": "Return a concise, practical JSON object with a single key named reply."},
+            {"role": "system", "content": "Return concise practical JSON with one key named reply."},
             {"role": "user", "content": prompt},
         ])
     finally:
         ACTIVE_THINKING_LEVEL.reset(thinking_token)
         ACTIVE_MODEL.reset(model_token)
+    if is_rate_limited(AI_ERROR.get()):
+        raise HTTPException(status_code=429, detail="Too many messages. Try again later.")
     if isinstance(result, dict) and str(result.get("reply", "")).strip():
         return ChatResponse(reply=str(result["reply"]))
 
@@ -406,7 +394,13 @@ async def extract_document(file: UploadFile = File(...)):
             raise HTTPException(501, "PDF support is not installed")
         try:
             reader = PdfReader(io.BytesIO(content))
-            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+            extracted_pages = []
+            for page_number, page in enumerate(reader.pages, start=1):
+                page_text = page.extract_text() or ""
+                page_text = " ".join(page_text.replace("\r", "\n").split())
+                if page_text:
+                    extracted_pages.append(f"[Page {page_number}]\n{page_text}")
+            text = "\n\n".join(extracted_pages)
         except Exception as exc:
             raise HTTPException(400, f"Could not read PDF: {exc}") from exc
     elif name.endswith((".png", ".jpg", ".jpeg")):
@@ -497,21 +491,3 @@ def serve_homepage():
 
 
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
-
-
-import asyncio
-import urllib.request
-import urllib.error
-
-# API keys stay on the server. Browser users only select an allowlisted model name.
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
-
-AI_MODELS = {
-    "gemini-3-flash": os.getenv("GEMINI_MODEL", os.getenv("CLAUSEGUARD_MODEL", "gemini-3-flash-preview")).strip(),
-    "groq-llama": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
-    "openrouter-qwen": os.getenv("OPENROUTER_QWEN_MODEL", "qwen/qwen3-4b:free").strip(),
-    "openrouter-deepseek": os.getenv("OPENROUTER_DEEPSEEK_MODEL", "deepseek/deepseek-r1-0528:free").strip(),
-    "groq-gpt-oss": os.getenv("GROQ_GPT_OSS_MODEL", "openai/gpt-oss-120b").strip(),
-}
-ModelName = Literal["gemini-3-flash", "groq-llama", "openrouter-qwen", "openrouter-deepseek", "groq-gpt-oss"]
