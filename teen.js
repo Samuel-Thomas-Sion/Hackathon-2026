@@ -105,6 +105,7 @@
 
   async function runCheck(payload) {
     if (state.busy) return;
+    state.lastPayload = payload;
     state.busy = true;
     $('check-btn').disabled = true;
     $('paste-btn').disabled = true;
@@ -279,6 +280,11 @@
       chip.type = 'button';
       chip.addEventListener('click', () => ask(q));
       $('chat-chips').appendChild(chip);
+    });
+
+    // Switching language after a result is shown re-checks in the new language.
+    $('lang-select').addEventListener('change', () => {
+      if (state.lastPayload && !$('result').classList.contains('hidden')) runCheck(state.lastPayload);
     });
 
     $('check-form').addEventListener('submit', (e) => {
