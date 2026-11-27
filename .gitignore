@@ -1,7 +1,12 @@
 __pycache__/
 *.py[cod]
 .env
+.dev.vars
 .venv/
 venv/
 .pytest_cache/
 data/
+.vercel
+node_modules/
+.wrangler/
+dist/

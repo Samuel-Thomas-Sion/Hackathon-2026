@@ -957,9 +957,13 @@
 
   <script>
     // =====================================================================
-    // LINK YOUR FRIEND'S BACKEND URL HERE:
+    // API base is read from clauseguard-config.js (window.CLAUSEGUARD_CONFIG)
+    // at call time so the same build works against a local server or a
+    // deployed Cloudflare Worker without editing this file.
     // =====================================================================
-    const API_BASE = 'https://YOUR-BACKEND-NAME.onrender.com';
+    function apiBase() {
+      return String((window.CLAUSEGUARD_CONFIG && window.CLAUSEGUARD_CONFIG.API_BASE) || '').replace(/\/$/, '');
+    }
 
     let currentModule = 'general';
     let currentThinkingLevel = 'low';
@@ -1032,17 +1036,7 @@
       input.value = `Extracting readable text from ${file.name}...`;
 
       try {
-        const form = new FormData();
-        form.append('file', file);
-        const res = await fetch(`${API_BASE}/api/extract`, {
-          method: 'POST',
-          body: form
-        });
-        if (!res.ok) {
-          const error = await res.json().catch(() => ({}));
-          throw new Error(error.detail || `HTTP ${res.status}`);
-        }
-        const data = await res.json();
+        const data = await window.ClausesGuardStatic.extract(file);
         input.value = String(data.text || '').trim();
         if (!input.value) throw new Error('No readable text was found');
         updateCharStats();
@@ -1104,25 +1098,24 @@
 
       document.getElementById('verdict-score-num').textContent = '...';
       document.getElementById('verdict-risk-badge').textContent = 'SCANNING';
-      document.getElementById('verdict-subtitle').textContent = `Sending to ${API_BASE}/api/audit`;
+      document.getElementById('verdict-subtitle').textContent = 'Sending to protected Cloudflare Worker';
       document.getElementById('verdict-title').textContent = 'Analyzing document via your backend...';
       document.getElementById('verdict-summary').textContent = 'Waiting for backend response...';
 
       try {
-        const res = await fetch(`${API_BASE}/api/audit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, module: currentModule, thinking_level: currentThinkingLevel, context_text: document.getElementById('audit-input').value.trim() })
+        const result = await window.ClausesGuardStatic.audit({
+          text,
+          module: currentModule,
+          thinking_level: currentThinkingLevel,
+          context_text: text
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
         activeAuditResult = result;
         document.getElementById('legalaid-status').textContent = 'Context: Contract + audit attached';
 
         setScoreGauge(result.score ?? result.safety_score ?? '--');
-        document.getElementById('verdict-risk-badge').textContent = result.risk_label ?? result.risk ?? 'AUDITED';
-        document.getElementById('verdict-subtitle').textContent = `Response from ${API_BASE}/api/audit`;
-        document.getElementById('verdict-title').textContent = result.title ?? result.flag_title ?? 'Audit Complete';
+               document.getElementById('verdict-risk-badge').textContent = result.risk_label ?? result.risk ?? 'AUDITED';
+        document.getElementById('verdict-subtitle').textContent = 'Response from protected Cloudflare Worker';
+        document.getElementById('verdict-title'). textContent = result.title ?? result.flag_title ?? 'Audit Complete';
         document.getElementById('verdict-summary').textContent = result.summary ?? result.explanation ?? result.reply ?? '';
 
         const flags = Array.isArray(result.red_flags)
@@ -1169,12 +1162,12 @@
           result.pushback_reply ?? result.counter_reply ?? result.draft ?? '';
 
         document.getElementById('audit-verdict').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } catch (_) {
+      } catch (error) {
         setScoreGauge('--');
         document.getElementById('verdict-risk-badge').textContent = 'OFFLINE';
         document.getElementById('verdict-subtitle').textContent = 'Connection Failed';
         document.getElementById('verdict-title').textContent = 'Backend Not Connected';
-        document.getElementById('verdict-summary').textContent = `Start your backend server on ${API_BASE} to run live audits here.`;
+        document.getElementById('verdict-summary').textContent = error.message || 'Could not reach the protected backend.';
       } finally {
         workspaceRoot.classList.remove('is-scanning');
         btn.disabled = false;
@@ -1259,20 +1252,18 @@
       const botBubble = appendChatBubble('bot', 'Thinking...');
 
       try {
-        const res = await fetch(`${API_BASE}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: userMsg,
-            module: currentModule,
-            context: document.getElementById('audit-input').value.trim()
-          })
+        const data = await window.ClausesGuardStatic.chat({
+          message: userMsg,
+          module: currentModule,
+          thinking_level: currentThinkingLevel,
+          context_text: document.getElementById('audit-input').value.trim(),
+          documentText: document.getElementById('audit-input').value.trim(),
+          auditSummary: activeAuditResult,
+          audit_context: activeAuditResult
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        botBubble.textContent = data.reply || data.response || data.answer || 'No reply field returned by backend.';
-      } catch (_) {
-        botBubble.textContent = `Could not reach backend at ${API_BASE}. Make sure the FastAPI server is running.`;
+        botBubble.textContent = data.reply || 'No reply was returned.';
+      } catch (error) {
+        botBubble.textContent = error.message || 'Could not reach LegalAID right now. Please try again.';
       }
 
       const box = document.getElementById('cg-chat-messages');
@@ -1291,7 +1282,7 @@
       const botBubble = appendLegalaidBubble('bot', 'Reviewing the contract and audit...');
 
       try {
-        const res = await fetch(`${API_BASE}/api/chat`, {
+        const res = await fetch(`${apiBase()}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1320,9 +1311,9 @@
         }
 
         const data = await res.json();
-        botBubble.textContent = data.reply || data.response || data.answer || 'No reply was returned.';
-      } catch (_) {
-        botBubble.textContent = 'Could not reach LegalAID right now. Please try again.';
+        botBubble.textContent = data.reply || 'No reply was returned.';
+      } catch (error) {
+        botBubble.textContent = error.message || 'Could not reach LegalAID right now. Please try again.';
       }
     }
 
@@ -1392,5 +1383,7 @@
       });
     });
   </script>
+  <script src="./clauseguard-config.js"></script>
+  <script src="./clauseguard-api.js"></script>
 </body>
 </html>
