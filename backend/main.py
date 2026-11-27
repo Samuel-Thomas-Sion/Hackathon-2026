@@ -497,3 +497,4 @@ def health_check():
 
 app.mount("/", StaticFiles(directory=str(ROOT), html=True), name="frontend")
 
+
