@@ -9,7 +9,7 @@
         "arbitrator",
         "arbitrate"
       ],
-      "teen": "Instead of a real court, a fight with the company is decided by a private 'referee' called an arbitrator. It's usually private and very hard to appeal.",
+      "teen": "Out-of-court settlement: a private referee decides, not a judge.",
       "official": "A way of settling a dispute outside the courts: the parties agree that one or more neutral arbitrators will hear the case and make a decision (an award) that is usually binding and can be challenged only on limited grounds."
     },
     {
@@ -19,7 +19,7 @@
         "class actions",
         "class-action"
       ],
-      "teen": "When lots of people with the same problem team up to sue a company together. Some terms make you give this up.",
+      "teen": "Lots of people suing a company together, as one team.",
       "official": "A lawsuit brought by one or more people on behalf of a larger group who have similar claims against the same defendant."
     },
     {
@@ -29,7 +29,7 @@
         "indemnification",
         "indemnity"
       ],
-      "teen": "If someone sues the company because of something you did, you promise to cover the company's costs.",
+      "teen": "If someone sues them because of you, you pay.",
       "official": "To compensate or protect another party against loss, damage or legal liability arising from specified events or conduct."
     },
     {
@@ -41,7 +41,7 @@
         "licenses",
         "licences"
       ],
-      "teen": "Permission. You still own your stuff, but you let them use it in the ways listed.",
+      "teen": "Permission to use your stuff. You still own it.",
       "official": "Legal permission granted by the owner of rights (such as copyright) allowing another party to use the protected material within stated limits, without transferring ownership."
     },
     {
@@ -50,7 +50,7 @@
         "royalty-free",
         "royalty free"
       ],
-      "teen": "They can use it without paying you anything.",
+      "teen": "They don't pay you for using it.",
       "official": "Permission to use material without paying royalties or ongoing fees to the rights holder."
     },
     {
@@ -61,7 +61,7 @@
         "sub-license",
         "sublicense"
       ],
-      "teen": "They're allowed to pass the permission on to other companies.",
+      "teen": "They can pass the permission on to other companies.",
       "official": "A licence term allowing the licensee to grant some or all of its licensed rights to third parties."
     },
     {
@@ -69,7 +69,7 @@
       "match": [
         "transferable"
       ],
-      "teen": "They can hand the permission to someone else, for example if the company is sold.",
+      "teen": "They can hand the permission to someone else.",
       "official": "Capable of being assigned or conveyed to another party."
     },
     {
@@ -78,7 +78,7 @@
         "derivative works",
         "derivative work"
       ],
-      "teen": "New things made from your stuff, like edits, remixes or translations.",
+      "teen": "New stuff made from your stuff, like edits or remixes.",
       "official": "A new work based on one or more existing works, such as a translation, adaptation or modification."
     },
     {
@@ -96,7 +96,7 @@
         "irrevocable",
         "irrevocably"
       ],
-      "teen": "Once you say yes, you can't take it back.",
+      "teen": "You can't take it back later.",
       "official": "Cannot be cancelled or withdrawn once granted."
     },
     {
@@ -106,7 +106,7 @@
         "third-party",
         "third party"
       ],
-      "teen": "Some other company or person: not you, and not the app.",
+      "teen": "Another company or person, not you and not the app.",
       "official": "A person or organisation that is not one of the main parties to an agreement."
     },
     {
@@ -115,7 +115,7 @@
         "personal data",
         "personal information"
       ],
-      "teen": "Anything that can identify you: your name, phone number, face, location, or what you do online.",
+      "teen": "Info that shows who you are: name, number, face, location.",
       "official": "Information relating to an identified or identifiable individual. India's DPDP Act, 2023 defines it as any data about an individual who is identifiable by or in relation to such data."
     },
     {
@@ -123,7 +123,7 @@
       "match": [
         "consent"
       ],
-      "teen": "Saying yes, clearly and on purpose, after being told what you're agreeing to. You should also be able to say no.",
+      "teen": "Saying yes, knowing what you're saying yes to.",
       "official": "Agreement given voluntarily by a person who understands what they are agreeing to. Under India's DPDP Act, 2023 it must be free, specific, informed, unconditional and unambiguous, given by a clear affirmative action."
     },
     {
@@ -133,7 +133,7 @@
         "parent or guardian",
         "verifiable consent"
       ],
-      "teen": "Your parent or guardian has to say OK first.",
+      "teen": "Your parent has to say OK first.",
       "official": "Permission given by a parent or lawful guardian on behalf of a minor. Under India's DPDP Act, 2023, verifiable consent of a parent is required before a child's (under 18) personal data is processed."
     },
     {
@@ -143,7 +143,7 @@
         "DPDP Act",
         "DPDP"
       ],
-      "teen": "India's 2023 law about how apps and companies must handle your personal data.",
+      "teen": "India's 2023 law that protects your personal data.",
       "official": "The Digital Personal Data Protection Act, 2023: India's law on processing digital personal data, setting rules on consent, children's data and the rights of individuals (called Data Principals)."
     },
     {
@@ -151,7 +151,7 @@
       "match": [
         "minors"
       ],
-      "teen": "Someone under 18 in India.",
+      "teen": "Anyone under 18 in India.",
       "official": "A person below the age of majority; in India, generally under 18 years."
     },
     {
@@ -161,7 +161,7 @@
         "governed by the laws",
         "jurisdiction"
       ],
-      "teen": "Which country's or state's laws apply, and where a court case would have to happen. Sometimes that's far away from you.",
+      "teen": "Which country's laws apply, and where you'd go to court.",
       "official": "Governing law is the legal system chosen to interpret a contract; jurisdiction is the authority of a particular court to hear and decide a case."
     },
     {
@@ -171,7 +171,7 @@
         "liability",
         "liable"
       ],
-      "teen": "Being responsible for paying if something goes wrong. A 'limit' means the company caps (or avoids) what it would have to pay you.",
+      "teen": "Who pays if something goes wrong.",
       "official": "Legal responsibility for one's acts or omissions. A limitation of liability clause restricts the amount or types of damages a party can be required to pay."
     },
     {
@@ -182,7 +182,7 @@
         "waives",
         "waiving"
       ],
-      "teen": "Giving up a right you'd normally have.",
+      "teen": "Giving up a right you normally have.",
       "official": "The voluntary giving up of a known legal right or claim."
     },
     {
@@ -192,7 +192,7 @@
         "termination",
         "terminated"
       ],
-      "teen": "End it: close your account or end the agreement.",
+      "teen": "End it, like closing your account.",
       "official": "To bring a contract or relationship to an end, as permitted by its terms."
     },
     {
@@ -201,7 +201,7 @@
         "cookies",
         "cookie"
       ],
-      "teen": "Tiny files a website saves in your browser to remember you, often also used to track you for ads.",
+      "teen": "Tiny files that help sites remember and track you.",
       "official": "Small data files stored on a user's device by a website, used to remember information such as logins, preferences or browsing activity."
     },
     {
@@ -209,7 +209,7 @@
       "match": [
         "metadata"
       ],
-      "teen": "Info about your stuff, not the stuff itself: when you sent a message, to whom, and from where.",
+      "teen": "Info about your stuff: when, where and to whom.",
       "official": "Data that describes other data, such as the time, location, sender or file details of a message or photo."
     },
     {
@@ -222,7 +222,7 @@
         "targeted ads",
         "targeted advertising"
       ],
-      "teen": "Ads picked just for you, based on what you watch, like and search.",
+      "teen": "Ads picked for you from what you watch and like.",
       "official": "Advertising selected for an individual based on data about their behaviour, interests or characteristics."
     },
     {
@@ -232,7 +232,7 @@
         "sponsored post",
         "sponsored posts"
       ],
-      "teen": "Posts a brand paid to show you. Basically ads that look like normal posts.",
+      "teen": "Ads that look like normal posts.",
       "official": "Content paid for by an advertiser and presented on a platform, often in a format similar to regular content."
     },
     {
@@ -244,7 +244,7 @@
         "automatically renews",
         "automatic renewal"
       ],
-      "teen": "The subscription restarts and charges you again automatically, unless you cancel in time.",
+      "teen": "It keeps charging you until you cancel.",
       "official": "A contract term under which a subscription continues for a new period, and is billed, unless cancelled before the renewal date."
     },
     {
@@ -254,7 +254,7 @@
         "retain",
         "retained"
       ],
-      "teen": "How long they keep your info before deleting it.",
+      "teen": "How long they keep your info.",
       "official": "The period for which an organisation stores data, and its rules for keeping and deleting it."
     },
     {
@@ -265,7 +265,7 @@
         "facial recognition",
         "face recognition"
       ],
-      "teen": "Body data like your face, fingerprint or voice.",
+      "teen": "Body data: your face, fingerprint or voice.",
       "official": "Data from physical or behavioural characteristics used to identify a person, such as fingerprints, facial geometry or voiceprints."
     },
     {
@@ -274,7 +274,7 @@
         "opt out",
         "opt-out"
       ],
-      "teen": "Saying 'no thanks' to something that's switched on unless you turn it off.",
+      "teen": "Saying 'no thanks' to something that's on by default.",
       "official": "Choosing not to take part in a practice, such as data sharing, that applies by default unless the user declines."
     },
     {
