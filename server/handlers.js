@@ -8,6 +8,7 @@ import { aiConfigured, callGeminiJson } from './gemini.js';
 import { checkAndCountAiCall, rateLimitEnabled, turnstileEnabled, verifyTurnstile } from './ratelimit.js';
 import { fetchSiteTerms, combinePages, normalizeSiteInput } from './terms.js';
 import { TEEN_RULES, TEEN_TOPICS, INDIA_UNDER_18_NOTE } from './teen-rules.js';
+import { SITE_HELPER_PROMPT } from './project-info.js';
 
 const CACHE_DAYS = 7;
 const MAX_DOC_FOR_AI = 60000;
@@ -242,7 +243,7 @@ export function cleanTeenResult(raw, documentText) {
 
 async function chat(request, env) {
   const body = await readJsonBody(request, 90000);
-  const mode = body.mode === 'teen' ? 'teen' : 'legalaid';
+  const mode = ['teen', 'site'].includes(body.mode) ? body.mode : 'legalaid';
   const message = String(body.message || '').trim();
   if (!message) throw new ApiError(400, 'Message cannot be empty.');
 
@@ -252,7 +253,7 @@ async function chat(request, env) {
     if (doc.length < 200) throw new ApiError(400, 'Check a website first, then ask about its terms.');
     const lang = body.lang === 'auto' ? 'auto' : pickLanguage(body.lang);
     await verifyTurnstile(request, env, body.turnstileToken);
-    await checkAndCountAiCall(request, env);
+    const questionsLeft = await checkAndCountAiCall(request, env, 'terms');
 
     const languageRule =
       lang === 'auto'
@@ -273,10 +274,18 @@ If the document does not answer the question, say so honestly in "reply" and ret
       .map((q) => cleanString(q, 700))
       .filter((q) => quoteIsInDocument(q, normalizedDoc))
       .slice(0, 3);
-    return json({ reply: cleanString(result.reply, 2000) || 'Sorry, I could not answer that.', quotes });
+    return json({ reply: cleanString(result.reply, 2000) || 'Sorry, I could not answer that.', quotes, questions_left: questionsLeft });
   }
 
-  // Original LegalAID chat used by indexOP.html and scanner.html.
+  // "Ask ClauseGuard AI" helper: answers only about the website and project.
+  if (mode === 'site') {
+    if (message.length > 600) throw new ApiError(400, 'Please keep your question under 600 characters.');
+    const questionsLeft = await checkAndCountAiCall(request, env, 'site');
+    const result = await callGeminiJson(`Question: ${message}`, SITE_HELPER_PROMPT, env, { maxOutputTokens: 800 });
+    return json({ reply: cleanString(result.reply, 1500) || 'Sorry, I could not answer that.', questions_left: questionsLeft });
+  }
+
+  // LegalAID: questions about the contract pasted in the Audit Workspace (scanner.html).
   if (message.length > 4000) throw new ApiError(400, 'Message is too long.');
   await checkAndCountAiCall(request, env);
   const documentText = String(body.documentText || body.context_text || body.context || '').trim();

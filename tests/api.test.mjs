@@ -222,6 +222,42 @@ test('teen chat only keeps quotes that are really in the terms', async () => {
   assert.equal(body.quotes.length, 1);
 });
 
+test('questions about terms: 10 a day per person, with a counter', async () => {
+  geminiReply = { reply: 'Yes.', quotes: [] };
+  const env = { GEMINI_API_KEY: 'test-key', CG_KV: fakeKV() };
+  const lefts = [];
+  let last;
+  for (let i = 0; i < 11; i++) {
+    last = await handleApi(post('/api/chat', { mode: 'teen', message: 'Can they read my DMs?', documentText: LEGAL_TEXT }), env, assets);
+    if (last.status === 200) lefts.push((await last.json()).questions_left);
+  }
+  assert.deepEqual(lefts, [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]);
+  assert.equal(last.status, 429);
+  assert.match((await last.json()).detail, /10 questions/);
+  // site checks are counted separately, so a check still works
+  const check = await handleApi(post('/api/teen-check', { text: LEGAL_TEXT }), env, assets);
+  assert.equal(check.status, 200);
+});
+
+test('Ask AI helper answers only from ClauseGuard facts, 10 a day', async () => {
+  let sentPrompt = '';
+  globalThis.fetch = async (url, init) => {
+    const body = JSON.parse(init.body);
+    sentPrompt = body.systemInstruction.parts[0].text + body.contents[0].parts[0].text;
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({ reply: 'ClauseGuard is a school project.' }) }] } }] }));
+  };
+  const env = { GEMINI_API_KEY: 'test-key', CG_KV: fakeKV() };
+  const res = await handleApi(post('/api/chat', { mode: 'site', message: 'What is ClauseGuard?' }), env, assets);
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.equal(body.questions_left, 9);
+  assert.match(sentPrompt, /Answer ONLY questions about the ClauseGuard website and project/);
+  assert.match(sentPrompt, /tncscan\.pages\.dev/);
+  for (let i = 0; i < 9; i++) await handleApi(post('/api/chat', { mode: 'site', message: 'Hi' }), env, assets);
+  const blocked = await handleApi(post('/api/chat', { mode: 'site', message: 'One more?' }), env, assets);
+  assert.equal(blocked.status, 429);
+});
+
 test('teen chat needs a checked document first', async () => {
   const res = await handleApi(post('/api/chat', { mode: 'teen', message: 'hi', documentText: '' }), { GEMINI_API_KEY: 'test-key' }, assets);
   assert.equal(res.status, 400);

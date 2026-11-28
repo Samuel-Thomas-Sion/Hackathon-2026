@@ -1,7 +1,9 @@
 // Daily limits, so strangers cannot use up the free AI allowance.
 //
 // Uses a Cloudflare KV namespace bound as CG_KV (free plan).
-//  - Each visitor gets DAILY_LIMIT_PER_VISITOR AI calls per day (default 20).
+//  - Each visitor gets DAILY_LIMIT_PER_VISITOR site checks / audits per day (default 20).
+//  - Each visitor gets QUESTION_LIMIT_PER_VISITOR questions per day (default 10)
+//    for "Ask about these terms", and the same again for the "Ask AI" helper.
 //  - The whole site gets DAILY_LIMIT_TOTAL AI calls per day (default 300).
 // Visitors are counted by a one-way hash of their IP address + the date, so no
 // IP address is ever stored.
@@ -20,21 +22,29 @@ export function rateLimitEnabled(env) {
   return Boolean(env.CG_KV);
 }
 
-async function bump(kv, key, limit) {
-  const current = Number((await kv.get(key)) || 0);
-  if (current >= limit) return false;
-  await kv.put(key, String(current + 1), { expirationTtl: DAY_SECONDS * 2 });
-  return true;
+// Buckets: 'general' (site checks, audits), 'terms' (questions about a site's
+// terms), 'site' (the Ask AI helper). Returns how many are left today, or null
+// when limits are off.
+const BUCKET_TEXT = {
+  general: (n) => `You have used today's ${n} free checks. Please come back tomorrow.`,
+  terms: (n) => `You've asked your ${n} questions about terms for today. Come back tomorrow! 👋`,
+  site: (n) => `You've asked your ${n} questions for today. Come back tomorrow! 👋`,
+};
+
+export function bucketLimit(env, bucket) {
+  if (bucket === 'general') return Number(env.DAILY_LIMIT_PER_VISITOR || 20);
+  return Number(env.QUESTION_LIMIT_PER_VISITOR || 10);
 }
 
-export async function checkAndCountAiCall(request, env) {
-  if (!rateLimitEnabled(env)) return;
+export async function checkAndCountAiCall(request, env, bucket = 'general') {
+  if (!rateLimitEnabled(env)) return null;
   const kv = env.CG_KV;
-  const perVisitor = Number(env.DAILY_LIMIT_PER_VISITOR || 20);
+  const perVisitor = bucketLimit(env, bucket);
   const total = Number(env.DAILY_LIMIT_TOTAL || 300);
   const date = today();
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
   const visitor = (await sha256Hex(`${ip}|${date}|clauseguard`)).slice(0, 32);
+  const visitorKey = bucket === 'general' ? `rl:${date}:v:${visitor}` : `rl:${date}:${bucket}:${visitor}`;
 
   try {
     const totalKey = `rl:${date}:all`;
@@ -42,11 +52,11 @@ export async function checkAndCountAiCall(request, env) {
     if (totalNow >= total) {
       throw new ApiError(429, 'ClauseGuard has reached its free AI limit for today. Please come back tomorrow.');
     }
-    const ok = await bump(kv, `rl:${date}:v:${visitor}`, perVisitor);
-    if (!ok) {
-      throw new ApiError(429, `You have used today's ${perVisitor} free AI checks. Please come back tomorrow.`);
-    }
+    const used = Number((await kv.get(visitorKey)) || 0);
+    if (used >= perVisitor) throw new ApiError(429, (BUCKET_TEXT[bucket] || BUCKET_TEXT.general)(perVisitor));
+    await kv.put(visitorKey, String(used + 1), { expirationTtl: DAY_SECONDS * 2 });
     await kv.put(totalKey, String(totalNow + 1), { expirationTtl: DAY_SECONDS * 2 });
+    return perVisitor - used - 1;
   } catch (error) {
     if (error instanceof ApiError) throw error;
     // KV itself failed (for example its free daily write allowance ran out).

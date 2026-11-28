@@ -918,14 +918,15 @@
 
       <div id="cg-chat-messages" class="chat-scroll h-72 overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
         <div class="p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed">
-          Hi! Ask me anything about the clause you're scanning, PG deposit rules, internship bonds, or Digital Arrest scams.
+          Hi! 👋 Ask me anything about ClauseGuard: what it does, how Teen Check works, or how your privacy is protected. (10 questions a day)
         </div>
       </div>
 
       <div class="px-3.5 py-2 border-t border-white/10 bg-black/25 flex gap-1.5 overflow-x-auto">
-        <button type="button" onclick="sendSuggestedPrompt('Can my landlord forfeit 100% of my PG deposit?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">PG deposit rules</button>
-        <button type="button" onclick="sendSuggestedPrompt('Can a company keep my original marksheets?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Original marksheets</button>
-        <button type="button" onclick="sendSuggestedPrompt('How do I report a Digital Arrest scam?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Report scam</button>
+        <button type="button" onclick="sendSuggestedPrompt('What is ClauseGuard?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">What is it?</button>
+        <button type="button" onclick="sendSuggestedPrompt('How does Teen Check work?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Teen Check</button>
+        <button type="button" onclick="sendSuggestedPrompt('Is my data safe here?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Privacy</button>
+        <button type="button" onclick="sendSuggestedPrompt('Who made this?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Who made it?</button>
       </div>
 
       <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-white/15 bg-black/25 flex items-center gap-2">
@@ -1260,17 +1261,14 @@
         const res = await fetch(`${API_BASE}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: userMsg,
-            module: currentModule,
-            context: document.getElementById('audit-input').value.trim()
-          })
+          body: JSON.stringify({ mode: 'site', message: userMsg })
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        botBubble.textContent = data.reply || data.response || data.answer || 'No reply field returned by backend.';
-      } catch (_) {
-        botBubble.textContent = `Could not reach backend at ${API_BASE}. Make sure the FastAPI server is running.`;
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+        const left = typeof data.questions_left === 'number' ? `\n\n💬 ${data.questions_left} of 10 questions left today` : '';
+        botBubble.textContent = (data.reply || 'No reply was returned.') + left;
+      } catch (error) {
+        botBubble.textContent = error.message || 'Could not reach ClauseGuard. Please try again.';
       }
 
       const box = document.getElementById('cg-chat-messages');

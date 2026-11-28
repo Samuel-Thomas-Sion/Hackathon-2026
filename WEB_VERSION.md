@@ -54,6 +54,7 @@ The Gemini key is stored only as an encrypted Cloudflare secret. It is never in 
 |---|---|
 | `server/teen-rules.js` | **The rules for 🟢 / 🟡 / 🔴**, written in plain English |
 | `data/popular-sites.json` | The quick-pick buttons and known Terms/Privacy links |
+| `server/project-info.js` | The facts the “Ask ClauseGuard AI” helper may use: it answers only about the website and project |
 | `data/glossary.json` | Legal words (like “arbitration”) shown with a 😎 teen version and a 📖 official meaning when you hover or tap them |
 | `data/saved-sites/*.json` | Saved copies for sites that block reading (from the extension project) |
 | `teen.js` → `CHAT_CHIPS` | The tap-to-ask questions |
@@ -64,7 +65,7 @@ After editing: `npm test`, then push to GitHub and Cloudflare updates the site b
 ## Safety built in
 
 - Only our own website can call the API (other sites and scripts get "403").
-- Daily limits: 20 AI checks per visitor and 300 for the whole site (change with `DAILY_LIMIT_PER_VISITOR` / `DAILY_LIMIT_TOTAL`). Visitors are counted by a one-way hash, so no IP addresses are stored. If the counter breaks, the AI pauses rather than running without limits.
+- Daily limits per visitor: 20 site checks or audits, 10 questions about terms, and 10 questions to Ask AI; 300 AI calls for the whole site (change with `DAILY_LIMIT_PER_VISITOR`, `QUESTION_LIMIT_PER_VISITOR`, `DAILY_LIMIT_TOTAL`). Visitors are counted by a one-way hash, so no IP addresses are stored. If the counter breaks, the AI pauses rather than running without limits.
 - The terms reader only opens normal public websites: no IP addresses, no `localhost`, no local files, with size and time limits.
 - The AI only answers about the terms (no homework, no chatting).
 - All text from websites and the AI is shown with `textContent`, never inserted as code.

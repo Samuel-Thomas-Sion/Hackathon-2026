@@ -457,6 +457,21 @@
   }
 
   // ------------------------------------------------ chat
+  // Each person can ask 10 questions a day about terms (the server keeps count).
+  function showQuestionsLeft(left, limitReached) {
+    const label = document.getElementById('chat-left');
+    if (!label) return;
+    if (limitReached || left === 0) {
+      label.textContent = '🙌 That’s your 10 questions for today. Come back tomorrow for more!';
+      $('chat-input').disabled = true;
+      $('chat-btn').disabled = true;
+      $('chat-input').placeholder = 'No questions left today';
+      document.querySelectorAll('#chat-chips button').forEach((b) => (b.disabled = true));
+      return;
+    }
+    if (typeof left === 'number') label.textContent = `💬 ${left} of 10 questions left today`;
+  }
+
   function addBubble(who, text, quotes) {
     const wrap = el('div', who === 'you' ? 'flex justify-end' : 'flex justify-start');
     const bubble = el(
@@ -493,13 +508,18 @@
       });
       await glossaryReady;
       pending.parentElement.parentElement.remove();
-      if (!ok) addBubble('bot', data.detail || `Sorry, something went wrong (HTTP ${status}).`);
-      else addBubble('bot', data.reply, data.quotes);
+      if (!ok) {
+        addBubble('bot', data.detail || `Sorry, something went wrong (HTTP ${status}).`);
+        if (status === 429 && /questions/i.test(data.detail || '')) showQuestionsLeft(0, true);
+      } else {
+        addBubble('bot', data.reply, data.quotes);
+        showQuestionsLeft(data.questions_left);
+      }
     } catch {
       pending.textContent = 'Could not reach ClauseGuard. Please try again.';
     } finally {
       state.busy = false;
-      $('chat-btn').disabled = false;
+      if (!$('chat-input').disabled) $('chat-btn').disabled = false;
     }
   }
 
@@ -528,6 +548,14 @@
     setupTermTips();
     loadTurnstile();
     loadPopular();
+
+    const chatForm = $('chat-form');
+    if (chatForm && !document.getElementById('chat-left')) {
+      const left = el('p', 'text-sm text-slate-400', '💬 You can ask up to 10 questions a day about the terms.');
+      left.id = 'chat-left';
+      chatForm.insertAdjacentElement('afterend', left);
+    }
+    $('chat-input').placeholder = 'Ask anything else… e.g. can they read my DMs?';
 
     CHAT_CHIPS.forEach(([label, question]) => {
       const chip = el('button', 'chip px-3 py-1.5 rounded-full text-sm bg-white/5 hover:bg-white/10 border border-white/15', label);
