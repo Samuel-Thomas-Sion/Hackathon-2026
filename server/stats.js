@@ -2,7 +2,7 @@
 // Only numbers and site names (like "instagram.com") are stored - nothing about who
 // checked what.
 //  - sites_checked: how many DIFFERENT apps/sites have been checked (shown on the site:
-//    "we've spilled the tea on the fine print of N apps & sites")
+//    "The fine prints of N apps & sites have been aura checked by us")
 //  - terms_checked: every finished check, including repeats and pasted terms
 
 const TOTAL_KEY = 'stats:terms_checked';

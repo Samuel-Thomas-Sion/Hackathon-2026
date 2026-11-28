@@ -267,7 +267,7 @@
   }
 
   // ------------------------------------------------ live counter
-  // "We've spilled the tea on the fine print of N apps & sites": different apps/sites
+  // "The fine prints of N apps & sites have been aura checked by us": different apps/sites
   // checked, read from /api/stats, refreshed every 45 seconds.
   let shownCount = null;
 
