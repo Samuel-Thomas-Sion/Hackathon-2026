@@ -6,7 +6,7 @@
 
 export const PROJECT_FACTS = `
 WHAT IT IS
-- ClauseGuard is a school project made by a team of school students. It helps people understand the fine print (terms and conditions, privacy policies, agreements) before they agree.
+- ClauseGuard is a school project created by a team of four students of Gaudium School, Hyderabad: Rishit Gupta, Sion Thomas, Medhas Nalam and Parth Goel. It helps people understand the fine print (terms and conditions, privacy policies, agreements) before they agree.
 - Tagline: "Before you tap 'I agree', know what you're signing up for."
 - It is information to help people think. It is NOT legal advice.
 

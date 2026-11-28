@@ -2,6 +2,8 @@
 
 *Version 1 · 28 Nov 2026*
 
+Created by **Rishit Gupta, Sion Thomas, Medhas Nalam and Parth Goel** of Gaudium School, Hyderabad.
+
 ClauseGuard has two versions:
 
 | | Laptop version | Web version (this repository) |
