@@ -405,16 +405,6 @@
       </nav>
 
       <div class="flex items-center gap-2.5">
-        <button
-          type="button"
-          onclick="toggleChatDrawer(true)"
-          class="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/35 px-3.5 py-2 rounded-xl transition cursor-pointer"
-        >
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span>Ask AI</span>
-        </button>
 
         <a
           href="scanner.html"
@@ -464,6 +454,14 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <span>Launch Audit Workspace</span>
+        </a>
+
+        <a
+          href="/teencheck"
+          class="ripple-btn inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl frosted-glass border border-emerald-400/50 hover:bg-white/15 text-slate-100 font-bold text-sm sm:text-base transition"
+        >
+          <span>👀 Teen Check: is this app OK for teens?</span>
+          <span class="text-emerald-300">→</span>
         </a>
 
         <a
@@ -1045,14 +1043,15 @@
 
       <div id="cg-chat-messages" class="chat-scroll h-72 overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
         <div class="p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed">
-          Hi! Ask me anything about PG deposit rules, Digital Arrest WhatsApp scams, internship bonds, or how ClauseGuard works.
+          Hi! 👋 Ask me anything about ClauseGuard: what it does, how Teen Check works, or how your privacy is protected. (10 questions a day)
         </div>
       </div>
 
-      <div class="px-3.5 py-2 border-t border-white/10 bg-black/20 flex gap-1.5 overflow-x-auto">
-        <button type="button" onclick="sendSuggestedPrompt('Can my landlord forfeit 100% of my PG deposit?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">PG deposit rules</button>
-        <button type="button" onclick="sendSuggestedPrompt('Can a company keep my original marksheets?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Original marksheets</button>
-        <button type="button" onclick="sendSuggestedPrompt('How do I report a Digital Arrest scam?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Report scam</button>
+      <div class="px-3.5 py-2 border-t border-white/10 bg-black/20 flex flex-wrap gap-1.5">
+        <button type="button" onclick="sendSuggestedPrompt('What is ClauseGuard?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">What is it?</button>
+        <button type="button" onclick="sendSuggestedPrompt('How does Teen Check work?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Teen Check</button>
+        <button type="button" onclick="sendSuggestedPrompt('Is my data safe here?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Privacy</button>
+        <button type="button" onclick="sendSuggestedPrompt('Who made this?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Who made it?</button>
       </div>
 
       <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-white/15 bg-black/25 flex items-center gap-2">

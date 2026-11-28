@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Type any website and see what its Terms and Privacy Policy mean for teenagers — in plain words, with proof." />
+  <title>Teen Check — ClauseGuard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./clauseguard-config.js"></script>
+  <script src="./teen.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Baloo+Tamma+2:wght@500;700&family=Baloo+Thambi+2:wght@500;700&family=Baloo+Tammudu+2:wght@500;700&family=Baloo+Chettan+2:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    body { background: radial-gradient(1200px 600px at 10% -10%, rgba(16,185,129,.18), transparent 60%), radial-gradient(900px 500px at 110% 10%, rgba(34,211,238,.12), transparent 60%), #070b14; }
+    body, input, select, button, textarea { font-family: 'Baloo 2', 'Baloo Tamma 2', 'Baloo Thambi 2', 'Baloo Tammudu 2', 'Baloo Chettan 2', ui-rounded, system-ui, sans-serif; }
+    .glass { background: rgba(19,25,38,.72); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.10); }
+    .chip { cursor: pointer; }
+    .quote { border-left: 3px solid rgba(52,211,153,.6); }
+    .spinner { width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,.25); border-top-color: #34d399; border-radius: 9999px; animation: spin .8s linear infinite; display: inline-block; vertical-align: -2px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 antialiased">
+  <header class="sticky top-0 z-30 bg-[#070b14]/80 backdrop-blur border-b border-white/10">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      <a href="/teencheck" class="flex items-center gap-2.5">
+        <span class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </span>
+        <span class="font-extrabold text-lg tracking-tight">Clause<span class="text-emerald-400">Guard</span></span>
+        <span class="hidden sm:inline-flex px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-emerald-500/15 border border-emerald-400/35 text-emerald-300">TEEN CHECK</span>
+      </a>
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="/teencheck" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15">Home</a>
+        <a href="scanner.html" class="hidden sm:inline-block px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15">Contract Scanner</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-8">
+    <!-- Search -->
+    <section class="text-center space-y-4">
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight">Is this app <span class="text-emerald-400">OK for teens?</span> 👀</h1>
+      <p class="text-slate-300 max-w-2xl mx-auto">Type any app or website. We read the long, boring Terms &amp; Privacy stuff and tell you in plain words what you’re really agreeing to, with receipts. 🧾</p>
+      <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-200 text-sm"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>The fine prints of <b id="checked-counter">…</b> apps &amp; sites have been aura checked by us ✨</span></p>
+
+      <form id="check-form" class="glass rounded-3xl p-3 sm:p-4 max-w-3xl mx-auto flex flex-col sm:flex-row gap-2 text-left" autocomplete="off">
+        <label for="site-input" class="sr-only">Website name or link</label>
+        <input id="site-input" type="text" inputmode="url" maxlength="300" placeholder="instagram.com, discord, or paste a link"
+          class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-base outline-none focus:border-emerald-400" />
+        <label for="lang-select" class="sr-only">Language</label>
+        <select id="lang-select" class="rounded-2xl bg-black/30 border border-white/15 px-3 py-3 text-base outline-none focus:border-emerald-400">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="kn">ಕನ್ನಡ</option>
+          <option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option>
+          <option value="ml">മലയാളം</option>
+        </select>
+        <button id="check-btn" type="submit" class="rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-extrabold px-6 py-3">Check 👀</button>
+      </form>
+
+      <div id="popular-chips" class="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto" aria-label="Popular sites"></div>
+
+      <details id="paste-box" class="glass rounded-2xl max-w-3xl mx-auto text-left">
+        <summary class="cursor-pointer px-4 py-3 text-sm text-slate-300">Can't find a site? <span class="text-emerald-300 font-semibold">Paste its terms instead</span></summary>
+        <div class="px-4 pb-4 space-y-2">
+          <label for="paste-input" class="sr-only">Paste terms text</label>
+          <textarea id="paste-input" rows="7" maxlength="60000" placeholder="Open the site's Terms or Privacy page, copy the text, and paste it here."
+            class="w-full rounded-2xl bg-black/30 border border-white/15 px-4 py-3 text-sm outline-none focus:border-emerald-400"></textarea>
+          <button id="paste-btn" type="button" class="rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-4 py-2 text-sm">Check pasted text</button>
+        </div>
+      </details>
+
+      <div id="turnstile-box" class="flex justify-center"></div>
+      <p id="status" class="min-h-[1.5rem] text-sm text-slate-300" aria-live="polite"></p>
+    </section>
+
+    <!-- Result -->
+    <section id="result" class="hidden space-y-6" aria-live="polite">
+      <div id="verdict-card" class="glass rounded-3xl p-5 sm:p-7 space-y-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <span id="verdict-badge" class="px-3 py-1 rounded-full text-sm font-extrabold"></span>
+          <h2 id="site-title" class="text-xl sm:text-2xl font-extrabold"></h2>
+        </div>
+        <p id="verdict-reason" class="text-lg text-slate-100"></p>
+        <p id="summary" class="text-slate-300"></p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="glass rounded-3xl p-5 space-y-2">
+          <h3 class="text-sm font-mono uppercase tracking-wider text-emerald-300">🎂 Age check</h3>
+          <p id="age-value" class="text-2xl font-extrabold"></p>
+          <blockquote id="age-quote" class="quote pl-3 text-sm text-slate-300 italic hidden"></blockquote>
+        </div>
+        <div class="glass rounded-3xl p-5 space-y-2">
+          <h3 class="text-sm font-mono uppercase tracking-wider text-amber-300">🇮🇳 Under 18?</h3>
+          <p id="india-note" class="text-slate-200"></p>
+          <p class="text-sm text-slate-400">Quick chat with a parent before you sign up 🙂</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-lg font-extrabold">📋 What you're signing up for</h3>
+        <div id="points" class="grid gap-3"></div>
+        <p id="no-points" class="hidden text-sm text-slate-400">Hmm, we couldn't find proof for any points in these terms 🤷 Try pasting the terms text instead.</p>
+      </div>
+
+      <div class="glass rounded-3xl p-5 space-y-2">
+        <h3 class="text-lg font-extrabold">✨ Pro moves</h3>
+        <ul id="tips" class="list-disc pl-5 space-y-1 text-slate-200"></ul>
+      </div>
+
+      <div class="text-sm text-slate-400 space-y-1">
+        <p id="source-line"></p>
+        <ul id="source-links" class="space-y-1"></ul>
+        <p>✔ Every point above quotes the terms word-for-word. ClauseGuard checks each quote against the real text and removes any that don't match.</p>
+      </div>
+    </section>
+
+    <!-- Chat -->
+    <section id="chat" class="hidden glass rounded-3xl p-5 sm:p-6 space-y-4">
+      <div>
+        <h3 class="text-lg font-extrabold">💬 Got another question? Ask anything about these terms</h3>
+        <p class="text-sm text-slate-400">Type it your way: English, Hindi, Kannada, Tamil, Telugu, Malayalam or a mix. Don't share personal stuff 🙏</p>
+      </div>
+      <div id="chat-chips" class="flex flex-wrap gap-2"></div>
+      <div id="chat-messages" class="space-y-3 max-h-[28rem] overflow-y-auto"></div>
+      <form id="chat-form" class="flex gap-2" autocomplete="off">
+        <label for="chat-input" class="sr-only">Your question</label>
+        <input id="chat-input" type="text" maxlength="1000" placeholder="e.g. can strangers DM me?"
+          class="flex-1 min-w-0 rounded-2xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-emerald-400" />
+        <button id="chat-btn" type="submit" class="rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-bold px-5">Send ➤</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="max-w-5xl mx-auto px-4 pb-10 text-xs text-slate-500 space-y-1">
+    <p>ClauseGuard is a school project created by Rishit Gupta, Sion Thomas, Medhas Nalam and Parth Goel of Gaudium School, Hyderabad. This is information to help you think, not legal advice.</p>
+    <p>Explanations are written by an AI (Google Gemini) from the site's own terms and can be wrong — always check the quoted sentences. Website text and your questions are sent to Google to be analysed; don't type personal details.</p>
+  </footer>
+</body>
+</html>

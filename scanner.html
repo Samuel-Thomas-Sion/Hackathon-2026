@@ -11,6 +11,8 @@
   <meta name="theme-color" content="#131926" />
   <title>ClauseGuard Scanner — Frosted 3D Clause Inspector</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./clauseguard-config.js"></script>
+  <script src="./clauseguard-api.js"></script>
 
   <script>
     tailwind.config = {
@@ -420,6 +422,7 @@
 
       <div class="flex items-center gap-5">
         <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-slate-300">
+          <a href="teen.html" class="text-emerald-300 hover:text-white font-semibold transition">Teen Check</a>
           <a href="indexOP.html#comparison" class="hover:text-white transition">Why ClauseGuard</a>
           <a href="#audit-verdict" class="hover:text-white transition">Architecture</a>
           <a href="#helplines" class="hover:text-white transition">Helplines</a>
@@ -915,14 +918,15 @@
 
       <div id="cg-chat-messages" class="chat-scroll h-72 overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
         <div class="p-3.5 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 leading-relaxed">
-          Hi! Ask me anything about the clause you're scanning, PG deposit rules, internship bonds, or Digital Arrest scams.
+          Hi! 👋 Ask me anything about ClauseGuard: what it does, how Teen Check works, or how your privacy is protected. (10 questions a day)
         </div>
       </div>
 
-      <div class="px-3.5 py-2 border-t border-white/10 bg-black/25 flex gap-1.5 overflow-x-auto">
-        <button type="button" onclick="sendSuggestedPrompt('Can my landlord forfeit 100% of my PG deposit?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">PG deposit rules</button>
-        <button type="button" onclick="sendSuggestedPrompt('Can a company keep my original marksheets?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Original marksheets</button>
-        <button type="button" onclick="sendSuggestedPrompt('How do I report a Digital Arrest scam?')" class="shrink-0 text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Report scam</button>
+      <div class="px-3.5 py-2 border-t border-white/10 bg-black/25 flex flex-wrap gap-1.5">
+        <button type="button" onclick="sendSuggestedPrompt('What is ClauseGuard?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">What is it?</button>
+        <button type="button" onclick="sendSuggestedPrompt('How does Teen Check work?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Teen Check</button>
+        <button type="button" onclick="sendSuggestedPrompt('Is my data safe here?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Privacy</button>
+        <button type="button" onclick="sendSuggestedPrompt('Who made this?')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition cursor-pointer">Who made it?</button>
       </div>
 
       <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-white/15 bg-black/25 flex items-center gap-2">
@@ -957,13 +961,10 @@
 
   <script>
     // =====================================================================
-    // API base is read from clauseguard-config.js (window.CLAUSEGUARD_CONFIG)
-    // at call time so the same build works against a local server or a
-    // deployed Cloudflare Worker without editing this file.
+    // LINK YOUR FRIEND'S BACKEND URL HERE:
     // =====================================================================
-    function apiBase() {
-      return String((window.CLAUSEGUARD_CONFIG && window.CLAUSEGUARD_CONFIG.API_BASE) || '').replace(/\/$/, '');
-    }
+    // Web version: the API lives on the same website (see clauseguard-config.js).
+    const API_BASE = String((window.CLAUSEGUARD_CONFIG || {}).API_BASE || '').replace(/\/$/, '');
 
     let currentModule = 'general';
     let currentThinkingLevel = 'low';
@@ -1036,6 +1037,7 @@
       input.value = `Extracting readable text from ${file.name}...`;
 
       try {
+        // Web version: TXT / MD / PDF text is extracted right here in the browser.
         const data = await window.ClausesGuardStatic.extract(file);
         input.value = String(data.text || '').trim();
         if (!input.value) throw new Error('No readable text was found');
@@ -1098,24 +1100,28 @@
 
       document.getElementById('verdict-score-num').textContent = '...';
       document.getElementById('verdict-risk-badge').textContent = 'SCANNING';
-      document.getElementById('verdict-subtitle').textContent = 'Sending to protected Cloudflare Worker';
+      document.getElementById('verdict-subtitle').textContent = `Sending to ${API_BASE}/api/audit`;
       document.getElementById('verdict-title').textContent = 'Analyzing document via your backend...';
       document.getElementById('verdict-summary').textContent = 'Waiting for backend response...';
 
       try {
-        const result = await window.ClausesGuardStatic.audit({
-          text,
-          module: currentModule,
-          thinking_level: currentThinkingLevel,
-          context_text: text
+        const res = await fetch(`${API_BASE}/api/audit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, module: currentModule, thinking_level: currentThinkingLevel, context_text: document.getElementById('audit-input').value.trim() })
         });
+        if (!res.ok) {
+          const failure = await res.json().catch(() => ({}));
+          throw new Error(failure.detail || `HTTP ${res.status}`);
+        }
+        const result = await res.json();
         activeAuditResult = result;
         document.getElementById('legalaid-status').textContent = 'Context: Contract + audit attached';
 
         setScoreGauge(result.score ?? result.safety_score ?? '--');
-               document.getElementById('verdict-risk-badge').textContent = result.risk_label ?? result.risk ?? 'AUDITED';
-        document.getElementById('verdict-subtitle').textContent = 'Response from protected Cloudflare Worker';
-        document.getElementById('verdict-title'). textContent = result.title ?? result.flag_title ?? 'Audit Complete';
+        document.getElementById('verdict-risk-badge').textContent = result.risk_label ?? result.risk ?? 'AUDITED';
+        document.getElementById('verdict-subtitle').textContent = `Response from ${API_BASE}/api/audit`;
+        document.getElementById('verdict-title').textContent = result.title ?? result.flag_title ?? 'Audit Complete';
         document.getElementById('verdict-summary').textContent = result.summary ?? result.explanation ?? result.reply ?? '';
 
         const flags = Array.isArray(result.red_flags)
@@ -1165,9 +1171,9 @@
       } catch (error) {
         setScoreGauge('--');
         document.getElementById('verdict-risk-badge').textContent = 'OFFLINE';
-        document.getElementById('verdict-subtitle').textContent = 'Connection Failed';
-        document.getElementById('verdict-title').textContent = 'Backend Not Connected';
-        document.getElementById('verdict-summary').textContent = error.message || 'Could not reach the protected backend.';
+        document.getElementById('verdict-subtitle').textContent = 'Audit Failed';
+        document.getElementById('verdict-title').textContent = 'Could not run the audit';
+        document.getElementById('verdict-summary').textContent = error.message || 'Please try again in a moment.';
       } finally {
         workspaceRoot.classList.remove('is-scanning');
         btn.disabled = false;
@@ -1252,18 +1258,17 @@
       const botBubble = appendChatBubble('bot', 'Thinking...');
 
       try {
-        const data = await window.ClausesGuardStatic.chat({
-          message: userMsg,
-          module: currentModule,
-          thinking_level: currentThinkingLevel,
-          context_text: document.getElementById('audit-input').value.trim(),
-          documentText: document.getElementById('audit-input').value.trim(),
-          auditSummary: activeAuditResult,
-          audit_context: activeAuditResult
+        const res = await fetch(`${API_BASE}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: 'site', message: userMsg })
         });
-        botBubble.textContent = data.reply || 'No reply was returned.';
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+        const left = typeof data.questions_left === 'number' ? `\n\n💬 ${data.questions_left} of 10 questions left today` : '';
+        botBubble.textContent = (data.reply || 'No reply was returned.') + left;
       } catch (error) {
-        botBubble.textContent = error.message || 'Could not reach LegalAID right now. Please try again.';
+        botBubble.textContent = error.message || 'Could not reach ClauseGuard. Please try again.';
       }
 
       const box = document.getElementById('cg-chat-messages');
@@ -1282,7 +1287,7 @@
       const botBubble = appendLegalaidBubble('bot', 'Reviewing the contract and audit...');
 
       try {
-        const res = await fetch(`${apiBase()}/api/chat`, {
+        const res = await fetch(`${API_BASE}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1311,14 +1316,34 @@
         }
 
         const data = await res.json();
-        botBubble.textContent = data.reply || 'No reply was returned.';
-      } catch (error) {
-        botBubble.textContent = error.message || 'Could not reach LegalAID right now. Please try again.';
+        botBubble.textContent = data.reply || data.response || data.answer || 'No reply was returned.';
+      } catch (_) {
+        botBubble.textContent = 'Could not reach LegalAID right now. Please try again.';
       }
+    }
+
+    // Sample documents for the module cards on the home page (scanner.html?sample=pg etc.)
+    const SAMPLE_DOCUMENTS = {
+      pg: 'PG ACCOMMODATION AGREEMENT\n\nClause 4: Rent of Rs 14,000 per month is payable by the 3rd of every month. A late fee of Rs 500 per day applies after the due date.\nClause 7: If the tenant vacates before completing the 11-month lock-in period for any reason, 100% of the Rs 35,000 security deposit shall be forfeited automatically.\nClause 9: The owner may enter the room at any time without prior notice for inspection.\nClause 12: Electricity will be charged at Rs 15 per unit, as decided by the owner.',
+      whatsapp: 'WhatsApp message from +91 98xxx xxx21:\n\nCYBER CELL NOTICE. A DIGITAL ARREST WARRANT has been issued in your name for money laundering. Do not tell anyone or you will be arrested today. Join Skype Officer Verification immediately and transfer Rs 24,500 refundable clearance via UPI to avoid arrest. This case will be closed after verification.',
+      app: 'APP TERMS & PRIVACY POLICY\n\nSection 4.1: Your 3-day free trial automatically renews at Rs 4,999/year unless cancelled.\nSection 4.2: Cancellation is accepted only via a notarized physical letter sent 30 days before renewal. No refunds are given for unused periods.\nSection 6.3: By installing the app you grant us perpetual access to your device contacts, photos and location, which may be shared with our partners.',
+      bond: 'INTERNSHIP & TRAINING BOND\n\nClause 1: The selected intern must submit original Class 10th, 12th and University marksheets, which will be kept by the company for 24 months.\nClause 2: Leaving the internship before 24 months requires paying a penalty of Rs 2,00,000.\nClause 5: The intern will receive no stipend during the first 6 months.',
+    };
+
+    function loadSampleFromLink() {
+      const key = new URLSearchParams(location.search).get('sample');
+      if (!key || !SAMPLE_DOCUMENTS[key]) return;
+      const input = document.getElementById('audit-input');
+      if (!input) return;
+      input.value = SAMPLE_DOCUMENTS[key];
+      currentModule = key;
+      updateCharStats();
+      document.getElementById('scanner-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       registerScrollReveals(document);
+      loadSampleFromLink();
 
       const progressBar = document.getElementById('scroll-progress-bar');
       const spyIds = ['inspector-hero', 'scanner-editor', 'audit-verdict', 'clause-breakdown', 'pushback-reply', 'helplines'];
@@ -1383,7 +1408,5 @@
       });
     });
   </script>
-  <script src="./clauseguard-config.js"></script>
-  <script src="./clauseguard-api.js"></script>
 </body>
 </html>

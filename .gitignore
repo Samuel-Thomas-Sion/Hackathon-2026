@@ -5,7 +5,7 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
-data/
+backend/data/
 .vercel
 node_modules/
 .wrangler/

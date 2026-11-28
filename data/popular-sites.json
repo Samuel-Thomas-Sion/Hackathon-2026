@@ -1,0 +1,50 @@
+{
+  "instagram.com": {
+    "name": "Instagram",
+    "terms": "https://help.instagram.com/581066165581870/",
+    "privacy": "https://privacycenter.instagram.com/policy/"
+  },
+  "youtube.com": {
+    "name": "YouTube",
+    "terms": "https://www.youtube.com/t/terms",
+    "privacy": "https://policies.google.com/privacy"
+  },
+  "snapchat.com": {
+    "name": "Snapchat",
+    "terms": "https://snap.com/en-US/terms",
+    "privacy": "https://values.snap.com/privacy/privacy-policy"
+  },
+  "discord.com": {
+    "name": "Discord",
+    "terms": "https://discord.com/terms",
+    "privacy": "https://discord.com/privacy"
+  },
+  "whatsapp.com": {
+    "name": "WhatsApp",
+    "terms": "https://www.whatsapp.com/legal/terms-of-service",
+    "privacy": "https://www.whatsapp.com/legal/privacy-policy"
+  },
+  "reddit.com": {
+    "name": "Reddit",
+    "terms": "https://www.redditinc.com/policies/user-agreement",
+    "privacy": "https://www.reddit.com/policies/privacy-policy"
+  },
+  "spotify.com": {
+    "name": "Spotify",
+    "terms": "https://www.spotify.com/in-en/legal/end-user-agreement/",
+    "privacy": "https://www.spotify.com/in-en/legal/privacy-policy/"
+  },
+  "facebook.com": {
+    "name": "Facebook",
+    "terms": "https://www.facebook.com/terms.php",
+    "privacy": "https://www.facebook.com/privacy/policy/"
+  },
+  "github.com": {
+    "name": "GitHub",
+    "terms": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "privacy": "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement"
+  },
+  "roblox.com": {
+    "name": "Roblox"
+  }
+}

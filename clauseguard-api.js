@@ -26,12 +26,18 @@
     });
   }
 
+  // The floating "Ask ClauseGuard AI" chat: answers only about the website and
+  // project, 10 questions a day per person.
   async function chat(payload) {
-    return request('/api/chat', {
+    const data = await request('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ mode: 'site', ...payload })
     });
+    if (typeof data.questions_left === 'number') {
+      data.reply = `${data.reply || ''}\n\n💬 ${data.questions_left} of 10 questions left today`;
+    }
+    return data;
   }
 
   async function extract(file) {

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>ClauseGuard — Presentation</title>
+  <style>
+    :root { --ink: #070b14; --ink2: #111a2b; --line: rgba(255,255,255,.12); --text: #e8eef2; --soft: #9fb2c1; --mint: #34d399; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--ink); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    button { font: inherit; cursor: pointer; }
+    .hidden { display: none !important; }
+
+    /* lock screen */
+    #lock { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(900px 500px at 15% -10%, rgba(16,185,129,.18), transparent 60%), var(--ink); }
+    .card { width: min(440px, 100%); background: var(--ink2); border: 1px solid var(--line); border-radius: 24px; padding: 32px; text-align: center; box-shadow: 0 30px 80px -30px rgba(0,0,0,.8); }
+    .logo { font-weight: 800; font-size: 22px; letter-spacing: -.01em; }
+    .logo span { color: var(--mint); }
+    .card h1 { font-size: 26px; margin: 18px 0 6px; }
+    .card p { color: var(--soft); margin: 0 0 22px; line-height: 1.5; }
+    .card input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: #0b1220; color: var(--text); font-size: 17px; outline: none; }
+    .card input:focus { border-color: var(--mint); }
+    .card .open { width: 100%; margin-top: 12px; padding: 14px; border: 0; border-radius: 14px; background: linear-gradient(90deg, #34d399, #5eead4); color: #052e22; font-weight: 800; font-size: 17px; }
+    .card .open:disabled { opacity: .6; cursor: wait; }
+    #lock-msg { min-height: 22px; margin-top: 12px; font-size: 14px; color: #fda4af; }
+
+    /* viewer */
+    #viewer { height: 100%; display: flex; flex-direction: column; }
+    .bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #0a101c; }
+    .bar .title { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar .count { color: var(--soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .bar button { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; font-size: 14px; white-space: nowrap; }
+    .bar button:hover { background: rgba(255,255,255,.12); }
+    .bar button[aria-pressed="true"] { border-color: var(--mint); color: var(--mint); }
+    .progress { height: 3px; background: rgba(255,255,255,.06); }
+    .progress div { height: 100%; width: 0; background: var(--mint); transition: width .25s ease; }
+    .stage { flex: 1; min-height: 0; position: relative; display: flex; align-items: center; justify-content: center; padding: 16px 64px; }
+    .stage img { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 14px; box-shadow: 0 25px 70px -25px rgba(0,0,0,.9); background: #0b1220; user-select: none; -webkit-user-drag: none; }
+    .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: rgba(10,16,28,.8); color: var(--text); font-size: 22px; line-height: 1; }
+    .nav:hover { border-color: var(--mint); color: var(--mint); }
+    .nav:disabled { opacity: .3; cursor: default; }
+    #prev { left: 10px; } #next { right: 10px; }
+    #notes { max-height: 26vh; overflow-y: auto; margin: 0 16px 14px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--ink2); color: #cbd5e1; line-height: 1.55; white-space: pre-line; font-size: 15px; }
+    #notes b { color: var(--mint); display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+    .hint { text-align: center; color: #64748b; font-size: 12px; padding: 0 0 10px; }
+    :fullscreen .bar, :fullscreen .progress, :fullscreen .hint, :fullscreen #notes { display: none; }
+    :fullscreen .stage { padding: 0; }
+    :fullscreen .stage img { border-radius: 0; box-shadow: none; }
+    @media (max-width: 640px) {
+      .stage { padding: 10px; }
+      .nav { display: none; }
+      .bar { flex-wrap: wrap; }
+      .bar .title { flex-basis: 100%; }
+    }
+  </style>
+  <script src="./slides.js" defer></script>
+</head>
+<body>
+  <main id="lock">
+    <form class="card" id="lock-form" autocomplete="off">
+      <div class="logo">Clause<span>Guard</span></div>
+      <h1>🔒 Presentation</h1>
+      <p>This presentation is password-protected. Enter the password to view it.</p>
+      <label for="password" class="hidden">Password</label>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" required />
+      <button class="open" id="open-btn" type="submit">Open presentation</button>
+      <div id="lock-msg" role="alert"></div>
+    </form>
+  </main>
+
+  <main id="viewer" class="hidden">
+    <div class="bar">
+      <div class="title" id="deck-title">Presentation</div>
+      <div class="count" id="count">1 / 1</div>
+      <button type="button" id="notes-btn" aria-pressed="false">📝 Notes</button>
+      <button type="button" id="full-btn">⛶ Full screen</button>
+      <button type="button" id="relock-btn">🔒 Lock</button>
+    </div>
+    <div class="progress"><div id="progress"></div></div>
+    <div class="stage" id="stage">
+      <button type="button" class="nav" id="prev" aria-label="Previous slide">‹</button>
+      <img id="slide" alt="" />
+      <button type="button" class="nav" id="next" aria-label="Next slide">›</button>
+    </div>
+    <div id="notes" class="hidden"></div>
+    <div class="hint">← → or swipe to move · F for full screen · N for notes</div>
+  </main>
+</body>
+</html>
