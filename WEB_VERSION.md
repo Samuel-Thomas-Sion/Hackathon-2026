@@ -54,6 +54,7 @@ The Gemini key is stored only as an encrypted Cloudflare secret. It is never in 
 |---|---|
 | `server/teen-rules.js` | **The rules for 🟢 / 🟡 / 🔴**, written in plain English |
 | `data/popular-sites.json` | The quick-pick buttons and known Terms/Privacy links |
+| `data/glossary.json` | Legal words (like “arbitration”) shown with a 😎 teen version and a 📖 official meaning when you hover or tap them |
 | `data/saved-sites/*.json` | Saved copies for sites that block reading (from the extension project) |
 | `teen.js` → `CHAT_CHIPS` | The tap-to-ask questions |
 | `teen.html` | Page wording and layout |

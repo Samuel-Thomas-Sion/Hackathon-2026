@@ -97,6 +97,175 @@
     });
   }
 
+  // ------------------------------------------------ legal words: hover / tap for a definition
+  // Words come from data/glossary.json (teen version + official meaning).
+  const glossary = { regex: null, byPhrase: new Map() };
+  let glossaryReady = Promise.resolve();
+
+  function loadGlossary() {
+    glossaryReady = fetch('./data/glossary.json', { cache: 'no-cache' })
+      .then((res) => res.json())
+      .then((data) => {
+        const phrases = [];
+        (data.terms || []).forEach((entry) => {
+          (entry.match || []).forEach((phrase) => {
+            const key = String(phrase).toLowerCase();
+            if (key && !glossary.byPhrase.has(key)) {
+              glossary.byPhrase.set(key, entry);
+              phrases.push(key);
+            }
+          });
+        });
+        phrases.sort((a, b) => b.length - a.length); // longest first: "binding arbitration" before "arbitration"
+        const escaped = phrases.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[ -]/g, '[\\s-]'));
+        if (escaped.length) glossary.regex = new RegExp(`\\b(${escaped.join('|')})\\b`, 'gi');
+      })
+      .catch(() => {
+        /* definitions are a bonus; the page works without them */
+      });
+  }
+
+  // Puts `text` into `node`, turning the first use of each legal word into a hover/tap term.
+  function glossify(node, text) {
+    const value = String(text ?? '');
+    node.textContent = '';
+    if (!glossary.regex) {
+      node.textContent = value;
+      return node;
+    }
+    const used = new Set();
+    let last = 0;
+    glossary.regex.lastIndex = 0;
+    let m;
+    while ((m = glossary.regex.exec(value))) {
+      const entry = glossary.byPhrase.get(m[0].toLowerCase().replace(/[\s-]+/g, (s) => (s.includes('-') ? '-' : ' '))) ||
+        glossary.byPhrase.get(m[0].toLowerCase().replace(/[\s-]+/g, ' ')) ||
+        glossary.byPhrase.get(m[0].toLowerCase().replace(/[\s-]+/g, '-'));
+      if (!entry || used.has(entry.term)) continue;
+      used.add(entry.term);
+      if (m.index > last) node.appendChild(document.createTextNode(value.slice(last, m.index)));
+      const term = el('span', 'term', m[0]);
+      term.tabIndex = 0;
+      term.setAttribute('role', 'button');
+      term.setAttribute('aria-label', `${m[0]}: tap for the meaning`);
+      term._entry = entry;
+      node.appendChild(term);
+      last = m.index + m[0].length;
+    }
+    if (last < value.length) node.appendChild(document.createTextNode(value.slice(last)));
+    return node;
+  }
+
+  function elG(tag, className, text) {
+    return glossify(el(tag, className), text);
+  }
+
+  let tip = null;
+  let tipTarget = null;
+  let tipPinned = false;
+
+  function setupTermTips() {
+    const style = document.createElement('style');
+    style.textContent = `
+      .term { border-bottom: 2px dotted #34d399; cursor: help; }
+      .term:hover, .term:focus { color: #6ee7b7; outline: none; }
+      #term-tip { position: fixed; z-index: 9999; width: min(380px, calc(100vw - 24px)); background: #0b1220; color: #e2e8f0;
+        border: 1px solid rgba(52, 211, 153, 0.55); border-radius: 18px; padding: 14px 16px; font-size: 15px; line-height: 1.5;
+        box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.7); font-style: normal; text-align: left; }
+      #term-tip[hidden] { display: none; }
+      #term-tip .tt-title { font-weight: 800; font-size: 17px; color: #fff; margin-bottom: 6px; }
+      #term-tip .tt-label { font-weight: 800; font-size: 13px; letter-spacing: .03em; margin-top: 8px; }
+      #term-tip .tt-teen { color: #6ee7b7; }
+      #term-tip .tt-official { color: #93c5fd; }
+      #term-tip .tt-foot { margin-top: 10px; font-size: 12px; color: #94a3b8; }`;
+    document.head.appendChild(style);
+
+    tip = el('div');
+    tip.id = 'term-tip';
+    tip.setAttribute('role', 'tooltip');
+    tip.hidden = true;
+    document.body.appendChild(tip);
+
+    const termFrom = (e) => (e.target && e.target.closest ? e.target.closest('.term') : null);
+    document.addEventListener('mouseover', (e) => {
+      const t = termFrom(e);
+      if (t && !tipPinned) showTip(t);
+    });
+    document.addEventListener('mouseout', (e) => {
+      const t = termFrom(e);
+      if (t && !tipPinned) hideTip();
+    });
+    document.addEventListener('focusin', (e) => {
+      const t = termFrom(e);
+      if (t) showTip(t);
+    });
+    document.addEventListener('focusout', (e) => {
+      if (termFrom(e) && !tipPinned) hideTip();
+    });
+    // Tap (phones) or click pins it open; tap again or anywhere else closes it.
+    document.addEventListener('click', (e) => {
+      const t = termFrom(e);
+      if (t) {
+        if (tipPinned && tipTarget === t) {
+          tipPinned = false;
+          hideTip();
+        } else {
+          tipPinned = true;
+          showTip(t);
+        }
+      } else if (tipPinned && !(e.target && e.target.closest && e.target.closest('#term-tip'))) {
+        tipPinned = false;
+        hideTip();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        tipPinned = false;
+        hideTip();
+      }
+      if ((e.key === 'Enter' || e.key === ' ') && termFrom(e)) {
+        e.preventDefault();
+        termFrom(e).click();
+      }
+    });
+    window.addEventListener('scroll', () => {
+      if (tipTarget && !tip.hidden) placeTip(tipTarget);
+    }, { passive: true });
+  }
+
+  function showTip(target) {
+    const entry = target._entry;
+    if (!entry || !tip) return;
+    tipTarget = target;
+    tip.textContent = '';
+    tip.append(
+      el('div', 'tt-title', `📚 ${entry.term}`),
+      el('div', 'tt-label tt-teen', '😎 Teen version'),
+      el('div', '', entry.teen),
+      el('div', 'tt-label tt-official', '📖 Official meaning'),
+      el('div', '', entry.official),
+      el('div', 'tt-foot', 'Info to help you understand, not legal advice.')
+    );
+    tip.hidden = false;
+    placeTip(target);
+  }
+
+  function placeTip(target) {
+    const r = target.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    let left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+    let top = r.bottom + 10;
+    if (top + h > window.innerHeight - 12) top = Math.max(12, r.top - h - 10);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
+  }
+
+  function hideTip() {
+    if (tip) tip.hidden = true;
+    tipTarget = null;
+  }
+
   // ------------------------------------------------ API
   async function post(path, body) {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -129,6 +298,7 @@
         return;
       }
       setStatus(data.from_cache ? 'Showing a result checked recently.' : '');
+      await glossaryReady;
       renderResult(data);
     } catch (error) {
       setStatus('Could not reach ClauseGuard. Check your internet connection and try again.', true);
@@ -178,7 +348,7 @@
     if (r.tldr) {
       const tldr = el('p', 'text-xl sm:text-2xl font-bold text-white');
       tldr.appendChild(el('span', 'text-xs font-mono uppercase tracking-widest text-slate-400 mr-2 align-middle', 'TL;DR'));
-      tldr.appendChild(document.createTextNode(r.tldr));
+      tldr.appendChild(elG('span', '', r.tldr));
       card.appendChild(tldr);
     }
 
@@ -194,8 +364,8 @@
     meter.append(labels, track);
     card.appendChild(meter);
 
-    if (r.verdict_reason) card.appendChild(el('p', 'text-lg text-slate-100', r.verdict_reason));
-    if (r.summary) card.appendChild(el('p', 'text-slate-300', r.summary));
+    if (r.verdict_reason) card.appendChild(elG('p', 'text-lg text-slate-100', r.verdict_reason));
+    if (r.summary) card.appendChild(elG('p', 'text-slate-300', r.summary));
   }
 
   async function shareCheck(site, label, tldr, button) {
@@ -223,10 +393,10 @@
     titles.appendChild(el('span', `inline-block mt-0.5 px-2 py-0.5 rounded-full text-xs font-bold ${style.chipCls}`, style.chip));
     head.appendChild(titles);
     card.appendChild(head);
-    card.appendChild(el('p', 'text-slate-200', p.explanation));
+    card.appendChild(elG('p', 'text-slate-200', p.explanation));
     const receipts = el('details', 'text-sm');
     receipts.appendChild(el('summary', 'cursor-pointer text-emerald-300 font-bold select-none', '🧾 Receipts'));
-    receipts.appendChild(el('blockquote', 'quote pl-3 mt-2 text-slate-400 italic', `“${p.quote}”`));
+    receipts.appendChild(elG('blockquote', 'quote pl-3 mt-2 text-slate-400 italic', `“${p.quote}”`));
     card.appendChild(receipts);
     return card;
   }
@@ -237,9 +407,9 @@
 
     $('age-value').textContent = r.min_age ? `${r.min_age}+` : 'Not mentioned 🤷';
     const ageQuote = $('age-quote');
-    ageQuote.textContent = r.min_age_quote ? `🧾 “${r.min_age_quote}”` : '';
+    glossify(ageQuote, r.min_age_quote ? `🧾 “${r.min_age_quote}”` : '');
     ageQuote.classList.toggle('hidden', !r.min_age_quote);
-    $('india-note').textContent = data.india_note || '';
+    glossify($('india-note'), data.india_note || '');
 
     const points = $('points');
     points.textContent = '';
@@ -255,7 +425,7 @@
       const box = document.createElement('input');
       box.type = 'checkbox';
       box.className = 'mt-1.5 w-4 h-4 accent-emerald-400 shrink-0';
-      const text = el('span', 'text-slate-200', t);
+      const text = elG('span', 'text-slate-200', t);
       box.addEventListener('change', () => text.classList.toggle('line-through', box.checked));
       label.append(box, text);
       li.appendChild(label);
@@ -295,9 +465,9 @@
         ? 'max-w-[85%] rounded-3xl rounded-br-md bg-emerald-400 text-slate-950 font-semibold px-4 py-2.5 whitespace-pre-line shadow-lg'
         : 'max-w-[90%] rounded-3xl rounded-bl-md bg-white/10 border border-white/10 px-4 py-3 space-y-2'
     );
-    const p = el('p', 'whitespace-pre-line', text);
+    const p = who === 'you' ? el('p', 'whitespace-pre-line', text) : elG('p', 'whitespace-pre-line', text);
     bubble.appendChild(p);
-    (quotes || []).forEach((q) => bubble.appendChild(el('blockquote', 'quote pl-3 text-sm text-slate-400 italic', `🧾 “${q}”`)));
+    (quotes || []).forEach((q) => bubble.appendChild(elG('blockquote', 'quote pl-3 text-sm text-slate-400 italic', `🧾 “${q}”`)));
     wrap.appendChild(bubble);
     $('chat-messages').appendChild(wrap);
     $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
@@ -321,6 +491,7 @@
         documentText: state.documentText,
         turnstileToken: token,
       });
+      await glossaryReady;
       pending.parentElement.parentElement.remove();
       if (!ok) addBubble('bot', data.detail || `Sorry, something went wrong (HTTP ${status}).`);
       else addBubble('bot', data.reply, data.quotes);
@@ -353,6 +524,8 @@
   }
 
   function start() {
+    loadGlossary();
+    setupTermTips();
     loadTurnstile();
     loadPopular();
 
