@@ -139,29 +139,55 @@ async function callGemini(prompt, systemPrompt, env) {
     model
   )}:generateContent?key=${encodeURIComponent(env.GEMINI_API_KEY)}`;
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
-    }),
-  });
+  const maxAttempts = 3;
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
+        }),
+      });
 
-  const responseText = await response.text();
-  if (!response.ok) {
-    throw new Error(`Gemini request failed: ${response.status} ${responseText.slice(0, 300)}`);
-  }
+      const responseText = await response.text();
 
-  const gemini = JSON.parse(responseText);
-  let text =
-    gemini.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '{}';
-  text = text.trim();
-  if (text.startsWith('```')) {
-    text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+      // Retry transient upstream failures (429 rate limit, 5xx) with backoff.
+      if (response.status === 429 || response.status >= 500) {
+        lastError = new Error(`Gemini request failed: ${response.status} ${responseText.slice(0, 300)}`);
+        if (attempt < maxAttempts) {
+          await new Promise((r) => setTimeout(r, 400 * attempt));
+          continue;
+        }
+        throw lastError;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Gemini request failed: ${response.status} ${responseText.slice(0, 300)}`);
+      }
+
+      const gemini = JSON.parse(responseText);
+      let text =
+        gemini.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '{}';
+      text = text.trim();
+      if (text.startsWith('```')) {
+        text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+      }
+      return JSON.parse(text);
+    } catch (error) {
+      // Network-level error: retry unless we are out of attempts.
+      lastError = error;
+      if (attempt < maxAttempts && !/Gemini request failed: 4\d\d/.test(error.message)) {
+        await new Promise((r) => setTimeout(r, 400 * attempt));
+        continue;
+      }
+      throw lastError;
+    }
   }
-  return JSON.parse(text);
+  throw lastError;
 }
 
 function corsResponse(body, env, status = 200) {
