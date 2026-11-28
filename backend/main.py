@@ -4,6 +4,7 @@ import asyncio
 import io
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -144,15 +145,37 @@ def _openai_compatible_call(base_url: str, api_key: str, model: str, messages: l
         headers=headers,
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=120) as response:
-        data = json.loads(response.read().decode("utf-8"))
-    content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-    content = content.strip()
-    if content.startswith("```"):
-        content = content.split("```", 2)[1]
-        if content.startswith("json"):
-            content = content[4:].lstrip()
-    return json.loads(content) if content else None
+
+    max_attempts = 3
+    last_error: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            content = content.strip()
+            if content.startswith("```"):
+                content = content.split("```", 2)[1]
+                if content.startswith("json"):
+                    content = content[4:].lstrip()
+            return json.loads(content) if content else None
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            # Retry only transient upstream failures; do not retry 4xx client errors.
+            if exc.code == 429 or exc.code >= 500:
+                if attempt < max_attempts:
+                    time.sleep(0.4 * attempt)
+                    continue
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+            last_error = exc
+            if attempt < max_attempts:
+                time.sleep(0.4 * attempt)
+                continue
+            raise
+    if last_error:
+        raise last_error
+    return None
 
 
 async def call_ai(messages: list[dict]) -> dict | None:
