@@ -10,7 +10,8 @@
     "try-site": "node tools/try-site.mjs",
     "dev:worker": "wrangler dev",
     "deploy:worker": "wrangler deploy",
-    "secret:gemini": "wrangler secret put GEMINI_API_KEY"
+    "secret:gemini": "wrangler secret put GEMINI_API_KEY",
+    "lock-deck": "node tools/lock-deck.mjs"
   },
   "devDependencies": {
     "wrangler": "^3.90.0"

@@ -113,3 +113,13 @@ You need a Cloudflare account, this repository on GitHub, and a **free-tier** Ge
 - Cloudflare's free plan limits how much computing one request may use. Very large pages could occasionally fail; pasting the text always works.
 - AI explanations can be wrong. That's why every point shows the exact quote to check.
 - This is a student project, not legal advice.
+
+## Password-protected presentation (`/slides`)
+
+The presentation lives at `https://<project-name>.pages.dev/slides`, behind a password.
+
+- The slides are **encrypted with the password** (AES-256-GCM, key from PBKDF2 with 310,000 rounds) into `data/locked-deck.json`. That file is public on GitHub, but it's unreadable without the password. The password is never saved anywhere.
+- The readable slide pictures and notes are kept **outside** this repository, in `../deck-source/` (slide01.png … and notes.json).
+- To set or change the password, run `npm run lock-deck`, type the password twice, then commit and push `data/locked-deck.json`.
+- To update the slides after editing the .pptx: export each slide as a 1920×1080 PNG into `../deck-source/` (PowerPoint: File › Export › PNG), then run `npm run lock-deck` again.
+- Use a password of 10+ characters. Because the locked file is public, a short password could be guessed.

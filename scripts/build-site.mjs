@@ -14,6 +14,8 @@ const PUBLIC_FILES = [
   'presentation.html',
   'teen.html',
   'teen.js',
+  'slides.html',
+  'slides.js',
   'clauseguard-config.js',
   'clauseguard-api.js',
   'clauseguard-static.js',
