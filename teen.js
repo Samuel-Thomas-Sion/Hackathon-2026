@@ -267,7 +267,8 @@
   }
 
   // ------------------------------------------------ live counter
-  // "N terms checked so far": read from /api/stats, refreshed every 45 seconds.
+  // "We've spilled the tea on the fine print of N apps & sites": different apps/sites
+  // checked, read from /api/stats, refreshed every 45 seconds.
   let shownCount = null;
 
   function showCount(target) {
@@ -289,7 +290,7 @@
     try {
       const res = await fetch(`${API_BASE}/api/stats`, { cache: 'no-store' });
       const data = await res.json();
-      showCount(Number(data.terms_checked));
+      showCount(Number(data.sites_checked));
     } catch {
       /* the counter is optional */
     }

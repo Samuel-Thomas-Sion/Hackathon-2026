@@ -261,13 +261,16 @@ test('Ask AI helper answers only from ClauseGuard facts, 10 a day', async () => 
 test('live counter: every finished check is counted, including saved results', async () => {
   geminiReply = { verdict: 'amber', points: [], tips: [] };
   const env = { GEMINI_API_KEY: 'test-key', CG_KV: fakeKV() };
-  const count = async () => (await (await handleApi(new Request(`${SITE}/api/stats`), env, assets)).json()).terms_checked;
+  const stats = async () => (await handleApi(new Request(`${SITE}/api/stats`), env, assets)).json();
+  const count = async () => (await stats()).terms_checked;
   assert.equal(await count(), 0);
   await handleApi(post('/api/teen-check', { text: LEGAL_TEXT }), env, assets);
   await handleApi(post('/api/teen-check', { site: 'instagram' }), env, assets);
   await handleApi(post('/api/teen-check', { site: 'instagram' }), env, assets); // from the 7-day cache
   await handleApi(post('/api/teen-check', { site: 'unknown-example-site.com' }), env, assets); // couldn't read: not counted
   assert.equal(await count(), 3);
+  // different apps/sites: instagram once, however often it is checked; pasted text isn't a site
+  assert.equal((await stats()).sites_checked, 1);
 });
 
 test('teen chat needs a checked document first', async () => {

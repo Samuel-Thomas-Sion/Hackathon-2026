@@ -10,7 +10,7 @@ import { checkAndCountAiCall, rateLimitEnabled, turnstileEnabled, verifyTurnstil
 import { fetchSiteTerms, combinePages, normalizeSiteInput } from './terms.js';
 import { TEEN_RULES, TEEN_TOPICS, INDIA_UNDER_18_NOTE } from './teen-rules.js';
 import { SITE_HELPER_PROMPT } from './project-info.js';
-import { countCheck, readChecks } from './stats.js';
+import { countCheck, readStats } from './stats.js';
 
 const CACHE_DAYS = 7;
 const MAX_DOC_FOR_AI = 60000;
@@ -35,7 +35,7 @@ export async function handleApi(request, env, assets) {
     }
 
     if (path === '/api/stats' && request.method === 'GET') {
-      return json({ terms_checked: await readChecks(env) });
+      return json(await readStats(env));
     }
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204 });
@@ -94,7 +94,7 @@ async function teenCheck(request, env, assets) {
     if (env.CG_KV) {
       const cached = await env.CG_KV.get(cacheKey, 'json').catch(() => null);
       if (cached) {
-        await countCheck(env);
+        await countCheck(env, host);
         return json({ ...cached, from_cache: true });
       }
     }
@@ -158,7 +158,7 @@ async function teenCheck(request, env, assets) {
   if (cacheKey && env.CG_KV) {
     await env.CG_KV.put(cacheKey, JSON.stringify(payload), { expirationTtl: CACHE_DAYS * 86400 }).catch(() => {});
   }
-  await countCheck(env);
+  await countCheck(env, host);
   return json(payload);
 }
 

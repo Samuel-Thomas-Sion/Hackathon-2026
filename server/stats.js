@@ -1,24 +1,40 @@
-// Public counter: how many terms & agreements people have checked with ClauseGuard.
-// Stored in the same free KV namespace (CG_KV) as the daily limits.
-// Only a number is stored - nothing about who checked what.
+// Public counters, stored in the same free KV namespace (CG_KV) as the daily limits.
+// Only numbers and site names (like "instagram.com") are stored - nothing about who
+// checked what.
+//  - sites_checked: how many DIFFERENT apps/sites have been checked (shown on the site:
+//    "we've spilled the tea on the fine print of N apps & sites")
+//  - terms_checked: every finished check, including repeats and pasted terms
 
-const KEY = 'stats:terms_checked';
+const TOTAL_KEY = 'stats:terms_checked';
+const SITES_KEY = 'stats:sites_checked';
 
-export async function countCheck(env) {
+async function bump(env, key) {
+  const now = Number((await env.CG_KV.get(key)) || 0);
+  await env.CG_KV.put(key, String(now + 1));
+}
+
+export async function countCheck(env, host = null) {
   if (!env.CG_KV) return;
   try {
-    const now = Number((await env.CG_KV.get(KEY)) || 0);
-    await env.CG_KV.put(KEY, String(now + 1));
+    await bump(env, TOTAL_KEY);
+    if (host) {
+      const seenKey = `stats:seen:${host}`;
+      if (!(await env.CG_KV.get(seenKey))) {
+        await env.CG_KV.put(seenKey, '1');
+        await bump(env, SITES_KEY);
+      }
+    }
   } catch {
     /* the counter is a nice-to-have; never break a check because of it */
   }
 }
 
-export async function readChecks(env) {
-  if (!env.CG_KV) return 0;
+export async function readStats(env) {
+  if (!env.CG_KV) return { terms_checked: 0, sites_checked: 0 };
   try {
-    return Number((await env.CG_KV.get(KEY)) || 0);
+    const [total, sites] = await Promise.all([env.CG_KV.get(TOTAL_KEY), env.CG_KV.get(SITES_KEY)]);
+    return { terms_checked: Number(total || 0), sites_checked: Number(sites || 0) };
   } catch {
-    return 0;
+    return { terms_checked: 0, sites_checked: 0 };
   }
 }
