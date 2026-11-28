@@ -266,6 +266,42 @@
     tipTarget = null;
   }
 
+  // ------------------------------------------------ live counter
+  // "N terms checked so far": read from /api/stats, refreshed every 45 seconds.
+  let shownCount = null;
+
+  function showCount(target) {
+    const box = document.getElementById('checked-counter');
+    if (!box || !Number.isFinite(target)) return;
+    const from = shownCount === null ? Math.max(0, target - 25) : shownCount;
+    shownCount = target;
+    const start = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - start) / 900);
+      box.textContent = Math.round(from + (target - from) * k).toLocaleString('en-IN');
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  async function refreshCount() {
+    if (!document.getElementById('checked-counter') || document.hidden) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/stats`, { cache: 'no-store' });
+      const data = await res.json();
+      showCount(Number(data.terms_checked));
+    } catch {
+      /* the counter is optional */
+    }
+  }
+
+  function startCounter() {
+    if (!document.getElementById('checked-counter')) return;
+    refreshCount();
+    setInterval(refreshCount, 45000);
+    document.addEventListener('visibilitychange', refreshCount);
+  }
+
   // ------------------------------------------------ API
   async function post(path, body) {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -300,6 +336,7 @@
       setStatus(data.from_cache ? 'Showing a result checked recently.' : '');
       await glossaryReady;
       renderResult(data);
+      refreshCount();
     } catch (error) {
       setStatus('Could not reach ClauseGuard. Check your internet connection and try again.', true);
     } finally {
@@ -544,6 +581,7 @@
   }
 
   function start() {
+    startCounter();
     loadGlossary();
     setupTermTips();
     loadTurnstile();

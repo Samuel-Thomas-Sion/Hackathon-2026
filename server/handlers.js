@@ -1,5 +1,6 @@
 // ClauseGuard web API. Routes:
 //   GET  /api/health      - is everything set up? (never reveals the key)
+//   GET  /api/stats       - live counter: how many terms have been checked
 //   POST /api/teen-check  - NEW: "Is this site OK for teens?"
 //   POST /api/chat        - questions about a document (teen mode + original LegalAID mode)
 //   POST /api/audit       - the original contract audit used by indexOP.html / scanner.html
@@ -9,6 +10,7 @@ import { checkAndCountAiCall, rateLimitEnabled, turnstileEnabled, verifyTurnstil
 import { fetchSiteTerms, combinePages, normalizeSiteInput } from './terms.js';
 import { TEEN_RULES, TEEN_TOPICS, INDIA_UNDER_18_NOTE } from './teen-rules.js';
 import { SITE_HELPER_PROMPT } from './project-info.js';
+import { countCheck, readChecks } from './stats.js';
 
 const CACHE_DAYS = 7;
 const MAX_DOC_FOR_AI = 60000;
@@ -30,6 +32,10 @@ export async function handleApi(request, env, assets) {
         daily_limits: rateLimitEnabled(env) ? 'on' : 'OFF - connect the CG_KV namespace',
         human_check: turnstileEnabled(env) ? 'on' : 'off',
       });
+    }
+
+    if (path === '/api/stats' && request.method === 'GET') {
+      return json({ terms_checked: await readChecks(env) });
     }
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204 });
@@ -87,7 +93,10 @@ async function teenCheck(request, env, assets) {
     cacheKey = `tc:v2:${host}:${lang}`; // v2 = teen-style answers
     if (env.CG_KV) {
       const cached = await env.CG_KV.get(cacheKey, 'json').catch(() => null);
-      if (cached) return json({ ...cached, from_cache: true });
+      if (cached) {
+        await countCheck(env);
+        return json({ ...cached, from_cache: true });
+      }
     }
   } else if (pasted.length < 300) {
     throw new ApiError(400, 'Please paste more of the terms (at least a few paragraphs).');
@@ -149,6 +158,7 @@ async function teenCheck(request, env, assets) {
   if (cacheKey && env.CG_KV) {
     await env.CG_KV.put(cacheKey, JSON.stringify(payload), { expirationTtl: CACHE_DAYS * 86400 }).catch(() => {});
   }
+  await countCheck(env);
   return json(payload);
 }
 
@@ -340,6 +350,7 @@ ${text.slice(0, 50000)}`;
     ? result.clauses.filter((item) => quoteIsInDocument(item?.quote, normalizedDoc)).slice(0, 20)
     : [];
 
+  await countCheck(env);
   return json({
     score: Math.max(0, Math.min(100, Number(result.score) || 0)),
     risk_label: cleanString(String(result.risk_label || 'AUDITED'), 40),
